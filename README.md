@@ -1,8 +1,8 @@
-# React + Vite
+# Home service Platform
+## Spring2025SWD392_NET1709_TeamRocket_FE
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+#### Link google drive nhóm: 
+[Google Drive](https://drive.google.com/drive/folders/1cVSpVK9Sg2tDHvwjEIc0mBnj41Wt9Rjw)
+#### Link Backend:
+[Backend](https://github.com/canxi4589/Spring2025SWD392_NET1709_TeamRocket_BE)
