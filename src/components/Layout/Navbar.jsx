@@ -6,7 +6,7 @@ import { login, logout } from '@/redux/features/authSlice'
 
 function Navbar() {
     const dispatch = useDispatch()
-    const handleLogin = ()=> {
+    const handleLogin = () => {
         dispatch(login({
             user: {
                 name: 'Long',
@@ -19,11 +19,14 @@ function Navbar() {
         }))
     }
   return (
-    <div>
+    <div className='p-3 flex items-center justify-between'>
+        <div className='w-40'>
+            <img src='/public/logo.png' className='object-contain w-full'/>
+        </div>
+        <div>
+            
+        </div>
         <ThemeToggle/>
-        navbar
-        <Button onClick={handleLogin}>Login</Button>
-        <Button onClick={()=> dispatch(logout())}>Logout</Button>
     </div>
   )
 }
