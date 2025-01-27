@@ -4,6 +4,7 @@ import { SidebarProvider, SidebarTrigger } from "../ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import Footer from "./Footer";
 import { Button } from "../ui/button";
+import Logo from "../Logo";
 
 const MainLayout = () => {
   return (
@@ -14,11 +15,9 @@ const MainLayout = () => {
       <SidebarProvider>
         <AppSidebar />
         <main className="w-full">
-          <div className="flex items-center gap-8 p-3 justify-between">
+          <div className="flex items-center gap-8 p-3 justify-between md:hidden">
             <SidebarTrigger />
-            <div className="w-40">
-              <img src="/public/logo.png" className="w-full block md:hidden" />
-            </div>
+            <Logo className='block md:hidden'/>
             <div className="block md:hidden">
               <Button>Login</Button>
             </div>
