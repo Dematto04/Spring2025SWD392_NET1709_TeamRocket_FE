@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import routes from "./routes";
 import { Suspense } from "react";
+import NotFound from "@/components/NotFound/NotFound";
 
 const AppRoutes = () => {
   return (
@@ -26,6 +27,7 @@ const AppRoutes = () => {
           </Route>
         );
       })}
+      <Route path="*" element={<NotFound/>}/>
     </Routes>
   );
 };
