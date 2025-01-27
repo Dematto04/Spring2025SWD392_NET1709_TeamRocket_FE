@@ -41,7 +41,7 @@ export default function Navbar() {
     dispatch(logout());
   };
   return (
-    <NavigationMenu className="px-3 h-20 flex items-center justify-between">
+    <NavigationMenu className="px-3 h-20 flex items-center justify-between fixed bg-primary-foreground rounded-br-2xl rounded-bl-rounded-br-2xl shadow-sm">
       <NavigationMenuList>
         <NavigationMenuItem className="mr-6">
           <Logo />

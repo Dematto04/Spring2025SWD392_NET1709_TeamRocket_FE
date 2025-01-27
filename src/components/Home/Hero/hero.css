@@ -1,0 +1,31 @@
+.banner-1{
+    animation: bn1 2s infinite alternate
+}
+.banner-2{
+    animation: bn1 2s infinite alternate
+}
+.banner-3{
+    animation: bn1 2s infinite alternate
+}
+.banner-4{
+    animation: bn2 2s linear infinite alternate
+}
+@keyframes bn1 {
+    from {
+        transform: translateY(0);
+    }
+    to {
+        transform: translateY(-10px)
+    }
+    
+}
+@keyframes bn2 {
+    from {
+        transform: translate(-100%, 0);
+    }
+    to {
+        transform: translate(-50%, 10px)
+    }
+    
+}
+

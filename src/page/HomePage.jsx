@@ -1,17 +1,6 @@
-import Hero from "@/components/Home/Hero";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import Hero from "@/components/Home/Hero/Hero";
+import HomeFeature from "@/components/Home/HomeFeature/HomeFeature";
 import React from "react";
-
 function HomePage() {
   const hehe = () => {
     console.log('hehe');
@@ -20,6 +9,7 @@ function HomePage() {
   return (
     <>
       <Hero />
+      <HomeFeature/>
     </>
   );
 }
