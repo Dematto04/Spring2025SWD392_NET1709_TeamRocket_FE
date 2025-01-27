@@ -44,7 +44,7 @@ export default function Navbar() {
     <NavigationMenu className="px-3 h-20 flex items-center justify-between">
       <NavigationMenuList>
         <NavigationMenuItem className="mr-6">
-          <Logo/>
+          <Logo />
         </NavigationMenuItem>
         <NavigationMenuItem>
           <Link to="/">
@@ -159,7 +159,7 @@ export default function Navbar() {
       </NavigationMenuList>
       <NavigationMenuList>
         <NavigationMenuItem>
-          <NavigationMenuLink>
+          <NavigationMenuLink className="flex gap-3">
             {isAuth ? (
               <NavbarUser onSignOut={handleLogout} />
             ) : (
@@ -168,12 +168,12 @@ export default function Navbar() {
                   <CircleUserRound className="mr-2" /> Register
                 </Button>
                 <Button onClick={handleLogin}>
-                  <CircleUserRound className="mr-2" /> 
+                  <CircleUserRound className="mr-2" />
                   Login
                 </Button>
-                <ThemeToggle/>
               </div>
             )}
+            <ThemeToggle />
           </NavigationMenuLink>
         </NavigationMenuItem>
       </NavigationMenuList>
