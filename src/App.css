@@ -6,7 +6,7 @@
 }
 /* width */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 2px;
 }
 
 /* Track */
@@ -22,4 +22,16 @@
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+/* .container {
+  padding: 6rem 0.75rem;
+  margin: 0 4rem;
+} */
+
+@media screen and (max-width: 768px) {
+  .container {
+    padding: 2rem 12px;
+    margin: 0;
+  }
 }

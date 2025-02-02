@@ -1,15 +1,15 @@
 import Hero from "@/components/Home/Hero/Hero";
 import HomeFeature from "@/components/Home/HomeFeature/HomeFeature";
+import { HomeFeedback } from "@/components/HomeFeedback/HomeFeedback";
+import HowItWork from "@/components/HowItWork/HowItWork";
 import React from "react";
 function HomePage() {
-  const hehe = () => {
-    console.log('hehe');
-    
-  }
   return (
     <>
       <Hero />
       <HomeFeature/>
+      <HomeFeedback/>
+      <HowItWork/>
     </>
   );
 }

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import "./homefeature.css";
 const ServiceCard = () => {
   return (
-    <Link className="service-feat group relative w-full h-44 bg-primary-foreground p-6 flex justify-center items-center flex-col rounded-2xl overflow-hidden">
+    <Link className="service-feat group relative w-full h-44 bg-card p-6 flex justify-center items-center flex-col rounded-2xl overflow-hidden">
       <div className="relative z-[2] rounded-full bg-accent w-24 h-24 flex justify-center items-center">
         <img
           src="/home-cleaning-icon.svg"
@@ -23,36 +23,36 @@ const ServiceCard = () => {
 };
 function HomeFeature() {
   return (
-    <div className="bg-secondary">
-      <div className="lg:mx-16 px-3 min-h-svh lg:pt-24">
+    <div className="home-feature bg-secondary">
+      <div className="px-3 py-8 lg:px-16 lg:py-20">
         <h1 className="text-3xl lg:text-5xl font-semibold">
           Available Services
         </h1>
         <p className="text-xl mt-4 text-gray-500">We only provide pleasure.</p>
 
-        <div className="grid lg:grid-cols-4 gap-8 mt-20">
-          <div className="col-span-1">
+        <div className="grid grid-cols-12 gap-8 mt-20">
+          <div className="col-span-12 sm:col-span-6 lg:col-span-3">
             <ServiceCard />
           </div>
-          <div className="col-span-1">
+          <div className="col-span-12 sm:col-span-6 lg:col-span-3">
             <ServiceCard />
           </div>
-          <div className="col-span-1">
+          <div className="col-span-12 sm:col-span-6 lg:col-span-3">
             <ServiceCard />
           </div>
-          <div className="col-span-1">
+          <div className="col-span-12 sm:col-span-6 lg:col-span-3">
             <ServiceCard />
           </div>
-          <div className="col-span-1">
+          <div className="col-span-12 sm:col-span-6 lg:col-span-3">
             <ServiceCard />
           </div>
-          <div className="col-span-1">
+          <div className="col-span-12 sm:col-span-6 lg:col-span-3">
             <ServiceCard />
           </div>
-          <div className="col-span-1">
+          <div className="col-span-12 sm:col-span-6 lg:col-span-3">
             <ServiceCard />
           </div>
-          <div className="col-span-1">
+          <div className="col-span-12 sm:col-span-6 lg:col-span-3">
             <ServiceCard />
           </div>
         </div>
