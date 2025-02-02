@@ -1,5 +1,6 @@
 import { Sparkles } from "lucide-react";
 import "./hero.css";
+import Paragraph from "@/components/Typo/Paragraph";
 function Hero() {
   return (
     <div className="relative bg-background min-h-[calc(100vh-5rem)] flex lg:flex justify-between items-center lg:mt-20">
@@ -14,12 +15,12 @@ function Hero() {
         <h1 className="text-3xl lg:text-5xl font-bold">
           at <span className="text-primary">Your Fingertips</span>
         </h1>
-        <p className="lg:text-xl mt-3 text-gray-500">
+        <Paragraph className="lg:text-xl mt-3 text-gray-500">
           Book a professional cleaner in just a few taps.
-        </p>
-        <p className="lg:text-xl text-gray-500">
+        </Paragraph>
+        <Paragraph className="lg:text-xl text-gray-500">
           Sit back and relax while we take care of your home.
-        </p>
+        </Paragraph>
       </div>
       <div className="hidden md:pl-14 md:grid grid-cols-3 lg:px-3 lg:mx-16 lg:mb-36">
         <div className="md:w-24 md:h-24 lg:w-40 lg:h-40 col-span-1 self-center">

@@ -61,6 +61,9 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
       },
+      header: {
+          h1: "3rem"
+      }
     },
   },
   plugins: [require("tailwindcss-animate")],
