@@ -3,7 +3,7 @@ import "./hero.css";
 import Paragraph from "@/components/Typo/Paragraph";
 function Hero() {
   return (
-    <div className="relative bg-background min-h-[calc(100vh-5rem)] flex lg:flex justify-between items-center lg:mt-20">
+    <div className="relative bg-background min-h-[calc(100vh-5rem)] flex lg:flex justify-between items-center md:mt-20">
       <div className="absolute top-0 left-0 bg-[url(/bg-banner.png)] h-1/3 w-[101px] bg-contain bg-no-repeat"></div>
       <div className="absolute bottom-0 left-0 bg-[url(/bg-banner.png)] h-1/3 w-[101px] bg-contain bg-no-repeat"></div>
       <div className="md:flex-shrink-0 lg:flex-shrink lg:text-start md:p-3 px-3 lg:mx-16 lg:mb-24">

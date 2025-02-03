@@ -15,7 +15,7 @@ const MainLayout = () => {
       <SidebarProvider>
         <AppSidebar />
         <main className="w-full">
-          <div className="flex items-center gap-8 p-3 justify-between md:hidden">
+          <div className="flex items-center gap-8 p-3 justify-between md:hidden fixed z-10 bg-background w-full">
             <SidebarTrigger />
             <Logo className='block md:hidden'/>
             <div className="block md:hidden">
@@ -23,7 +23,6 @@ const MainLayout = () => {
             </div>
           </div>
           <Outlet />
-          <footer>Main Footer</footer>
         </main>
       </SidebarProvider>
       <Footer/>

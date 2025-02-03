@@ -164,13 +164,17 @@ export default function Navbar() {
               <NavbarUser onSignOut={handleLogout} />
             ) : (
               <div className="flex gap-3">
-                <Button variant="outline" onClick={handleLogin}>
-                  <CircleUserRound className="mr-2" /> Register
-                </Button>
-                <Button onClick={handleLogin}>
-                  <CircleUserRound className="mr-2" />
-                  Login
-                </Button>
+                <Link to="/register">
+                  <Button variant="outline">
+                    <CircleUserRound className="mr-2" /> Register
+                  </Button>
+                </Link>
+                <Link to="/login">
+                  <Button>
+                    <CircleUserRound className="mr-2" />
+                    Login
+                  </Button>
+                </Link>
               </div>
             )}
             <ThemeToggle />
