@@ -1,41 +1,21 @@
-import Hero from "@/components/Home/Hero";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import BookNow from "@/components/Home/BookNow/BookNow";
+import FAQ from "@/components/Home/FAQ/FAQ";
+import Hero from "@/components/Home/Hero/Hero";
+import HomeFeature from "@/components/Home/HomeFeature/HomeFeature";
+import WhyChooseUs from "@/components/Home/WhyChooseUs/WhyChooseUs";
+import { HomeFeedback } from "@/components/HomeFeedback/HomeFeedback";
+import HowItWork from "@/components/HowItWork/HowItWork";
 import React from "react";
-
 function HomePage() {
-  const hehe = () => {
-    console.log('hehe');
-    
-  }
   return (
     <>
       <Hero />
-      <AlertDialog>
-        <AlertDialogTrigger>Open</AlertDialogTrigger>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete your
-              account and remove your data from our servers.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={hehe}>Continue</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <HomeFeature/>
+      <HomeFeedback/>
+      <HowItWork/>
+      <BookNow/>
+      <WhyChooseUs/>
+      <FAQ/>
     </>
   );
 }

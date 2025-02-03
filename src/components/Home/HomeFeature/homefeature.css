@@ -1,0 +1,41 @@
+.feature-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  left: -100%;
+  top: 0;
+  opacity: 0;
+  transition: 1s;
+  background-color: rgba(0, 0, 0, 0,2);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.service-img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+}
+.feature-overlay::after {
+    position: absolute;
+    content: "";
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0,2);
+    top: 0;
+    left: 0;
+}
+.service-feat {
+    z-index: 3;
+}
+.service-feat:hover .feature-overlay {
+    opacity: 1;
+    left: 0;
+}
+
+.home-feature {
+    background-image: url('/public/feature-bg-01.png'), url('/public/feature-bg-02.png');
+    background-position: left, right;
+    background-repeat: no-repeat;
+    /* clip-path: polygon(50% 0%, 100% 0, 100% 97%, 73% 100%, 28% 100%, 0 96%, 0 0); */
+}

@@ -1,0 +1,9 @@
+.booknow::after {
+  content: "";
+  position: absolute;
+  background: url('/offer-bg.png'), center, no-repeat;
+  top: 10px;
+  left: 10px;
+  width: 100%;
+  height: 100%;
+}
