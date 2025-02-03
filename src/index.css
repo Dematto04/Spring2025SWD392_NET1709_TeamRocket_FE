@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* primary : #2563eb */
 
 @layer base {
   :root {
