@@ -57,8 +57,8 @@ export default function Navbar() {
           <NavigationMenuTrigger>Services</NavigationMenuTrigger>
           {/* navbar items */}
           <NavigationMenuContent>
-            <ul className="grid gap-3 p-4 md:w-screen md:grid-cols-4">
-              <li className="">
+            <ul className="grid gap-3 p-4 md:w-screen md:grid-cols-8">
+              <li className="col-span-1">
                 <NavigationMenuLink asChild href="/service/home-cleaning">
                   <Link
                     className="group flex h-full w-full select-none flex-col justify-start rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
@@ -80,7 +80,7 @@ export default function Navbar() {
                   </Link>
                 </NavigationMenuLink>
               </li>
-              <li className="">
+              <li className="col-span-1">
                 <NavigationMenuLink asChild>
                   <Link
                     className="group flex h-full w-full select-none flex-col justify-start rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
@@ -102,7 +102,7 @@ export default function Navbar() {
                   </Link>
                 </NavigationMenuLink>
               </li>
-              <li className="">
+              <li className="col-span-1">
                 <NavigationMenuLink asChild>
                   <Link
                     className="group flex h-full w-full select-none flex-col justify-start rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
@@ -124,7 +124,95 @@ export default function Navbar() {
                   </Link>
                 </NavigationMenuLink>
               </li>
-              <li className="">
+              <li className="col-span-1">
+                <NavigationMenuLink asChild>
+                  <Link
+                    className="group flex h-full w-full select-none flex-col justify-start rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                    href="/"
+                  >
+                    <div className="overflow-hidden">
+                      <img
+                        loading="lazy"
+                        src="/public/home-cleaning.jpg"
+                        className="duration-200 group-hover:scale-110 h-full w-full object-contain"
+                      />
+                    </div>
+                    <div className="mb-2 mt-4 text-lg font-medium">
+                      Your Mom Cleaning
+                    </div>
+                    <p className="text-sm leading-tight text-muted-foreground">
+                      Fresh sofas, happy homes!
+                    </p>
+                  </Link>
+                </NavigationMenuLink>
+              </li>
+              <li className="col-span-1">
+                <NavigationMenuLink asChild>
+                  <Link
+                    className="group flex h-full w-full select-none flex-col justify-start rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                    href="/"
+                  >
+                    <div className="overflow-hidden">
+                      <img
+                        loading="lazy"
+                        src="/public/home-cleaning.jpg"
+                        className="duration-200 group-hover:scale-110 h-full w-full object-contain"
+                      />
+                    </div>
+                    <div className="mb-2 mt-4 text-lg font-medium">
+                      Your Mom Cleaning
+                    </div>
+                    <p className="text-sm leading-tight text-muted-foreground">
+                      Fresh sofas, happy homes!
+                    </p>
+                  </Link>
+                </NavigationMenuLink>
+              </li>
+              <li className="col-span-1">
+                <NavigationMenuLink asChild>
+                  <Link
+                    className="group flex h-full w-full select-none flex-col justify-start rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                    href="/"
+                  >
+                    <div className="overflow-hidden">
+                      <img
+                        loading="lazy"
+                        src="/public/home-cleaning.jpg"
+                        className="duration-200 group-hover:scale-110 h-full w-full object-contain"
+                      />
+                    </div>
+                    <div className="mb-2 mt-4 text-lg font-medium">
+                      Your Mom Cleaning
+                    </div>
+                    <p className="text-sm leading-tight text-muted-foreground">
+                      Fresh sofas, happy homes!
+                    </p>
+                  </Link>
+                </NavigationMenuLink>
+              </li>
+              <li className="col-span-1">
+                <NavigationMenuLink asChild>
+                  <Link
+                    className="group flex h-full w-full select-none flex-col justify-start rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                    href="/"
+                  >
+                    <div className="overflow-hidden">
+                      <img
+                        loading="lazy"
+                        src="/public/home-cleaning.jpg"
+                        className="duration-200 group-hover:scale-110 h-full w-full object-contain"
+                      />
+                    </div>
+                    <div className="mb-2 mt-4 text-lg font-medium">
+                      Your Mom Cleaning
+                    </div>
+                    <p className="text-sm leading-tight text-muted-foreground">
+                      Fresh sofas, happy homes!
+                    </p>
+                  </Link>
+                </NavigationMenuLink>
+              </li>
+              <li className="col-span-1">
                 <NavigationMenuLink asChild>
                   <Link
                     className="group flex h-full w-full select-none flex-col justify-start rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
