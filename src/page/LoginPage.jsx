@@ -5,7 +5,7 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default function LoginPage() {
   return (
-    <div className="grid max-h-svh lg:grid-cols-2">
+    <div className="grid max-h-svh lg:grid-cols-2 overflow-y-hidden">
       <div className="flex flex-col gap-4 p-6 md:p-10">
         <div className="gap-2 flex justify-between">
           <Link to="/" className="flex  items-center gap-2 font-medium">
