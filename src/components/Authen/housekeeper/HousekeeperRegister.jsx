@@ -6,67 +6,81 @@ import HousekeeperAccountForm from "./HousekeeperAccountForm";
 import { Link } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-import HousekeeperProfileForm from "./HousekeeperProfileForm";
+import schema from "./formSchema";
+import { useDispatch } from "react-redux";
+import { housekeeperRegister } from "@/redux/features/housekeeperRegisterSlice";
+import HousekeeperSelfForm from "./HousekeeperSelfForm";
 
-const formSchema = z
-  .object({
-    email: z.string().email({
-      message: "Invalid Email",
-    }),
-    password: z.string().min(6, "Password must at least 6 characters"),
-    confirmPassword: z.string().min(4),
-  })
-  .superRefine(({ confirmPassword, password }, ctx) => {
-    if (confirmPassword !== password) {
-      ctx.addIssue({
-        code: "custom",
-        message: "The passwords did not match",
-        path: ["confirmPassword"],
-      });
-    }
-  });
-function HousekeeperRegister() {
-  const form = useForm({
-    resolver: zodResolver(formSchema),
+const HousekeeperRegister = () => {
+  const dispatch = useDispatch();
+  const registerForm = useForm({
+    resolver: zodResolver(schema.register),
     defaultValues: {
       email: "",
       password: "",
       confirmPassword: "",
     },
   });
+  const selfForm = useForm({
+    resolver: zodResolver(schema.self),
+    defaultValues: {
+      fullName: "",
+      dob: "",
+      phone: "",
+      address: "",
+      services: [],
+      workingTime: "",
+      salary: ""
+    },
+  });
   const steps = [
     {
       label: "Account",
-      description: "Personal Info",
-      stepItem: <HousekeeperAccountForm form={form} />,
+      description: "Register Account",
+      stepItem: <HousekeeperAccountForm form={registerForm} />,
     },
     {
       label: "Profile",
       description: "Account Setup",
-      stepItem: <HousekeeperProfileForm />,
+      stepItem: <HousekeeperSelfForm form={selfForm} />,
     },
     { label: "CV", description: "Experience" },
     { label: "Complete", description: "Final Step" },
   ];
-  //Handle Register
-  const handleSubmit = async () => {
-    const isValid = await form.trigger();
-    if(isValid){
-        //call api register, xài form.getValues
+  const handleNextStep = [
+    //Handle Register
+    async () => {
+      const isValid = await registerForm.trigger();
+      if (isValid) {
+        dispatch(
+          housekeeperRegister({
+            email: registerForm.getValues("email"),
+            password: registerForm.getValues("password"),
+          })
+        );
+        console.log('step 1');
         
-       
-    }
-    if (!isValid) return false; 
-    return true;
-  };
+      }
+      if (!isValid) return false;
+      return true;
+    },
+    //Handle Self
+    async () => {
+      const isValid = await selfForm.trigger();
+      if (isValid) {
+        console.log('step 2');
+        console.log(selfForm.getValues());
+        
+
+      }
+      if (!isValid) return false;
+      return true;
+    },
+  ];
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-start p-4">
-      <StepperExample
-        steps={steps}
-        handleNextStep={handleSubmit}
-        form={form}
-      >
+      <StepperExample steps={steps} handleNextStep={handleNextStep}>
         <StepperHeader>
           <div className="flex justify-center items-center gap-8">
             <Link to="/">
