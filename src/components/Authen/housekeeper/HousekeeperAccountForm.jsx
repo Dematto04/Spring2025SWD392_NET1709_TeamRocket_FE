@@ -17,7 +17,7 @@ const HousekeeperAccountForm = ({form}) => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(handleRegister)}
-        className="flex flex-col gap-6"
+        className="flex flex-col gap-6 mt-8"
       >
         <div className="grid gap-6">
           {/* Email Field */}

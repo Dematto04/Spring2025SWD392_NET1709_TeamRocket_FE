@@ -5,7 +5,7 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default function LoginPage() {
   return (
-    <div className="grid max-h-svh lg:grid-cols-2 overflow-y-hidden">
+    <div className="grid max-h-svh h-full lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
         <div className="gap-2 flex justify-between">
           <Link to="/" className="flex  items-center gap-2 font-medium">
@@ -19,7 +19,7 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-      <div className="hidden lg:block h-screen">
+      <div className="hidden lg:block h-full">
         <img
           src="/login.webp"
           alt="Image"

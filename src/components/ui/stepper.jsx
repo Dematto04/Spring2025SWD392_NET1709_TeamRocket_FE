@@ -6,8 +6,7 @@ export function StepperHeader({ children }) {
   return <>{children}</>;
 }
 export function StepperFooter({ children }) {
-  return <>
-  {children}</>;
+  return <>{children}</>;
 }
 export function StepperExample({
   steps,
@@ -15,20 +14,24 @@ export function StepperExample({
   handlePreviousStep,
   className,
   children,
-  form
 }) {
   const [currentStep, setCurrentStep] = useState(0);
-  //Chạy handleNext để sang step mới, handleNextStep để register 
+  //Chạy handleNext để sang step mới, handleNextStep để register
   const handleNext = async () => {
     try {
       if (handleNextStep) {
-        const result = await handleNextStep();
-        if (result) {
-          setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
-        }
+        handleNextStep.forEach(async (fn, idx) => {
+          if (currentStep === idx) {
+            const result = await fn();
+            if (result) {
+              setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
+            }
+          }
+        });
       }
     } catch (error) {
-      console.error("Validation failed, staying on current step.");
+      // console.error("Validation failed, staying on current step.");
+      console.log(error);
     }
   };
 
