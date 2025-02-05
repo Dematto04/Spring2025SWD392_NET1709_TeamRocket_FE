@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import { SidebarProvider, SidebarTrigger } from "../ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
@@ -18,9 +18,9 @@ const MainLayout = () => {
           <div className="flex items-center gap-8 p-3 justify-between md:hidden fixed z-10 bg-background w-full">
             <SidebarTrigger />
             <Logo className='block md:hidden'/>
-            <div className="block md:hidden">
+            <Link to="/login" className="block md:hidden">
               <Button>Login</Button>
-            </div>
+            </Link>
           </div>
           <Outlet />
         </main>

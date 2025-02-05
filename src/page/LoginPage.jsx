@@ -19,7 +19,7 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-      <div className="hidden lg:block h-full">
+      <div className="hidden lg:block min-h-screen h-full">
         <img
           src="/login.webp"
           alt="Image"
