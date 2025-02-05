@@ -28,14 +28,14 @@ export default function HousekeeperRegisterComplete() {
           <InfoItem label="Expected Salary" value={formatCurrency(salary)} />
         </div>
         <div className="mt-6">
-          <p className="font-medium text-gray-700">Selected Services</p>
+          <p className="font-medium">Selected Services</p>
           <div className="flex flex-wrap gap-2 mt-2">
             {services?.length ? (
               services.map((service) => (
                 <Badge key={service}>{service}</Badge>
               ))
             ) : (
-              <p className="text-gray-500">No services selected</p>
+              <p className="">No services selected</p>
             )}
           </div>
         </div>
@@ -47,8 +47,8 @@ export default function HousekeeperRegisterComplete() {
 function InfoItem({ label, value }) {
   return (
     <div className="border-b pb-2">
-      <p className="font-medium text-gray-700">{label}</p>
-      <p className="text-gray-600">{value || "Not provided"}</p>
+      <p className="font-medium">{label}</p>
+      <p className="">{value || "Not provided"}</p>
     </div>
   );
 }
