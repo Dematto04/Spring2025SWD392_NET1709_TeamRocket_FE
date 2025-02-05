@@ -84,10 +84,9 @@ export function StepperExample({
         </Button>
         <Button
           onClick={handleNext}
-          disabled={currentStep === steps.length - 1}
           className="w-full sm:w-auto"
         >
-          {currentStep === steps.length - 1 ? "Finish" : "Next"}
+          {currentStep === steps.length - 1 ? "Back to Home" : "Next"}
         </Button>
       </div>
       {/* Footer */}
