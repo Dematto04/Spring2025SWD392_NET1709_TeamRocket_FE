@@ -21,9 +21,9 @@ import { login } from "@/redux/features/authSlice";
 
 const HousekeeperRegister = () => {
   const profile = useSelector(selectRegisterProfile);
-  const [idFront, setIdFront] = useState(profile.cv?.idFront || null);
-  const [idBack, setIdBack] = useState(profile.cv?.idBack || null);
-  const [cv, setCv] = useState(profile.cv?.cv || null);
+  const [idFront, setIdFront] = useState(profile?.cv?.idFront || null);
+  const [idBack, setIdBack] = useState(profile?.cv?.idBack || null);
+  const [cv, setCv] = useState(profile?.cv?.cv || null);
   const dispatch = useDispatch();
   const nav = useNavigate();
 
@@ -39,13 +39,13 @@ const HousekeeperRegister = () => {
   const selfForm = useForm({
     resolver: zodResolver(schema.self),
     defaultValues: {
-      fullName: profile.fullName || "",
-      dob: profile.dob || "",
-      phone: profile.phone || "",
-      address: profile.address || "",
-      services: profile.services || [],
-      workingTime: profile.workingTime || "",
-      salary: profile.salary || "",
+      fullName: profile?.fullName || "",
+      dob: profile?.dob || "",
+      phone: profile?.phone || "",
+      address: profile?.address || "",
+      services: profile?.services || [],
+      workingTime: profile?.workingTime || "",
+      salary: profile?.salary || "",
     },
   });
   const steps = [
@@ -129,7 +129,7 @@ const HousekeeperRegister = () => {
     // review complete
     async () => {
       dispatch(login({ email: "long" }));
-      nav("/", {replace: true});
+      nav("/", { replace: true });
       return true;
     },
   ];
