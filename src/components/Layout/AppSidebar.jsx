@@ -28,7 +28,7 @@ import { selectUser } from "@/redux/features/authSlice";
 import Logo from "../Logo";
 import { useTheme } from "../theme-provider";
 export function AppSidebar() {
-  const {theme} = useTheme()
+  const { theme } = useTheme();
   const { isMobile, toggleSidebar } = useSidebar();
   const user = useSelector(selectUser);
   return (
@@ -38,7 +38,7 @@ export function AppSidebar() {
           <Sidebar side="left">
             <SidebarHeader>
               <div className="flex justify-between items-center">
-                <Logo className={theme === 'dark' && 'mix-blend-lighten'}/>
+                <Logo className={theme === "dark" && "mix-blend-lighten"} />
                 <div>
                   <ThemeToggle />
                   <Button
@@ -109,8 +109,12 @@ export function AppSidebar() {
                 <SidebarUser />
               ) : (
                 <>
-                  <Button>Login</Button>
-                  <Button variant="outline">Register</Button>
+                  <Link className="block w-full" to="/login">
+                    <Button className="w-full">Login</Button>
+                  </Link>
+                  <Link className="block w-full" to="/register">
+                    <Button className="w-full" variant="outline">Register</Button>
+                  </Link>
                 </>
               )}
             </SidebarFooter>

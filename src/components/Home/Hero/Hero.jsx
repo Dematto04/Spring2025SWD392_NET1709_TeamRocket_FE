@@ -25,21 +25,21 @@ function Hero() {
       <div className="hidden md:pl-14 md:grid grid-cols-3 lg:px-3 lg:mx-16 lg:mb-36">
         <div className="md:w-24 md:h-24 lg:w-40 lg:h-40 col-span-1 self-center">
           <img
-            src="hero-1.jpg"
+            src="hero-1.webp"
             className="banner-1 rounded-full w-full h-full object-cover shadow-slate-600 shadow-2xl"
             alt=""
           />
         </div>
         <div className="md:w-40 md:h-40 lg:w-64 lg:h-64 -ml-4 col-span-2 ">
           <img
-            src="hero-2.jpg"
+            src="hero-2.webp"
             className="banner-2 rounded-full w-full h-full object-cover shadow-slate-600 shadow-2xl"
             alt=""
           />
         </div>
         <div className="banner-3 relative md:w-36 md:h-36 lg:w-56 lg:h-56 -ml-10 -mt-8 col-span-2">
           <img
-            src="hero-3.jpg"
+            src="hero-3.webp"
             className="rounded-full w-full h-full object-cover shadow-slate-600 shadow-2xl"
             alt=""
           />
@@ -47,7 +47,7 @@ function Hero() {
         </div>
         <div className="lg:w-32 lg:h-32 md:w-24 md:h-24 col-span-1">
           <img
-            src="hero-4.jpg"
+            src="hero-4.webp"
             className="banner-4 rounded-full w-full h-full object-cover shadow-slate-600 shadow-2xl"
             alt=""
           />

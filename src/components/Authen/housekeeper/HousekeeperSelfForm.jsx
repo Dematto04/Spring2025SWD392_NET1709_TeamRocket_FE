@@ -52,10 +52,12 @@ const services = [
   },
 ];
 export default function HousekeeperSelfForm({ form }) {
+  
+
   return (
     <Form
       {...form}
-      className="max-w-xl mx-auto space-y-6 p-6 border rounded-lg shadow-md bg-white"
+      className="max-w-xl mx-auto space-y-6 p-6 border rounded-lg shadow-md"
     >
       <form className="mt-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

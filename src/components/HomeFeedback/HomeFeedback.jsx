@@ -57,7 +57,7 @@ export function HomeFeedback() {
                 <Card className="relative ">
                   <CardHeader className=" justify-center items-center">
                     <Avatar className="size-28">
-                      <AvatarImage src={`/client-${index + 1}.jpg`} />
+                      <AvatarImage src={`/client-${index + 1}.webp`} />
                     </Avatar>
                   </CardHeader>
                   <CardContent className="flex items-start justify-center p-6 h-fit">

@@ -15,7 +15,7 @@ const ServiceCard = () => {
         Home Cleaning
       </h1>
       <div class="feature-overlay">
-        <img className="service-img" src="/home-cleaning-feat.jpg" />
+        <img className="service-img" src="/home-cleaning-feat.webp" />
       </div>
       <div className="absolute rounded-2xl bg-[rgba(0,0,0,0.2)] group-hover:block hidden z-[1] w-full h-full duration-300"></div>
     </Link>

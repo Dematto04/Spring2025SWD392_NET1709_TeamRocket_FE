@@ -10,7 +10,7 @@ function BookNow() {
     <section className="booknow relative bg-primary min-h-[384px] flex justify-center items-center px-3 py-3 md:py-0">
       <div className="relative flex justify-start h-full w-full xl:w-2/3 z-[1]">
         <div className="hidden md:block flex-shrink-0 h-full self-end">
-          <img src="/offer-image.png" alt="offer" className="" />
+          <img src="/offer-image.webp" alt="offer" className="" />
         </div>
         <div className="self-center">
           <Header1 className="text-primary-foreground">
