@@ -79,7 +79,7 @@ const HousekeeperRegister = () => {
       stepItem: <HousekeeperRegisterComplete />,
     },
     {
-      label: "Successfully",
+      label: "Success",
       description: "Welcome",
       stepItem: <HousekeeperWelcome />,
     },
@@ -135,7 +135,7 @@ const HousekeeperRegister = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start p-4">
+    <div className="min-h-screen  flex flex-col items-center justify-start py-4 px-3">
       <StepperExample steps={steps} handleNextStep={handleNextStep}>
         <StepperHeader>
           <div className="flex justify-center items-center gap-8">
