@@ -59,7 +59,7 @@ export function StepperExample({
   );
   return (
     <div
-      className={`w-full max-w-xs sm:max-w-2xl md:max-w-4xl bg-card rounded-lg shadow-lg p-4 sm:p-6 md:p-8 transition duration-100 ${className}`}
+      className={`w-full md:max-w-4xl bg-card rounded-lg shadow-lg p-4 sm:p-6 md:p-8 transition duration-100 ${className}`}
     >
       {/* Header */}
       {childrenByType.header}
@@ -108,7 +108,7 @@ export const Step = ({ label, description, icon, stepNumber, status }) => {
   };
 
   return (
-    <div className="relative flex flex-col items-center group">
+    <div className="relative flex flex-col items-center group w-full">
       <div
         className={`w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full border-2 ${getStepClassName()} transition-colors duration-200`}
       >
@@ -144,7 +144,7 @@ export const Stepper = ({ steps, currentStep }) => {
   return (
     <nav
       aria-label="Progress"
-      className="w-full max-w-xs sm:max-w-2xl md:max-w-3xl mx-auto"
+      className="w-full md:max-w-3xl mx-auto"
     >
       <ol className="flex items-center">
         {steps.map((step, index) => (
@@ -161,7 +161,7 @@ export const Stepper = ({ steps, currentStep }) => {
                 </div>
               </li>
             )}
-            <li className={index > 0 ? "flex-1" : ""}>
+            <li className={"basis-[50px] sm:basis-[100px]"}>
               <Step
                 {...step}
                 stepNumber={index + 1}

@@ -31,8 +31,8 @@ const services = [
     label: "Laundry",
   },
   {
-    id: "Cooking (personal chef)",
-    label: "Cooking (personal chef)",
+    id: "Cooking",
+    label: "Cooking",
   },
   {
     id: "Babysitting",
@@ -52,8 +52,6 @@ const services = [
   },
 ];
 export default function HousekeeperSelfForm({ form }) {
-  
-
   return (
     <Form
       {...form}
@@ -138,25 +136,30 @@ export default function HousekeeperSelfForm({ form }) {
                         return (
                           <FormItem
                             key={item.id}
-                            className="flex flex-row items-start space-x-3 space-y-0"
+                            className="col-span-2 lg:col-span-1 flex flex-wrap flex-row items-start space-x-3 space-y-0"
                           >
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes(item.id)}
-                                onCheckedChange={(checked) => {
-                                  return checked
-                                    ? field.onChange([...field.value, item.id])
-                                    : field.onChange(
-                                        field.value?.filter(
-                                          (value) => value !== item.id
-                                        )
-                                      );
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel className="text-sm font-normal">
-                              {item.label}
-                            </FormLabel>
+                            <div className="flex items-center gap-1">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value?.includes(item.id)}
+                                  onCheckedChange={(checked) => {
+                                    return checked
+                                      ? field.onChange([
+                                          ...field.value,
+                                          item.id,
+                                        ])
+                                      : field.onChange(
+                                          field.value?.filter(
+                                            (value) => value !== item.id
+                                          )
+                                        );
+                                  }}
+                                />
+                              </FormControl>
+                              <FormLabel className="text-sm font-normal">
+                                {item.label}
+                              </FormLabel>
+                            </div>
                           </FormItem>
                         );
                       }}
