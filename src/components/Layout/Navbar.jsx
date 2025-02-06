@@ -64,7 +64,7 @@ export default function Navbar() {
                   <NavigationMenuLink asChild>
                     <Link
                       className="group flex h-full w-full select-none flex-col justify-start rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                      to="/home-cleaning"
+                      to="/service/intro/home-cleaning"
                     >
                       <div className="overflow-hidden">
                         <img
