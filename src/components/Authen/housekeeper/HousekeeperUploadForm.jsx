@@ -1,5 +1,4 @@
 import { Input } from "@/components/ui/input";
-import { uploadFile } from "@/firebase/config";
 import { FileUser, IdCard } from "lucide-react";
 import React, { useRef } from "react";
 
