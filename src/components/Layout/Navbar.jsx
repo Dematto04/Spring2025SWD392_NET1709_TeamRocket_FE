@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { cn } from "@/lib/utils";
 
@@ -25,21 +25,10 @@ import { services } from "./services";
 export default function Navbar() {
   const isAuth = useSelector(isUserAuth);
   const dispatch = useDispatch();
-  const handleLogin = () => {
-    dispatch(
-      login({
-        user: {
-          name: "long",
-          age: 20,
-        },
-        userToken: {
-          hehe: "123",
-        },
-      })
-    );
-  };
+  const nav = useNavigate()
   const handleLogout = () => {
     dispatch(logout());
+    nav('/login')
   };
   return (
     <NavigationMenu className="px-3 h-20 flex items-center justify-between fixed bg-background rounded-br-2xl rounded-bl-rounded-br-2xl shadow-sm">

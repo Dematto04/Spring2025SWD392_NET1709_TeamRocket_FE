@@ -1,5 +1,6 @@
 import MainLayout from "@/components/Layout/MainLayout";
 import SimpleLayout from "@/components/Layout/SimpleLayout";
+import ConfirmEmail from "@/page/ConfirmEmail";
 import HousekeeperRegisterPage from "@/page/HousekeeperRegisterPage";
 
 import LoginPage from "@/page/LoginPage";
@@ -40,6 +41,10 @@ const routes = [
       {
         path: "/register-housekeeper",
         component: HousekeeperRegisterPage,
+      },
+      {
+        path: "/confirm-email",
+        component: ConfirmEmail,
       },
     ],
   },
