@@ -87,7 +87,7 @@ export function LoginForm() {
         },
       })
     );
-    // nav('/')
+    nav('/')
   };
 
   const handleLoginWithGoogle = () => {
