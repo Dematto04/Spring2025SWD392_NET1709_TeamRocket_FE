@@ -34,7 +34,7 @@
 }
 
 .home-feature {
-    background-image: url('/public/feature-bg-01.png'), url('/public/feature-bg-02.png');
+    background-image: url('/feature-bg-01.png'), url('/feature-bg-02.png');
     background-position: left, right;
     background-repeat: no-repeat;
     /* clip-path: polygon(50% 0%, 100% 0, 100% 97%, 73% 100%, 28% 100%, 0 96%, 0 0); */
