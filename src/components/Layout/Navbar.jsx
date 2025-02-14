@@ -25,24 +25,24 @@ import { services } from "./services";
 export default function Navbar() {
   const isAuth = useSelector(isUserAuth);
   const dispatch = useDispatch();
-  const nav = useNavigate()
+  const nav = useNavigate();
   const handleLogout = () => {
     dispatch(logout());
-    nav('/login')
+    nav("/login");
   };
   return (
     <NavigationMenu className="px-3 h-20 flex items-center justify-between fixed bg-background rounded-br-2xl rounded-bl-rounded-br-2xl shadow-sm">
       <NavigationMenuList>
-        <NavigationMenuItem className="mr-6">
-          <Logo />
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-          <Link to="/">
-            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Home
-            </NavigationMenuLink>
-          </Link>
-        </NavigationMenuItem>
+        <Link to="/">
+          <NavigationMenuItem className="mr-6">
+            <Logo />
+          </NavigationMenuItem>
+        </Link>
+        <Link to="/">
+          <NavigationMenuItem className={navigationMenuTriggerStyle()}>
+            Home
+          </NavigationMenuItem>
+        </Link>
         <NavigationMenuItem>
           <NavigationMenuTrigger>Services</NavigationMenuTrigger>
           {/* navbar items */}
