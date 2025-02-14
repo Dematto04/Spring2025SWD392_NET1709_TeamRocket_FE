@@ -8,7 +8,7 @@ function Logo({ className, classImg }) {
   return (
     <div className={`w-40 ${className}`}>
       <img
-        src={theme === "light" ? `logo.png` : `logo-dark.png`}
+        src={theme === "light" ? `/logo.png` : `/logo-dark.png`}
         className={`w-full ${classImg}`}
       />
     </div>
