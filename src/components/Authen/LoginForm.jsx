@@ -8,13 +8,22 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { Link, useNavigate } from "react-router-dom";
 import GoogleIcon from "./GoogleIcon";
-import { useLoginMutation } from "@/redux/api/authApi";
+import { useLoginMutation, useResendEmailMutation } from "@/redux/api/authApi";
 
 import { handleError } from "@/lib/utils";
 import { useDispatch } from "react-redux";
@@ -22,6 +31,7 @@ import { login } from "@/redux/features/authSlice";
 import { LoaderCircle } from "lucide-react";
 import { jwtDecode } from "jwt-decode";
 import { loginWithGoogle } from "@/firebase/firebaseHelper";
+import { useState } from "react";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid Email" }),
@@ -32,10 +42,13 @@ const formSchema = z.object({
 
 export function LoginForm() {
   const { toast } = useToast();
-  const [loginMutation, { isLoading, isError }] = useLoginMutation();
+  const [loginMutation, { isLoading }] = useLoginMutation();
+  const [resendEmail, { isLoading: isSending }] = useResendEmailMutation();
   const dispatch = useDispatch();
+  const [open, setOpen] = useState();
+  const [email, setEmail] = useState("");
   const nav = useNavigate();
-  
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -46,28 +59,30 @@ export function LoginForm() {
   //handle login
   const handleLogin = async (data) => {
     console.log(import.meta.env.VITE_API_URL);
-    
+
     const result = await loginMutation(data);
     if (result.error) {
       const error = result.error;
       console.log(error);
-      const errorMessage = error.data.messages?.Email ? error.data.messages?.Email[0] : error.data.messages.Credentials[0];
+      let errorMessage = error.data?.messages?.Email
+        ? error.data?.messages?.Email[0]
+        : error.data?.messages.Credentials[0];
+      if(!errorMessage){
+        errorMessage = "Server Error"
+      }
       form.setError("email", {
         message: errorMessage,
       });
       form.setError("password", {
         message: errorMessage,
       });
-      if(error.data.messages.Credentials[0]){
-        
-      }
       return;
     }
     const account = result.data;
     const userData = jwtDecode(account.accessToken);
     console.log(jwtDecode(account.accessToken));
-    localStorage.setItem('accessToken', account.accessToken)
-    localStorage.setItem('refreshToken', account.refreshToken)
+    localStorage.setItem("accessToken", account.accessToken);
+    localStorage.setItem("refreshToken", account.refreshToken);
     toast({
       title: "Login sucessfully!",
       description: `Welcome ${userData.name || "User"} 😊`,
@@ -77,9 +92,9 @@ export function LoginForm() {
       login({
         user: {
           fullName: userData.name,
-          userId: userData.Id,
-          email: userData.Email,
-          role: account.role,
+          userId: userData.id,
+          email: userData.email,
+          role: userData.role,
         },
         userToken: {
           accessToken: account.accessToken,
@@ -87,11 +102,28 @@ export function LoginForm() {
         },
       })
     );
-    nav('/')
+    nav("/");
   };
 
   const handleLoginWithGoogle = () => {
     loginWithGoogle();
+  };
+  const handleConfirmEmail = async () => {
+    console.log(email);
+    const result = await resendEmail({email});
+    if (result.error) {
+      console.log(result.error);
+      toast({
+        title: "Email already confirmed",
+        description: "Please Login"
+      })
+      return
+    }
+    toast({
+      title: 'Send email successfully',
+      description: 'Please check your inbox'
+    })
+
   };
 
   return (
@@ -114,7 +146,15 @@ export function LoginForm() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <Label htmlFor="email">Email</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="email">Email</Label>
+                  <Link
+                    className="text-sm underline-offset-4 hover:underline"
+                    onClick={() => setOpen(true)}
+                  >
+                    Verify your email here!
+                  </Link>
+                </div>
                 <FormControl>
                   <Input
                     {...field}
@@ -136,12 +176,12 @@ export function LoginForm() {
               <FormItem>
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Password</Label>
-                  <a
-                    href="#"
+                  <Link
+                    to="/forgot-password"
                     className="text-sm underline-offset-4 hover:underline"
                   >
                     Forgot your password?
-                  </a>
+                  </Link>
                 </div>
                 <FormControl>
                   <Input
@@ -155,7 +195,6 @@ export function LoginForm() {
               </FormItem>
             )}
           />
-
           <Button
             type="submit"
             className={`${isLoading && "pointer-events-none"} w-full`}
@@ -190,6 +229,39 @@ export function LoginForm() {
           </Link>
         </div>
       </form>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Email verification</DialogTitle>
+            <DialogDescription>
+              We'll send you an email with a verification link. Please click the
+              link to complete your account confirmation.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="flex items-center gap-3">
+              <Label className="text-right">Email</Label>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your.email@example.com"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              type="submit"
+              className={`${isSending && "pointer-events-none"}`}
+              variant={isSending ? "secondary" : ""}
+              onClick={handleConfirmEmail}
+            >
+              {isSending && <LoaderCircle className="animate-spin" />} Send
+              Email
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Form>
   );
 }

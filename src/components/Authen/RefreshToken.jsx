@@ -33,7 +33,7 @@ function RefreshToken() {
       const exp = decodeAccessToken.exp;
       console.log({ exp, now });
 
-      if ((now <= exp && now >= exp - 300) || now >= exp) {
+      if ((now <= exp && now >= exp - 60) || now >= exp) {
         const result = await refreshTokenMutation({
           token: accessToken,
           refreshToken,

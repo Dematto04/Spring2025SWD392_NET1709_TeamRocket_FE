@@ -1,7 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import routes from "./routes";
-import { Suspense } from "react";
+
 import NotFound from "@/components/NotFound/NotFound";
+import ProtectedRoute from "@/components/Authen/ProtectedRoute";
 
 const AppRoutes = () => {
   return (
@@ -17,9 +18,9 @@ const AppRoutes = () => {
                   key={item.path}
                   path={item.path}
                   element={
-                    <Suspense fallback={''}>
+                    <ProtectedRoute isRestricted={route.isRestricted} allowedRoles={item?.allowedRoles}>
                       <Component />
-                    </Suspense>
+                    </ProtectedRoute>
                   }
                 />
               );
@@ -27,7 +28,7 @@ const AppRoutes = () => {
           </Route>
         );
       })}
-      <Route path="*" element={<NotFound/>}/>
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 };
