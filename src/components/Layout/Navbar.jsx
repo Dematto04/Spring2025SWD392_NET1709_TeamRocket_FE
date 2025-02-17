@@ -50,42 +50,37 @@ export default function Navbar() {
             <ul className="grid gap-3 p-4 md:w-screen grid-cols-8">
               {services.map((service, idx) => (
                 <li key={idx} className="col-span-2 xl:col-span-1">
-                  <NavigationMenuLink asChild>
-                    <Link
-                      className="group flex h-full w-full select-none flex-col justify-start rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                      to="/service/intro/home-cleaning"
-                    >
-                      <div className="overflow-hidden">
-                        <img
-                          loading="lazy"
-                          src={service.image}
-                          className="duration-200 group-hover:scale-110 h-full w-full object-contain"
-                        />
-                      </div>
-                      <div className="mb-2 mt-4 text-lg font-medium">
-                        {service.name}
-                      </div>
-                      <p className="text-sm leading-tight text-muted-foreground">
-                        {service.description}
-                      </p>
-                    </Link>
-                  </NavigationMenuLink>
+                  <Link
+                    className="group flex h-full w-full select-none flex-col justify-start rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                    to="/service/intro/home-cleaning"
+                  >
+                    <div className="overflow-hidden">
+                      <img
+                        loading="lazy"
+                        src={service.image}
+                        className="duration-200 group-hover:scale-110 h-full w-full object-contain"
+                      />
+                    </div>
+                    <div className="mb-2 mt-4 text-lg font-medium">
+                      {service.name}
+                    </div>
+                    <p className="text-sm leading-tight text-muted-foreground">
+                      {service.description}
+                    </p>
+                  </Link>
                 </li>
               ))}
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
-        <NavigationMenuItem>
-          <Link to="/blogs">
-            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Blogs
-            </NavigationMenuLink>
-          </Link>
-        </NavigationMenuItem>
+
+        <Link to="/blogs">
+          <NavigationMenuItem className={navigationMenuTriggerStyle()}>Blogs</NavigationMenuItem>
+        </Link>
       </NavigationMenuList>
       <NavigationMenuList>
         <NavigationMenuItem>
-          <NavigationMenuLink className="flex gap-3">
+          <div className="flex gap-3">
             {isAuth ? (
               <NavbarUser onSignOut={handleLogout} />
             ) : (
@@ -104,7 +99,7 @@ export default function Navbar() {
               </div>
             )}
             <ThemeToggle />
-          </NavigationMenuLink>
+          </div>
         </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>
