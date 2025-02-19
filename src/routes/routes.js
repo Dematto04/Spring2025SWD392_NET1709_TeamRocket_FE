@@ -12,7 +12,7 @@ import RegisterPage from "@/page/RegisterPage";
 import ResetPassword from "@/page/ResetPassword";
 import ServiceBookPage from "@/page/ServiceBookPage";
 import ServiceIntroPage from "@/page/ServiceIntro";
-
+import CustomerProfilePage from "@/page/CustomerProfilePage";
 
 const routes = [
   {
@@ -31,6 +31,10 @@ const routes = [
         component: ServiceBookPage,
       },
       {
+        path: "/profile/customer",
+        component: CustomerProfilePage,
+        },
+        {
         path: "/dashboard/admin",
         component: DashboardAdmin,
         allowedRoles: ['Admin']
