@@ -1,6 +1,7 @@
 import { clsx } from "clsx";
+import { jwtDecode } from "jwt-decode";
 import { lazy } from "react";
-import { twMerge } from "tailwind-merge"
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs) {
   return twMerge(clsx(inputs));
@@ -20,3 +21,25 @@ export const fileToBase64 = (file) => {
     reader.onerror = (error) => reject(error);
   });
 };
+export const handleError = (error) => {
+  console.log("API Error:", error);
+
+  if (!error) return "An unknown error occurred.";
+
+  if (error.status === 401) {
+    return error.data?.messages?.Credentials?.[0] || "Unauthorized access.";
+  }
+
+  if (error.status === 403) {
+    return "You don't have permission to perform this action.";
+  }
+
+  if (error.status === 500) {
+    return "Internal server error. Please try again later.";
+  }
+
+  return error.data?.messages || "Something went wrong. Please try again.";
+};
+
+
+

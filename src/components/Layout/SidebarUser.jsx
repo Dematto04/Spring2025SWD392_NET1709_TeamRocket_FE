@@ -28,10 +28,13 @@ import { logout } from "@/redux/features/authSlice";
 
 export function SidebarUser({ user }) {
   const { isMobile } = useSidebar();
-    const dispatch = useDispatch()
-  const handleLogout = ()=> {
-    dispatch(logout())
-  }
+  const dispatch = useDispatch();
+  const nav = useNavigate();
+
+  const handleLogout = () => {
+    dispatch(logout());
+    nav("/login");
+  };
   return (
     <SidebarMenu>
       <SidebarMenuItem>
