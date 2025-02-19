@@ -13,9 +13,6 @@ import ResetPassword from "@/page/ResetPassword";
 import ServiceBookPage from "@/page/ServiceBookPage";
 import ServiceIntroPage from "@/page/ServiceIntro";
 import CustomerProfilePage from "@/page/CustomerProfilePage";
-import { lazy } from "react";
-const HomePage = lazy(() => import("@/page/HomePage"));
-
 
 const routes = [
   {
@@ -36,6 +33,16 @@ const routes = [
       {
         path: "/profile/customer",
         component: CustomerProfilePage,
+        },
+        {
+        path: "/dashboard/admin",
+        component: DashboardAdmin,
+        allowedRoles: ['Admin']
+      },
+      {
+        path: "/dashboard/staff",
+        component: DashboardStaff,
+        allowedRoles: ["Admin", "Staff"]
       },
     ],
   },
