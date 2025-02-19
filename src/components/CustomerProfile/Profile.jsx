@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -9,29 +9,33 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
-  firstName: z.string().min(1, { message: "First name is required" }),
-  lastName: z.string().min(1, { message: "Last name is required" }),
+  fullName: z.string().min(1, { message: "Full name is required" }),
   email: z.string().email({ message: "Invalid email address" }),
-  username: z.string().min(1, { message: "Username is required" }),
   phoneNumber: z.string().min(10, { message: "Invalid phone number" }),
-  gender: z.enum(["Male", "Female", "Other"], { message: "Select a gender" }),
+  gender: z.enum(["Male", "Female"], { message: "Select a gender" }),
   dob: z.string().min(1, { message: "Date of birth is required" }),
 });
 
 const Profile = () => {
   const { toast } = useToast();
+  const [imagePreview, setImagePreview] = useState(null);
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      FirstName: "Demo",
-      lastName: "User",
-      email: "demouser@gmail.com",
-      username: "Demouser",
-      phoneNumber: "+93 98765432103",
+      fullName: "",
+      email: "",
+      phoneNumber: "",
       gender: "Male",
-      dob: "2007-01-02",
+      dob: "",
     },
   });
+
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
 
   const handleSubmit = (data) => {
     console.log("Profile Data:", data);
@@ -45,27 +49,105 @@ const Profile = () => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="p-6 bg-white rounded-lg shadow-sm space-y-6">
         <h2 className="text-2xl font-bold">Profile Settings</h2>
+        
+        {/* Profile Picture */}
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold mb-4">Profile Picture</h3>
+          <div className="flex items-center space-x-4">
+            <div className="w-20 h-20 bg-gray-200 rounded-full overflow-hidden flex items-center justify-center">
+              {imagePreview ? (
+                <img src={imagePreview} alt="Profile Preview" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-gray-500">Preview</span>
+              )}
+            </div>
+            <div>
+              <input type="file" id="profile-picture" className="hidden" onChange={handleImageChange} />
+              <label
+                htmlFor="profile-picture"
+                className="px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer hover:bg-blue-600"
+              >
+                Choose File
+              </label>
+              <p className="text-sm text-gray-500 mt-2">
+                *Image size should be less than 2MB. Allowed files: .png, .jpg, .jpeg.
+              </p>
+            </div>
+          </div>
+        </div>
 
         {/* General Information */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <h3 className="text-lg font-semibold mb-4">General Information</h3>
-        <br></br>
-          {Object.keys(formSchema.shape).slice(0, 7).map((field) => (
-            <FormField
-              key={field}
-              control={form.control}
-              name={field}
-              render={({ field }) => (
-                <FormItem>
-                  <Label htmlFor={field.name}>{field.name.replace(/([A-Z])/g, " $1").trim()} *</Label>
-                  <FormControl>
-                    <Input {...field} id={field.name} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          ))}
+          <h3 className="text-lg font-semibold mb-4">General Information</h3>
+          <br />
+          <FormField
+            control={form.control}
+            name="fullName"
+            render={({ field }) => (
+              <FormItem>
+                <Label htmlFor="firstName">Full Name *</Label>
+                <FormControl>
+                  <Input {...field} id="fullName" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="gender"
+            render={({ field }) => (
+              <FormItem>
+                <Label htmlFor="gender">Gender *</Label>
+                <FormControl>
+                  <select {...field} id="gender" className="border p-2 rounded-md w-full">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                  </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <Label htmlFor="email">Email *</Label>
+                <FormControl>
+                  <Input {...field} id="email" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="phoneNumber"
+            render={({ field }) => (
+              <FormItem>
+                <Label htmlFor="phoneNumber">Phone Number *</Label>
+                <FormControl>
+                  <Input {...field} id="phoneNumber" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="dob"
+            render={({ field }) => (
+              <FormItem>
+                <Label htmlFor="dob">Date of Birth *</Label>
+                <FormControl>
+                  <Input {...field} id="dob" type="date" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
         <div className="flex justify-end">
