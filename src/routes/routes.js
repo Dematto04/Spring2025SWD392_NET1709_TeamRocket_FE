@@ -6,6 +6,7 @@ import LoginPage from "@/page/LoginPage";
 import RegisterPage from "@/page/RegisterPage";
 import ServiceBookPage from "@/page/ServiceBookPage";
 import ServiceIntroPage from "@/page/ServiceIntro";
+import CustomerProfilePage from "@/page/CustomerProfilePage";
 import { lazy } from "react";
 const HomePage = lazy(() => import("@/page/HomePage"));
 const routes = [
@@ -23,6 +24,10 @@ const routes = [
       {
         path: "/service/:id",
         component: ServiceBookPage,
+      },
+      {
+        path: "/profile/customer",
+        component: CustomerProfilePage,
       },
     ],
   },
