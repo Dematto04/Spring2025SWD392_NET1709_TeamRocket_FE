@@ -9,8 +9,20 @@ const serviceApi = apiSlice.injectEndpoints({
                 url: "/HomeService"
             }),
             providesTags: ["Services"]
-        })
+        }),
+        getServicesDetail: build.query({
+            query: (id)=> ({
+                url: `/HomeService/${id}/details`,
+            }),
+            providesTags: ["ServiceDetail"]
+        }),
+        getServicesPrice: build.query({
+            query: (id)=> ({
+                url: `/HomeService/${id}/prices`,
+            }),
+            providesTags: ["ServiceDetail"]
+        }),
     })
 })
 
-export const { useGetServicesQuery } = serviceApi
+export const { useGetServicesQuery, useGetServicesDetailQuery, useGetServicesPriceQuery } = serviceApi
