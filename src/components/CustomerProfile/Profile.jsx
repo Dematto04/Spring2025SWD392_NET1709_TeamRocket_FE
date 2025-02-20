@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -7,28 +7,58 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
+import { useUpdateCustomerProfileMutation } from "@/redux/api/customerProfileApi";
 
 const formSchema = z.object({
   fullName: z.string().min(1, { message: "Full name is required" }),
-  email: z.string().email({ message: "Invalid email address" }),
   phoneNumber: z.string().min(10, { message: "Invalid phone number" }),
   gender: z.enum(["Male", "Female"], { message: "Select a gender" }),
-  dob: z.string().min(1, { message: "Date of birth is required" }),
+  dob: z.string().optional(),
 });
 
-const Profile = () => {
+const Profile = ({ profileInfo }) => {
   const { toast } = useToast();
   const [imagePreview, setImagePreview] = useState(null);
+  const [updateProfile, { isLoading }] = useUpdateCustomerProfileMutation();
+
+  const getTomorrowDate = (dateString) => {
+    // Extract the date part (e.g., "2024-02-07" from "2024-02-07T00:00:00")
+    const [year, month, day] = dateString.split("T")[0].split("-").map(Number);
+    // Create a UTC date object using Date.UTC (month is 0-indexed)
+    const utcDate = new Date(Date.UTC(year, month - 1, day));
+    // Add one day (in UTC)
+    utcDate.setUTCDate(utcDate.getUTCDate() );
+    // Convert back to ISO string and extract just the date portion
+    return utcDate.toISOString().split("T")[0];
+  };
+  // Transform API data to match form structure
+  const defaultValues = profileInfo?.data
+    ? {
+        fullName: profileInfo.data.fullName || "",
+        phoneNumber: profileInfo.data.phoneNumber || "",
+        gender: profileInfo.data.gender ? "Male" : "Female", // Convert boolean to string
+         dob: profileInfo.data.birthday
+        ? getTomorrowDate(profileInfo.data.birthday)
+        : "",
+      }
+    : {
+        fullName: "",
+        phoneNumber: "",
+        gender: "Male",
+        dob: "",
+      };
+
   const form = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      fullName: "",
-      email: "",
-      phoneNumber: "",
-      gender: "Male",
-      dob: "",
-    },
+    defaultValues,
   });
+
+  useEffect(() => {
+    if (profileInfo?.data) {
+      form.reset(defaultValues);
+      setImagePreview(profileInfo.data.avatar); // Set avatar image preview
+    }
+  }, [profileInfo]);
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -36,20 +66,74 @@ const Profile = () => {
       setImagePreview(URL.createObjectURL(file));
     }
   };
-
-  const handleSubmit = (data) => {
-    console.log("Profile Data:", data);
-    toast({
-      title: "Profile Updated Successfully!",
-      description: "Your profile details have been saved.",
-    });
+  const getDateString = (dateString) => {
+    if (!dateString) return "";
+  
+    // Split input date manually to avoid time zone shifts
+    const [year, month, day] = dateString.split("-").map(Number);
+  
+    // Create a new Date object in UTC without unwanted timezone shifts
+    const date = new Date(Date.UTC(year, month - 1, day)); // month is 0-indexed
+  
+    // Add one day
+    date.setUTCDate(date.getUTCDate());
+  
+    // Format back to "YYYY-MM-DDT00:00:00"
+    const formattedYear = date.getUTCFullYear();
+    const formattedMonth = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const formattedDay = String(date.getUTCDate()).padStart(2, "0");
+  
+    return `${formattedYear}-${formattedMonth}-${formattedDay}T00:00:00`;
   };
+  
+  const handleSubmit = async (data) => {
+    try {
+      // Convert gender if necessary (e.g., true for Male, false for Female)
+      const formattedGender = data.gender === "Male" ? true : false;
+  
+      // Format phone number (remove non-digit characters)
+      const formattedPhoneNumber = data.phoneNumber.replace(/\D/g, "");
+  
+      const formattedBirthdate = data.dob;
+
+      const payload = {
+          fullName: data.fullName,
+          phoneNumber: formattedPhoneNumber,
+          gender: formattedGender,
+          birthdate: formattedBirthdate,
+          avatar: imagePreview, // Using imagePreview URL. 
+          // If the API expects the file itself (or a base64 string), you'll need to handle that conversion.
+      };
+  
+      console.log("Sending Data:", payload); // Debug: log the payload
+  
+      const response = await updateProfile(payload).unwrap();
+      console.log("Response:", response);
+  
+      toast({
+        title: "Profile Updated Successfully!",
+        description: "Your profile details have been saved.",
+      });
+    } catch (error) {
+      console.error("Update Error:", error);
+      console.error("Error Details:", error?.data?.errors);
+  
+      toast({
+        title: "Update Failed",
+        description: error?.data?.message || "Something went wrong!",
+        variant: "destructive",
+      });
+    }
+  };  
+  
+  
+  
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="p-6 bg-white rounded-lg shadow-sm space-y-6">
         <h2 className="text-2xl font-bold">Profile Settings</h2>
-        
+
         {/* Profile Picture */}
         <div className="mb-8">
           <h3 className="text-lg font-semibold mb-4">Profile Picture</h3>
@@ -85,7 +169,7 @@ const Profile = () => {
             name="fullName"
             render={({ field }) => (
               <FormItem>
-                <Label htmlFor="firstName">Full Name *</Label>
+                <Label htmlFor="fullName">Full Name *</Label>
                 <FormControl>
                   <Input {...field} id="fullName" />
                 </FormControl>
@@ -104,19 +188,6 @@ const Profile = () => {
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
                   </select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <Label htmlFor="email">Email *</Label>
-                <FormControl>
-                  <Input {...field} id="email" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -151,7 +222,9 @@ const Profile = () => {
         </div>
 
         <div className="flex justify-end">
-          <Button type="submit">Save Changes</Button>
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? "Saving..." : "Save Changes"}
+          </Button>
         </div>
       </form>
     </Form>

@@ -35,7 +35,7 @@ function RefreshToken() {
 
       if ((now <= exp && now >= exp - 60) || now >= exp) {
         const result = await refreshTokenMutation({
-          token: accessToken,
+          accessToken,
           refreshToken,
         });
         if (result.error) {
@@ -45,7 +45,7 @@ function RefreshToken() {
           return;
         }
         console.log({ result });
-        localStorage.setItem("accessToken", result.data.data.token);
+        localStorage.setItem("accessToken", result.data.data.accessToken);
         localStorage.setItem("refreshToken", result.data.data.refreshToken);
       }
     }, 5000);
