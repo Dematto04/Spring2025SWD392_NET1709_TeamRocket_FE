@@ -11,7 +11,7 @@ import LoginPage from "@/page/LoginPage";
 import RegisterPage from "@/page/RegisterPage";
 import ResetPassword from "@/page/ResetPassword";
 import ServiceBookPage from "@/page/ServiceBookPage";
-import ServiceIntroPage from "@/page/ServiceIntro";
+import ServiceIntroPage from "@/page/ServiceIntroPage";
 import CustomerProfilePage from "@/page/CustomerProfilePage";
 
 const routes = [
@@ -23,7 +23,7 @@ const routes = [
         component: HomePage,
       },
       {
-        path: "/service/intro/:id",
+        path: "/service/intro/:name/:id",
         component: ServiceIntroPage,
       },
       {

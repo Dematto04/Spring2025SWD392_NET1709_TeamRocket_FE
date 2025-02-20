@@ -1,7 +1,7 @@
 import { Sparkles } from "lucide-react";
 import "./hero.css";
 import Paragraph from "@/components/Typo/Paragraph";
-function Hero() {
+function Hero({name}) {
   return (
     <div className="relative bg-background min-h-[calc(100vh-5rem)] flex lg:flex justify-between items-center md:mt-20">
       <div className="absolute top-0 left-0 bg-[url(/bg-banner.png)] h-1/3 w-[101px] bg-contain bg-no-repeat"></div>

@@ -3,7 +3,7 @@ import { isUserAuth, logout } from "@/redux/features/authSlice";
 import { jwtDecode } from "jwt-decode";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useNavigate, useNavigationType } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 //not check those paths
 const NOT_CHECK_PATH = [
   "/login",
@@ -13,6 +13,7 @@ const NOT_CHECK_PATH = [
 ];
 function RefreshToken() {
   const isAuth = useSelector(isUserAuth);
+  
   const location = useLocation();
   const pathName = location.pathname;
   const dispatch = useDispatch();
@@ -31,11 +32,10 @@ function RefreshToken() {
       }
       const decodeAccessToken = jwtDecode(accessToken);
       const exp = decodeAccessToken.exp;
-      console.log({ exp, now });
 
       if ((now <= exp && now >= exp - 60) || now >= exp) {
         const result = await refreshTokenMutation({
-          token: accessToken,
+          accessToken,
           refreshToken,
         });
         if (result.error) {
@@ -44,8 +44,7 @@ function RefreshToken() {
           console.log(result.error);
           return;
         }
-        console.log({ result });
-        localStorage.setItem("accessToken", result.data.data.token);
+        localStorage.setItem("accessToken", result.data.data.accessToken);
         localStorage.setItem("refreshToken", result.data.data.refreshToken);
       }
     }, 5000);

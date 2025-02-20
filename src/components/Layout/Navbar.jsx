@@ -14,22 +14,26 @@ import {
 import { forwardRef } from "react";
 import { ThemeToggle } from "../ui/theme-toggle";
 import { useDispatch, useSelector } from "react-redux";
-import { isUserAuth, login, logout } from "@/redux/features/authSlice";
-import { SidebarUser } from "./SidebarUser";
+import { isUserAuth, logout, selectUser } from "@/redux/features/authSlice";
 import { Button } from "../ui/button";
 import { NavbarUser } from "./NavbarUser";
 import { CircleUserRound } from "lucide-react";
 import Logo from "../Logo";
-import { services } from "./services";
 
-export default function Navbar() {
+
+export default function Navbar({services}) {
   const isAuth = useSelector(isUserAuth);
+  const user = useSelector(selectUser)
+
+  
   const dispatch = useDispatch();
   const nav = useNavigate();
   const handleLogout = () => {
     dispatch(logout());
     nav("/login");
   };
+  console.log({services});
+  
   return (
     <NavigationMenu className="px-3 h-20 flex items-center justify-between fixed bg-background rounded-br-2xl rounded-bl-rounded-br-2xl shadow-sm">
       <NavigationMenuList>
@@ -52,7 +56,7 @@ export default function Navbar() {
                 <li key={idx} className="col-span-2 xl:col-span-1">
                   <Link
                     className="group flex h-full w-full select-none flex-col justify-start rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                    to="/service/intro/home-cleaning"
+                    to={`/service/intro/${service.name}/${service.id}`}
                   >
                     <div className="overflow-hidden">
                       <img
@@ -82,7 +86,7 @@ export default function Navbar() {
         <NavigationMenuItem>
           <div className="flex gap-3">
             {isAuth ? (
-              <NavbarUser onSignOut={handleLogout} />
+              <NavbarUser onSignOut={handleLogout} user={user}/>
             ) : (
               <div className="flex gap-3">
                 <Link to="/register">
@@ -106,25 +110,25 @@ export default function Navbar() {
   );
 }
 
-const ListItem = forwardRef(({ className, title, children, ...props }, ref) => {
-  return (
-    <li>
-      <NavigationMenuLink asChild>
-        <a
-          ref={ref}
-          className={cn(
-            "block select-none space-y-1 rounded-md p-3 leadingduration-200 -none no-underline outline-none -colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-            className
-          )}
-          {...props}
-        >
-          <div className="text-sm font-medium leading-none">{title}</div>
-          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-            {children}
-          </p>
-        </a>
-      </NavigationMenuLink>
-    </li>
-  );
-});
-ListItem.displayName = "ListItem";
+// const ListItem = forwardRef(({ className, title, children, ...props }, ref) => {
+//   return (
+//     <li>
+//       <NavigationMenuLink asChild>
+//         <a
+//           ref={ref}
+//           className={cn(
+//             "block select-none space-y-1 rounded-md p-3 leadingduration-200 -none no-underline outline-none -colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+//             className
+//           )}
+//           {...props}
+//         >
+//           <div className="text-sm font-medium leading-none">{title}</div>
+//           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+//             {children}
+//           </p>
+//         </a>
+//       </NavigationMenuLink>
+//     </li>
+//   );
+// });
+// ListItem.displayName = "ListItem";
