@@ -1,9 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./homefeature.css";
-const ServiceCard = () => {
+const ServiceCard = ({service}) => {
   return (
-    <Link className="service-feat group relative w-full h-44 bg-card p-6 flex justify-center items-center flex-col rounded-2xl overflow-hidden">
+    <Link className="service-feat group relative w-full h-44 bg-card p-6 flex justify-center items-center flex-col rounded-2xl overflow-hidden"
+      to={service ? `/service/intro/${service.name}/${service.id}` : "/"}
+    >
       <div className="relative z-[2] rounded-full bg-accent w-24 h-24 flex justify-center items-center">
         <img
           src="/home-cleaning-icon.svg"
@@ -12,7 +14,7 @@ const ServiceCard = () => {
         />
       </div>
       <h1 className="service-title mt-2 text-xl z-[2] font-medium group-hover:text-primary-foreground duration-300">
-        Home Cleaning
+        {service.name}
       </h1>
       <div className="feature-overlay">
         <img className="service-img" src="/home-cleaning-feat.webp" />
@@ -21,7 +23,7 @@ const ServiceCard = () => {
     </Link>
   );
 };
-function HomeFeature() {
+function HomeFeature({ services }) {
   return (
     <div className="home-feature bg-secondary">
       <div className="px-3 py-8 lg:px-16 lg:py-20">
@@ -30,31 +32,13 @@ function HomeFeature() {
         </h1>
         <p className="text-xl mt-4 text-gray-500">We only provide pleasure.</p>
 
-        <div className="grid grid-cols-12 gap-8 mt-20">
-          <div className="col-span-12 sm:col-span-6 lg:col-span-3">
-            <ServiceCard />
-          </div>
-          <div className="col-span-12 sm:col-span-6 lg:col-span-3">
-            <ServiceCard />
-          </div>
-          <div className="col-span-12 sm:col-span-6 lg:col-span-3">
-            <ServiceCard />
-          </div>
-          <div className="col-span-12 sm:col-span-6 lg:col-span-3">
-            <ServiceCard />
-          </div>
-          <div className="col-span-12 sm:col-span-6 lg:col-span-3">
-            <ServiceCard />
-          </div>
-          <div className="col-span-12 sm:col-span-6 lg:col-span-3">
-            <ServiceCard />
-          </div>
-          <div className="col-span-12 sm:col-span-6 lg:col-span-3">
-            <ServiceCard />
-          </div>
-          <div className="col-span-12 sm:col-span-6 lg:col-span-3">
-            <ServiceCard />
-          </div>
+        <div className="grid grid-cols-12 gap-x-0 gap-y-8 sm:gap-x-8 mt-20">
+          {services &&
+            services.map((service) => (
+              <div className="col-span-12 sm:col-span-6 xl:col-span-3" key={service.id}>
+                <ServiceCard service={service}/>
+              </div>
+            ))}
         </div>
       </div>
     </div>

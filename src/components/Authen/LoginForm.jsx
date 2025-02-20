@@ -15,7 +15,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  
 } from "@/components/ui/dialog";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,7 +25,7 @@ import { Link, useNavigate } from "react-router-dom";
 import GoogleIcon from "./GoogleIcon";
 import { useLoginMutation, useResendEmailMutation } from "@/redux/api/authApi";
 
-import { handleError } from "@/lib/utils";
+
 import { useDispatch } from "react-redux";
 import { login } from "@/redux/features/authSlice";
 import { LoaderCircle } from "lucide-react";
@@ -58,8 +58,6 @@ export function LoginForm() {
   });
   //handle login
   const handleLogin = async (data) => {
-    console.log(import.meta.env.VITE_API_URL);
-
     const result = await loginMutation(data);
     if (result.error) {
       const error = result.error;

@@ -34,10 +34,7 @@ const formSchema = z
 export default function ResetPassword() {
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email") || "";
-  const token = searchParams.get("token") ? decodeURIComponent(searchParams.get("token")) : "";
-    console.log(token);
-    
-    
+  const token = searchParams.get("token") || ""
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {

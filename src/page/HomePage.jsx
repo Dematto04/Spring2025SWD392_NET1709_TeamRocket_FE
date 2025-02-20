@@ -6,11 +6,15 @@ import WhyChooseUs from "@/components/Home/WhyChooseUs/WhyChooseUs";
 import { HomeFeedback } from "@/components/HomeFeedback/HomeFeedback";
 import HowItWork from "@/components/HowItWork/HowItWork";
 import React from "react";
+import { useOutletContext } from "react-router-dom";
 function HomePage() {
+  const {services} = useOutletContext()
+  console.log({services});
+  
   return (
     <>
       <Hero />
-      <HomeFeature/>
+      <HomeFeature services={services}/>
       <HomeFeedback/>
       <HowItWork/>
       <BookNow/>

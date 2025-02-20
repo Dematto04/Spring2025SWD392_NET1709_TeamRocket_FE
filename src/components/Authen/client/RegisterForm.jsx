@@ -12,11 +12,9 @@ import {
 import { Label } from "../../ui/label";
 import { Link } from "react-router-dom";
 import { Button } from "../../ui/button";
-import GoogleIcon from "../GoogleIcon";
 import { Input } from "../../ui/input";
 import { useCustomerRegisterMutation } from "@/redux/api/authApi";
 import { LoaderCircle } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
@@ -25,7 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import Logo from "@/components/Logo";
+
 
 const formSchema = z
   .object({
