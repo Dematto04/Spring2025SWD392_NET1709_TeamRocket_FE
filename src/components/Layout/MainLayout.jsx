@@ -17,7 +17,7 @@ const MainLayout = () => {
     !isLoading && (
       <>
         <div className="hidden md:block">
-          <Navbar services={data.data}/>
+          <Navbar services={data?.data}/>
         </div>
         <SidebarProvider>
           <AppSidebar />
@@ -33,7 +33,7 @@ const MainLayout = () => {
                 <div></div>
               )}
             </div>
-            <Outlet context={{services: data.data}}/>
+            <Outlet context={{services: data?.data}}/>
           </main>
         </SidebarProvider>
         <Footer />
