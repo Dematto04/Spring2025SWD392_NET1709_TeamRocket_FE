@@ -6,7 +6,7 @@ function Logo({ className, classImg }) {
   const { theme } = useTheme();
 
   return (
-    <div className={`w-40 ${className}`}>
+    <div className={`w-40 ${className} block`}>
       <img
         src={theme === "light" ? `/logo.png` : `/logo-dark.png`}
         className={`w-full ${classImg}`}

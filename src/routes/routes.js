@@ -10,9 +10,10 @@ import HousekeeperRegisterPage from "@/page/HousekeeperRegisterPage";
 import LoginPage from "@/page/LoginPage";
 import RegisterPage from "@/page/RegisterPage";
 import ResetPassword from "@/page/ResetPassword";
-import ServiceBookPage from "@/page/ServiceBookPage";
-import ServiceIntroPage from "@/page/ServiceIntro";
-
+import ServiceListPage from "@/page/ServiceListPage";
+import ServiceIntroPage from "@/page/ServiceIntroPage";
+import CustomerProfilePage from "@/page/CustomerProfilePage";
+import ServiceDetailPage from "@/page/ServiceDetailPage";
 
 const routes = [
   {
@@ -23,14 +24,22 @@ const routes = [
         component: HomePage,
       },
       {
-        path: "/service/intro/:id",
+        path: "/service/intro/:name/:id",
         component: ServiceIntroPage,
       },
       {
-        path: "/service/:id",
-        component: ServiceBookPage,
+        path: "/services",
+        component: ServiceListPage,
       },
       {
+        path: "/service/:id",
+        component: ServiceDetailPage,
+      },
+      {
+        path: "/profile/customer",
+        component: CustomerProfilePage,
+        },
+        {
         path: "/dashboard/admin",
         component: DashboardAdmin,
         allowedRoles: ['Admin']
