@@ -29,7 +29,7 @@ function ServiceBookingSidebar({step, currentStep = 0}) {
         <CardTitle>Booking</CardTitle>
         <div className="flex flex-col mt-4">
           {steps.map((item, idx) => (
-            <>
+            <div key={idx}>
               <div className="flex gap-1 items-center">
                 <CircleCheck size={16} className={`text-green-500 duration-1000 ${idx < step ? "text-slate-200 fill-green-500" : ""}`} />
                 <span className="text-sm">{item}</span>
@@ -40,7 +40,7 @@ function ServiceBookingSidebar({step, currentStep = 0}) {
                   className="h-8 w-[2px] ml-[6.5px]"
                 />
               )}
-            </>
+            </div>
           ))}
         </div>
       </CardContent>

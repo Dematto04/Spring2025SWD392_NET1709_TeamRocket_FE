@@ -27,12 +27,16 @@ function ServiceDetailSidebar() {
         </div>
         <Separator />
         <div>
-          <Button className="mt-8 w-full py-6">
-            <Link to={"/service/booking/123"} className="flex gap-2 items-center text-lg">
+          <Link
+            to={"/service/booking/123"}
+            className="flex gap-2 items-center text-lg"
+          >
+            <Button className="mt-8 w-full py-6">
               <Calendar />
               <span>Book service</span>
-            </Link>
-          </Button>
+            </Button>
+          </Link>
+
           <Button variant="outline" className="mt-4 w-full py-6">
             <Link className="flex gap-2 items-center text-lg">
               <Mail />
