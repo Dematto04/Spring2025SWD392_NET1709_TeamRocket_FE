@@ -8,8 +8,9 @@ import {
 } from "../ui/card";
 import { CircleCheck } from "lucide-react";
 import { Separator } from "../ui/separator";
-const steps = ["Additional Services", "Date & Time", "Personal Information"];
-function ServiceBookingSidebar({step, currentStep = 0}) {
+export const bookingSteps = ["Additional Services", "Date & Time", "Personal Information"];
+function ServiceBookingSidebar({ step, currentStep = 0 }) {
+
   return (
     <Card className="w-56  rounded-lg">
       <CardHeader className="p-4">
@@ -28,13 +29,18 @@ function ServiceBookingSidebar({step, currentStep = 0}) {
       <CardContent className="p-4">
         <CardTitle>Booking</CardTitle>
         <div className="flex flex-col mt-4">
-          {steps.map((item, idx) => (
+          {bookingSteps.map((item, idx) => (
             <div key={idx}>
               <div className="flex gap-1 items-center">
-                <CircleCheck size={16} className={`text-green-500 duration-1000 ${idx < step ? "text-slate-200 fill-green-500" : ""}`} />
+                <CircleCheck
+                  size={16}
+                  className={`text-green-500 duration-1000 ${
+                    idx < step ? "text-slate-200 fill-green-500" : ""
+                  }`}
+                />
                 <span className="text-sm">{item}</span>
               </div>
-              {idx !== 2 && (
+              {idx !== bookingSteps.length - 1 && (
                 <Separator
                   orientation="vertical"
                   className="h-8 w-[2px] ml-[6.5px]"
