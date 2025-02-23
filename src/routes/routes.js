@@ -15,6 +15,7 @@ import ServiceIntroPage from "@/page/ServiceIntroPage";
 import CustomerProfilePage from "@/page/CustomerProfilePage";
 import ServiceDetailPage from "@/page/ServiceDetailPage";
 import ServiceBookingPage from "@/page/ServiceBookingPage";
+import CheckoutPage from "@/page/CheckoutPage";
 
 const routes = [
   {
@@ -39,6 +40,11 @@ const routes = [
       {
         path: "/service/booking/:id",
         component: ServiceBookingPage,
+        // allowedRoles: ['Customer']
+      },
+      {
+        path: "/service/checkout",
+        component: CheckoutPage,
         // allowedRoles: ['Customer']
       },
       {
