@@ -9,17 +9,27 @@ import {
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
-export default function FAQ() {
+export default function FAQ({
+  headerStyle = "mx-auto max-w-3xl space-y-6 text-center",
+  contentStyle = "mx-auto mt-12 max-w-3xl space-y-4",
+  containerStyle = "py-12 px-3 md:py-24",
+  cardDisplay = true,
+  headerText,
+}) {
   return (
-    <section className="py-12 px-3 md:py-24">
-      <div className="mx-auto max-w-3xl space-y-6 text-center">
-        <Header1 className="">Frequently Asked Questions</Header1>
+    <section className={` ${containerStyle}`}>
+      <div className={`${headerStyle}`}>
+        {cardDisplay ? (
+          <Header1 className={headerText}>Frequently Asked Questions</Header1>
+        ) : (
+          <h2 className={headerText}>Frequently Asked Questions</h2>
+        )}
         <p className="text-muted-foreground">
           Have questions? We’ve got answers! Find out more about our home
           services below.
         </p>
       </div>
-      <div className="mx-auto mt-12 max-w-3xl space-y-4">
+      <div className={` ${contentStyle}`}>
         <Accordion type="single" collapsible>
           <AccordionItem value="item-1">
             <AccordionTrigger className="text-md">
@@ -82,17 +92,19 @@ export default function FAQ() {
           </AccordionItem>
         </Accordion>
       </div>
-      <div className="flex justify-center items-center flex-col max-w-3xl mx-auto bg-secondary p-6 mt-12 rounded-2xl min-h-56 gap-6">
-        <div className="text-center">
-          <h2 className="text-2xl font-semibold">Still have question?</h2>
-          <p className="mt-2 text-gray-400">
-            Have questions or need assistance? Our team is here to help!
-          </p>
+      {cardDisplay && (
+        <div className="flex justify-center items-center flex-col max-w-3xl mx-auto bg-secondary p-6 mt-12 rounded-2xl min-h-56 gap-6">
+          <div className="text-center">
+            <h2 className="text-2xl font-semibold">Still have question?</h2>
+            <p className="mt-2 text-gray-400">
+              Have questions or need assistance? Our team is here to help!
+            </p>
+          </div>
+          <Link to={"/"}>
+            <Button className="">Contact us!</Button>
+          </Link>
         </div>
-        <Link to={'/'}>
-          <Button className="">Contact us!</Button>
-        </Link>
-      </div>
+      )}
     </section>
   );
 }

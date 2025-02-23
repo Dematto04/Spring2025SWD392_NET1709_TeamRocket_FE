@@ -14,16 +14,15 @@ import {
 import { forwardRef } from "react";
 import { ThemeToggle } from "../ui/theme-toggle";
 import { useDispatch, useSelector } from "react-redux";
-import { isUserAuth, login, logout } from "@/redux/features/authSlice";
-import { SidebarUser } from "./SidebarUser";
+import { isUserAuth, logout, selectUser } from "@/redux/features/authSlice";
 import { Button } from "../ui/button";
 import { NavbarUser } from "./NavbarUser";
 import { CircleUserRound } from "lucide-react";
 import Logo from "../Logo";
-import { services } from "./services";
 
-export default function Navbar() {
+export default function Navbar({ services }) {
   const isAuth = useSelector(isUserAuth);
+  const user = useSelector(selectUser);
   const dispatch = useDispatch();
   const nav = useNavigate();
   const handleLogout = () => {
@@ -44,45 +43,72 @@ export default function Navbar() {
           </NavigationMenuItem>
         </Link>
         <NavigationMenuItem>
-          <NavigationMenuTrigger>Services</NavigationMenuTrigger>
+          <NavigationMenuTrigger>
+            <Link to="/service/12">Category</Link>
+          </NavigationMenuTrigger>
           {/* navbar items */}
           <NavigationMenuContent>
             <ul className="grid gap-3 p-4 md:w-screen grid-cols-8">
-              {services.map((service, idx) => (
-                <li key={idx} className="col-span-2 xl:col-span-1">
+              {services ? (
+                services.map((service, idx) => (
+                  <li key={idx} className="col-span-2 xl:col-span-1">
+                    <Link
+                      className="group flex h-full w-full select-none flex-col justify-start rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                      to={`/service/intro/${service.name}/${service.id}`}
+                    >
+                      <div className="overflow-hidden">
+                        <img
+                          loading="lazy"
+                          src={service.image}
+                          className="duration-200 group-hover:scale-110 h-full w-full object-contain"
+                        />
+                      </div>
+                      <div className="mb-2 mt-4 text-lg font-medium">
+                        {service.name}
+                      </div>
+                      <p className="text-sm leading-tight text-muted-foreground">
+                        {service.description}
+                      </p>
+                    </Link>
+                  </li>
+                ))
+              ) : (
+                <li className="col-span-2 xl:col-span-1">
                   <Link
                     className="group flex h-full w-full select-none flex-col justify-start rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                    to="/service/intro/home-cleaning"
+                    to={`/services?category=house-problem`}
                   >
                     <div className="overflow-hidden">
                       <img
                         loading="lazy"
-                        src={service.image}
+                        src={"/home-cleaning.webp"}
                         className="duration-200 group-hover:scale-110 h-full w-full object-contain"
                       />
                     </div>
                     <div className="mb-2 mt-4 text-lg font-medium">
-                      {service.name}
+                      Home cleaning
                     </div>
                     <p className="text-sm leading-tight text-muted-foreground">
-                      {service.description}
+                      anfsdjnfj
                     </p>
                   </Link>
                 </li>
-              ))}
+              )}
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
 
         <Link to="/blogs">
-          <NavigationMenuItem className={navigationMenuTriggerStyle()}>Blogs</NavigationMenuItem>
+          <NavigationMenuItem className={navigationMenuTriggerStyle()}>
+            Blogs
+          </NavigationMenuItem>
         </Link>
       </NavigationMenuList>
       <NavigationMenuList>
         <NavigationMenuItem>
           <div className="flex gap-3">
             {isAuth ? (
-              <NavbarUser onSignOut={handleLogout} />
+              <NavbarUser onSignOut={handleLogout} user={user} />
             ) : (
               <div className="flex gap-3">
                 <Link to="/register">
@@ -106,25 +132,25 @@ export default function Navbar() {
   );
 }
 
-const ListItem = forwardRef(({ className, title, children, ...props }, ref) => {
-  return (
-    <li>
-      <NavigationMenuLink asChild>
-        <a
-          ref={ref}
-          className={cn(
-            "block select-none space-y-1 rounded-md p-3 leadingduration-200 -none no-underline outline-none -colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-            className
-          )}
-          {...props}
-        >
-          <div className="text-sm font-medium leading-none">{title}</div>
-          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-            {children}
-          </p>
-        </a>
-      </NavigationMenuLink>
-    </li>
-  );
-});
-ListItem.displayName = "ListItem";
+// const ListItem = forwardRef(({ className, title, children, ...props }, ref) => {
+//   return (
+//     <li>
+//       <NavigationMenuLink asChild>
+//         <a
+//           ref={ref}
+//           className={cn(
+//             "block select-none space-y-1 rounded-md p-3 leadingduration-200 -none no-underline outline-none -colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+//             className
+//           )}
+//           {...props}
+//         >
+//           <div className="text-sm font-medium leading-none">{title}</div>
+//           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+//             {children}
+//           </p>
+//         </a>
+//       </NavigationMenuLink>
+//     </li>
+//   );
+// });
+// ListItem.displayName = "ListItem";

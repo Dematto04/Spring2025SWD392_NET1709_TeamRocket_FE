@@ -41,5 +41,7 @@ export const handleError = (error) => {
   return error.data?.messages || "Something went wrong. Please try again.";
 };
 
-
-
+export const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.3 } },
+};

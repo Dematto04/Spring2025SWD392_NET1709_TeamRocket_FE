@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useDispatch } from "react-redux";
 import { logout } from "@/redux/features/authSlice";
+import { useNavigate } from "react-router-dom";
 
 export function SidebarUser({ user }) {
   const { isMobile } = useSidebar();
