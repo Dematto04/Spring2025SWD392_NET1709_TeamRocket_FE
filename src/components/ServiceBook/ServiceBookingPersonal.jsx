@@ -52,11 +52,15 @@ function ServiceBookingPersonal() {
       setNewAddress("");
     }
   };
+  const handleInfo = (data) => {
+    console.log(data);
+    
+  }
 
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="visible">
       <Form {...form}>
-        <form className="rounded-lg shadow-sm space-y-6">
+        <form onSubmit={form.handleSubmit(handleInfo)} className="rounded-lg shadow-sm space-y-6">
           <h1 className="font-semibold leading-none tracking-tight mb-4">
             Add Personal Information
           </h1>

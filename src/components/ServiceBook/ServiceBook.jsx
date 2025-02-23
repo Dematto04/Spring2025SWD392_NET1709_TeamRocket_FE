@@ -7,6 +7,8 @@ import ServiceDateTime from "./ServiceDateTime";
 import Profile from "../CustomerProfile/Profile";
 import ServiceBookingPersonal from "./ServiceBookingPersonal";
 import { ServiceBookContext } from "./ServiceBookContext";
+import { bookingSteps } from "./ServiceBookingSidebar";
+import { useNavigate } from "react-router-dom";
 const Content = ({ step }) => {
   switch (step) {
     case 0:
@@ -19,12 +21,13 @@ const Content = ({ step }) => {
 };
 function ServiceBook({ step, setStep }) {
   const { form } = useContext(ServiceBookContext);
-  const handNextStep = () => {
-    if(step === 2){
-      form.trigger()
-      return
+  const nav = useNavigate()
+  const handNextStep = async () => {
+    if (step === 2) {
+      const isValid = await form.trigger();
+      if (!isValid) return;
     }
-    setStep(step + 1);
+    setStep((prev) => prev + 1);
   };
   return (
     <div className="flex-1 h-full p-4 rounded-lg">
@@ -37,13 +40,13 @@ function ServiceBook({ step, setStep }) {
             Prev
           </Button>
         )}
-        {step < 3 && (
+        {step < bookingSteps.length - 1 && (
           <Button onClick={handNextStep}>
             Next
             <ArrowRight />
           </Button>
         )}
-        {step === 3 && <Button>Place Order</Button>}
+        {step === bookingSteps.length - 1 && <Button onClick={()=> nav('/service/checkout')}>Place Order</Button>}
       </div>
     </div>
   );
