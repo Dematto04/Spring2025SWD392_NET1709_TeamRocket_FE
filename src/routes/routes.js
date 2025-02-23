@@ -16,6 +16,13 @@ import CustomerProfilePage from "@/page/CustomerProfilePage";
 import ServiceDetailPage from "@/page/ServiceDetailPage";
 import ServiceBookingPage from "@/page/ServiceBookingPage";
 import CheckoutPage from "@/page/CheckoutPage";
+import DashboardLayout from "@/components/Layout/DashboardLayout";
+import HousekeeperDashboard from "@/page/Dashboard/Housekeeper/HousekeeperDashboard";
+import HousekeeperAddService from "@/page/Dashboard/Housekeeper/HousekeeperAddService";
+import HousekeeperMyService from "@/page/Dashboard/Housekeeper/HousekeeperMyService";
+import HouseKeeperBookingList from "@/page/Dashboard/Housekeeper/HouseKeeperBookingList";
+import HousekeeperWallet from "@/page/Dashboard/Housekeeper/HousekeeperWallet";
+import HousekeeperEarning from "@/page/Dashboard/Housekeeper/HousekeeperEarning";
 
 const routes = [
   {
@@ -50,16 +57,17 @@ const routes = [
       {
         path: "/profile/customer",
         component: CustomerProfilePage,
-        },
-        {
+      },
+      {
         path: "/dashboard/admin",
         component: DashboardAdmin,
-        allowedRoles: ['Admin']
+        allowedRoles: ["Admin"],
       },
+      
       {
         path: "/dashboard/staff",
         component: DashboardStaff,
-        allowedRoles: ["Admin", "Staff"]
+        allowedRoles: ["Admin", "Staff"],
       },
     ],
   },
@@ -93,6 +101,35 @@ const routes = [
       },
     ],
   },
+  {
+    layout: DashboardLayout,
+    children: [
+      {
+        path: "/dashboard/housekeeper",
+        component: HousekeeperDashboard
+      },
+      {
+        path: "/dashboard/housekeeper/add-service",
+        component: HousekeeperAddService
+      },
+      {
+        path: "/dashboard/housekeeper/my-service",
+        component: HousekeeperMyService
+      },
+      {
+        path: "/dashboard/housekeeper/booking-list",
+        component: HouseKeeperBookingList
+      },
+      {
+        path: "/dashboard/housekeeper/wallet",
+        component: HousekeeperWallet
+      },
+      {
+        path: "/dashboard/housekeeper/earning",
+        component: HousekeeperEarning
+      },
+    ]
+  }
 ];
 
 export default routes;
