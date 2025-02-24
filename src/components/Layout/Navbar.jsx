@@ -54,12 +54,12 @@ export default function Navbar({ services }) {
                   <li key={idx} className="col-span-2 xl:col-span-1">
                     <Link
                       className="group flex h-full w-full select-none flex-col justify-start rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                      to={`/service/intro/${service.name}/${service.id}`}
+                      to={`/services?category=${service.id}`}
                     >
                       <div className="overflow-hidden">
                         <img
                           loading="lazy"
-                          src={service.image}
+                          src={service.imgUrl}
                           className="duration-200 group-hover:scale-110 h-full w-full object-contain"
                         />
                       </div>
