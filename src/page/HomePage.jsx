@@ -10,7 +10,7 @@ import { useOutletContext } from "react-router-dom";
 function HomePage() {
   const {services} = useOutletContext()
   console.log({services});
-  
+
   return (
     <>
       <Hero />

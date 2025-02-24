@@ -5,33 +5,26 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-function ServiceDetailOverview() {
+function ServiceDetailOverview({ overview, additionalServices }) {
   return (
     <>
       <div>
         <h1 className="text-2xl font-medium mt-8">Service Overview</h1>
-        <p className="mt-4">
-          Provides reliable and professional electrical solutions for
-          residential and commercial clients. Our licensed electricians are
-          dedicated to delivering top-quality service, ensuring safety, and
-          meeting all your electrical needs. Committed to providing high-quality
-          electrical solutions with a focus on safety and customer satisfaction.
-          Our team of licensed electricians is equipped to handle both
-          residential and commercial projects with expertise and care.
-        </p>
+        <p className="mt-4">{overview}</p>
       </div>
       <div>
         <div className="mt-4">
           {/* Service card  */}
-          <Accordion type="single" collapsible>
-            <AccordionItem value="item-1">
-              <AccordionTrigger>
-                <h1 className="text-2xl font-medium mt-8">Services Offered</h1>
-              </AccordionTrigger>
-              <AccordionContent>
-                {Array(6)
-                  .fill(0)
-                  .map((item, i) => (
+          {additionalServices.length > 0 ? (
+            <Accordion type="single" collapsible>
+              <AccordionItem value="item-1">
+                <AccordionTrigger>
+                  <h1 className="text-2xl font-medium mt-8">
+                    Additional Services
+                  </h1>
+                </AccordionTrigger>
+                <AccordionContent>
+                  {additionalServices.map((item, i) => (
                     <div
                       key={i}
                       className="min-h-40 md:h-40 shadow-lg rounded-lg md:p-6 mt-4 hover:-translate-y-2 duration-500"
@@ -65,9 +58,12 @@ function ServiceDetailOverview() {
                       </div>
                     </div>
                   ))}
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          ) : (
+            <></>
+          )}
         </div>
       </div>
     </>

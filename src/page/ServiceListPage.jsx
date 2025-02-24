@@ -9,11 +9,18 @@ import {
 } from "@/components/ui/breadcrumb";
 import Filter from "@/components/ServiceList/Filter";
 import ServiceList from "@/components/ServiceList/ServiceList";
+import { useGetServicesQuery } from "@/redux/api/serviceApi";
 
 function ServiceListPage() {
   const [searchParams] = useSearchParams();
   const category = searchParams.get("category");
-
+  const { data, isLoading } = useGetServicesQuery({
+    pageIndex: 1,
+    pageSize: 10,
+  });
+  if (isLoading) return null;
+  console.log({data});
+  
   return (
     <>
       {/* Hero */}
@@ -55,7 +62,7 @@ function ServiceListPage() {
 
         {/* Danh sách dịch vụ */}
         <div className="w-full">
-          <ServiceList />
+          <ServiceList services={data.data.items} />
         </div>
       </div>
     </>
