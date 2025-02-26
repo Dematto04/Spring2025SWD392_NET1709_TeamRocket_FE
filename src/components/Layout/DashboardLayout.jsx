@@ -8,11 +8,11 @@ import { Outlet } from "react-router-dom";
 
 export default function DashboardLayout() {
   return (
-    <SidebarProvider>
+    <SidebarProvider >
       <DashboardSidebar />
       <SidebarInset>
         <SidebarTrigger className="-ml-1" />
-        <div className="py-4 px-8 bg-secondary h-full">
+        <div className="py-4 px-3 md:px-8 bg-secondary h-full">
           <Outlet />
         </div>
       </SidebarInset>
