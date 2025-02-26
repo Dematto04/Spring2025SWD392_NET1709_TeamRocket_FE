@@ -16,8 +16,6 @@ import { useTheme } from "@/components/theme-provider";
 import { data } from "./sidebarItemData";
 
 // This is sample data.
-
-
 export function DashboardSidebar({ ...props }) {
   const [clickedItem, setClickedItem] = React.useState("Dashboard")
   const { theme } = useTheme();
