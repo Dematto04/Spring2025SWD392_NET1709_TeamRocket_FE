@@ -18,7 +18,7 @@ import ServiceBookingPage from "@/page/ServiceBookingPage";
 import CheckoutPage from "@/page/CheckoutPage";
 import DashboardLayout from "@/components/Layout/DashboardLayout";
 import HousekeeperDashboard from "@/page/Dashboard/Housekeeper/HousekeeperDashboard";
-import HousekeeperAddService from "@/page/Dashboard/Housekeeper/HousekeeperAddService";
+import HousekeeperAddService from "@/page/Dashboard/Housekeeper/HousekeeperAddService/HousekeeperAddService";
 import HousekeeperMyService from "@/page/Dashboard/Housekeeper/HousekeeperMyService";
 import HouseKeeperBookingList from "@/page/Dashboard/Housekeeper/HouseKeeperBookingList";
 import HousekeeperWallet from "@/page/Dashboard/Housekeeper/HousekeeperWallet";

@@ -67,7 +67,7 @@ export default function Navbar({ services }) {
                         {service.name}
                       </div>
                       <p className="text-sm leading-tight text-muted-foreground">
-                        {service.description}
+                        Wow
                       </p>
                     </Link>
                   </li>
@@ -89,7 +89,7 @@ export default function Navbar({ services }) {
                       Home cleaning
                     </div>
                     <p className="text-sm leading-tight text-muted-foreground">
-                      anfsdjnfj
+                      Service Category
                     </p>
                   </Link>
                 </li>

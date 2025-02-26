@@ -27,11 +27,13 @@ const serviceApi = apiSlice.injectEndpoints({
       }),
       providesTags: ["Categories"],
     }),
-    getCategories: build.query({
-      query: () => ({
-        url: `/Service/Categories`,
+    createService: build.mutation({
+      query: (body) => ({
+        url: `/Service`,
+        method: 'POST',
+        body
       }),
-      providesTags: ["Categories"],
+      invalidatesTags: ["Services"],
     }),
   }),
 });
@@ -41,4 +43,5 @@ export const {
   useGetServicesDetailQuery,
   useGetServicesPriceQuery,
   useGetCategoriesQuery,
+  useCreateServiceMutation
 } = serviceApi;
