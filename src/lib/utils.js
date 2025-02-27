@@ -45,3 +45,6 @@ export const containerVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.3 } },
 };
+export const formatTime = (time) => {
+  return time.includes(":") && time.split(":").length === 2 ? `${time}:00` : time;
+};

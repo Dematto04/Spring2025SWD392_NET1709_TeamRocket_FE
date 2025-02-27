@@ -13,8 +13,8 @@ import { Button } from "../ui/button";
 import { Link } from "react-router-dom";
 function ServiceItem({service}) {
   return (
-    <div className="max-w-80 rounded-lg overflow-hidden shadow-md">
-      <Card>
+    <div className=" rounded-lg overflow-hidden shadow-md">
+      <Card className="h-full">
         <CardHeader className="p-0 relative">
           <Link to={`/service/${service.id}`}>
             <img src="/home-cleaning.webp" alt="" />

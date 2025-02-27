@@ -19,7 +19,7 @@ import CheckoutPage from "@/page/CheckoutPage";
 import DashboardLayout from "@/components/Layout/DashboardLayout";
 import HousekeeperDashboard from "@/page/Dashboard/Housekeeper/HousekeeperDashboard";
 import HousekeeperAddService from "@/page/Dashboard/Housekeeper/HousekeeperAddService/HousekeeperAddService";
-import HousekeeperMyService from "@/page/Dashboard/Housekeeper/HousekeeperMyService";
+import HousekeeperMyService from "@/page/Dashboard/Housekeeper/HousekeeperMyService/HousekeeperMyService";
 import HouseKeeperBookingList from "@/page/Dashboard/Housekeeper/HouseKeeperBookingList";
 import HousekeeperWallet from "@/page/Dashboard/Housekeeper/HousekeeperWallet";
 import HousekeeperEarning from "@/page/Dashboard/Housekeeper/HousekeeperEarning";
@@ -57,6 +57,7 @@ const routes = [
       {
         path: "/profile/customer",
         component: CustomerProfilePage,
+        allowedRoles: ['Customer']
       },
       {
         path: "/dashboard/admin",
@@ -106,27 +107,33 @@ const routes = [
     children: [
       {
         path: "/dashboard/housekeeper",
-        component: HousekeeperDashboard
+        component: HousekeeperDashboard,
+        allowedRoles: ["Housekeeper"]
       },
       {
         path: "/dashboard/housekeeper/add-service",
-        component: HousekeeperAddService
+        component: HousekeeperAddService,
+        allowedRoles: ["Housekeeper"]
       },
       {
         path: "/dashboard/housekeeper/my-service",
-        component: HousekeeperMyService
+        component: HousekeeperMyService,
+        allowedRoles: ["Housekeeper"]
       },
       {
         path: "/dashboard/housekeeper/booking-list",
-        component: HouseKeeperBookingList
+        component: HouseKeeperBookingList,
+        allowedRoles: ["Housekeeper"]
       },
       {
         path: "/dashboard/housekeeper/wallet",
-        component: HousekeeperWallet
+        component: HousekeeperWallet,
+        allowedRoles: ["Housekeeper"]
       },
       {
         path: "/dashboard/housekeeper/earning",
-        component: HousekeeperEarning
+        component: HousekeeperEarning,
+        allowedRoles: ["Housekeeper"]
       },
     ]
   }
