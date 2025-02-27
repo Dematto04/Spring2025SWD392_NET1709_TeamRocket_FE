@@ -27,6 +27,8 @@ import { useSelector } from "react-redux";
 import { selectUser } from "@/redux/features/authSlice";
 import Logo from "../Logo";
 import { useTheme } from "../theme-provider";
+import { SheetTitle } from "../ui/sheet";
+import { DialogTitle } from "../ui/dialog";
 export function AppSidebar() {
   const { theme } = useTheme();
   const { isMobile, toggleSidebar } = useSidebar();
@@ -106,14 +108,16 @@ export function AppSidebar() {
             </SidebarContent>
             <SidebarFooter>
               {user ? (
-                <SidebarUser />
+                <SidebarUser user={user} />
               ) : (
                 <>
                   <Link className="block w-full" to="/login">
                     <Button className="w-full">Login</Button>
                   </Link>
                   <Link className="block w-full" to="/register">
-                    <Button className="w-full" variant="outline">Register</Button>
+                    <Button className="w-full" variant="outline">
+                      Register
+                    </Button>
                   </Link>
                 </>
               )}

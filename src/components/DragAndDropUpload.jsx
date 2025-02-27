@@ -1,41 +1,32 @@
+import { useUploadFilesMutation } from "@/redux/api/uploadFileApi";
 import { Upload } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useDropzone } from "react-dropzone";
 
 const DragAndDropUpload = ({ files, setFiles }) => {
+  const [upload, { isLoading, error, data }] = useUploadFilesMutation();
   const { getRootProps, getInputProps } = useDropzone({
-    accept: {
-      "image/*": [],
-    },
-    onDrop: (acceptedFiles) => {
-      setFiles(
-        acceptedFiles.map((file) =>
-          Object.assign(file, {
-            preview: URL.createObjectURL(file),
-          })
-        )
-      );
+    accept: { "image/*": [] },
+    onDrop: async (acceptedFiles) => {
+      console.log("Accepted files:", acceptedFiles);
+
+      if (acceptedFiles.length === 0) {
+        console.log("No files selected");
+        return;
+      }      
+      const formData = new FormData();
+      acceptedFiles.forEach((file) => formData.append("files", file));
+      try {
+        const response = await upload(formData);
+        console.log("Upload response:", response.data);
+        setFiles(response?.data?.data?.map((url) => url))
+      } catch (err) {
+        console.error("Upload failed", err);
+      }
     },
   });
 
-  const thumbs = files.map((file) => (
-    <div
-      key={file.name}
-      className="inline-flex border border-gray-300 rounded-md p-1 w-[100px] h-[100px] m-2"
-    >
-      <div className="flex min-w-0 overflow-hidden">
-        <img
-          src={file.preview}
-          className="block w-auto h-full"
-          onLoad={() => URL.revokeObjectURL(file.preview)}
-        />
-      </div>
-    </div>
-  ));
-
-  useEffect(() => {
-    return () => files.forEach((file) => URL.revokeObjectURL(file.preview));
-  }, [files]);
+ 
 
   return (
     <section className="container">
@@ -48,12 +39,26 @@ const DragAndDropUpload = ({ files, setFiles }) => {
         <input {...getInputProps()} />
         <div className="flex flex-col justify-center items-center gap-4">
           <p className="text-gray-600">
-            Drag and drop images or click to choose images{" "}
+            Drag and drop images or click to choose images
           </p>
-          <Upload className="text-gray-600" size={32}/>
+          <Upload className="text-gray-600" size={32} />
         </div>
       </div>
-      <aside className="flex flex-wrap mt-4">{thumbs}</aside>
+      {isLoading && <p className="text-blue-500 mt-2">Uploading...</p>}
+      {error && <p className="text-red-500 mt-2">Upload failed!</p>}
+      {data && <p className="text-green-500 mt-2">Upload successful!</p>}
+      <aside className="flex flex-wrap mt-4">
+        {files && files.length > 0 && files.map((preview, index) => (
+          <div
+            key={index}
+            className="inline-flex border border-gray-300 rounded-md p-1 w-[100px] h-[100px] m-2"
+          >
+            <div className="flex min-w-0 overflow-hidden">
+              <img src={preview} className="block w-auto h-full object-cover" />
+            </div>
+          </div>
+        ))}
+      </aside>
     </section>
   );
 };

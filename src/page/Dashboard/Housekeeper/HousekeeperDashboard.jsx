@@ -204,11 +204,11 @@ function HousekeeperDashboard() {
         <CardHeader>
           <CardTitle>Recent Booking</CardTitle>
         </CardHeader>
-        {Array(5)
+        {Array(1)
           .fill(1)
           .map((item, idx) => (
             <>
-              <CardContent key={idx} className=" min-h-40 md:h-52 rounded-lg ">
+              <CardContent key={item} className=" min-h-40 md:h-52 rounded-lg ">
                 <div className="border p-4 h-full rounded-md flex gap-4 flex-wrap md:flex-nowrap">
                   <div className="md:shrink-0">
                     <img

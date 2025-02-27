@@ -15,7 +15,10 @@ export function NavMain({ items, clickedItem, setClickedItem }) {
             key={item.title}
             to={item.url}
             className="block"
-            onClick={() => setClickedItem(item.title)}
+            onClick={() => {
+              setClickedItem(item.title);
+              localStorage.setItem("dashboard-item", item.title)
+            }}
           >
             <SidebarMenuItem>
               <SidebarMenuButton
