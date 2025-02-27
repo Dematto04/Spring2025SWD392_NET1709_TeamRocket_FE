@@ -38,6 +38,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { serviceTimeSlots } from "./slotData";
 import DragAndDropUpload from "@/components/DragAndDropUpload";
 import { useCreateServiceMutation, useGetCategoriesQuery } from "@/redux/api/serviceApi";
+import { toast } from "@/hooks/use-toast";
+import { formatTime } from "@/lib/utils";
+import BasisInformation from "./BasisInformation";
 const formSchema = z.object({
   service_name: z.string().min(1, { message: "Service name is required" }),
   category_id: z.string().min(1, { message: "Service name is required" }),
@@ -104,7 +107,7 @@ function HousekeeperAddService() {
     control,
     name: "additionalServices",
   });
-  const handleSubmit = (data) => {
+  const handleSubmit = async (data) => {
     
 
     const haveSlotDays = dateOfWeek.filter((date) => date.slots.length > 0);
@@ -112,18 +115,34 @@ function HousekeeperAddService() {
     haveSlotDays.forEach((date) => {
       date.slots.forEach((slot) => {
         serviceTimeSlots.push({
-          start_time: slot.start_time,
+          start_time: formatTime(slot.start_time),
           day_of_week: date.dateOfWeek,
-          date_start: new Date(),
+          // date_start: new Date().toISOString(),
         });
       });
     });
     const body = {
       ...data,
-      serviceTimeSlots
+      duration: data.duration,
+      price: data.price,
+      serviceTimeSlots,
+      serviceImages: files?.map(file => (
+        {
+          link: file
+        }
+      ))
     }
     console.log({body});
-    
+    const result = await createService(body)
+    if(result.error){
+      toast({
+        title: "Create service fail",
+      })
+      return
+    }
+    toast({
+      title: "Create service sucessfully",
+    })
   };
   if (isLoading) return null;
 
@@ -150,63 +169,7 @@ function HousekeeperAddService() {
                 ]}
               >
                 {/* Basic Info */}
-                <AccordionItem value="item-1">
-                  <AccordionTrigger className="text-lg">
-                    Basis Information
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="flex w-full gap-6">
-                      <FormField
-                        control={form.control}
-                        name="service_name"
-                        render={({ field }) => (
-                          <FormItem className="flex-grow">
-                            <FormLabel>Service Name</FormLabel>
-                            <FormControl>
-                              <Input
-                                {...field}
-                                placeholder="Your service name"
-                              />
-                            </FormControl>
-                            <FormDescription />
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="category_id"
-                        render={({ field }) => (
-                          <FormItem className="flex-grow">
-                            <FormLabel>Category</FormLabel>
-                            <FormControl>
-                              <Select
-                                onValueChange={field.onChange}
-                                defaultValue={field.value}
-                              >
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select a category" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  {categories.data &&
-                                    categories.data.map((category) => (
-                                      <SelectItem key={category.id} value={category.id}>
-                                        {category.name}
-                                      </SelectItem>
-                                    ))}
-                                </SelectContent>
-                              </Select>
-                            </FormControl>
-                            <FormDescription />
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
+                <BasisInformation categories={categories && categories} form={form}/>
 
                 {/* Detail and service steps*/}
                 <AccordionItem value="item-2">
@@ -222,13 +185,13 @@ function HousekeeperAddService() {
                           key={field.id}
                           className="border p-4 rounded-lg mt-5"
                         >
-                          <div className="flex items-center gap-3 ">
+                          <div className="flex flex-wrap items-center gap-3 ">
                             {/* Step Order */}
                             <FormField
                               control={control}
                               name={`serviceSteps.${index}.step_order`}
                               render={() => (
-                                <FormItem className="w-1/12">
+                                <FormItem className="w-1/3 md:w-1/12">
                                   <FormLabel>Step Order</FormLabel>
                                   <FormControl>
                                     <Input
@@ -314,12 +277,12 @@ function HousekeeperAddService() {
                   <AccordionTrigger className="text-lg">
                     Pricing
                   </AccordionTrigger>
-                  <AccordionContent className="flex gap-3">
+                  <AccordionContent className="block lg:flex lg:gap-3">
                     <FormField
                       control={form.control}
                       name="duration"
                       render={({ field }) => (
-                        <FormItem className="w-1/5">
+                        <FormItem className="w-1/4 lg:w-1/5">
                           <FormLabel>Estimate Duration (min)</FormLabel>
                           <FormControl>
                             <Input
@@ -338,7 +301,7 @@ function HousekeeperAddService() {
                       control={form.control}
                       name="price"
                       render={({ field }) => (
-                        <FormItem className="w-1/5">
+                        <FormItem className="w-1/4 lg:w-1/5">
                           <FormLabel>Price</FormLabel>
                           <FormControl>
                             <Input
@@ -391,7 +354,7 @@ function HousekeeperAddService() {
                             key={slotIndex}
                             className="flex items-center gap-2 mt-2"
                           >
-                            <FormControl className="w-1/5">
+                            <FormControl className="w-full md:1/2 lg:w-1/5">
                               <Input
                                 type="time"
                                 value={slot.start_time}
@@ -437,12 +400,12 @@ function HousekeeperAddService() {
                     Location
                   </AccordionTrigger>
                   <AccordionContent>
-                    <div className="flex w-full gap-6 p-2">
+                    <div className="flex flex-wrap w-full gap-6 p-2">
                       <FormField
                         control={form.control}
                         name="city"
                         render={({ field }) => (
-                          <FormItem className="w-1/5">
+                          <FormItem className="lg:w-1/5">
                             <FormLabel>City</FormLabel>
                             <FormControl>
                               <Input {...field} placeholder="Enter city" />
@@ -454,7 +417,7 @@ function HousekeeperAddService() {
                         control={form.control}
                         name="province"
                         render={({ field }) => (
-                          <FormItem className="w-1/5">
+                          <FormItem className="lg:w-1/5">
                             <FormLabel>Province</FormLabel>
                             <FormControl>
                               <Input {...field} placeholder="Enter province" />
@@ -499,7 +462,7 @@ function HousekeeperAddService() {
                     {addtionalFields?.map((field, idx) => (
                       <div
                         key={field.id}
-                        className="flex w-full gap-6 items-center my-4"
+                        className="flex flex-wrap w-full gap-6 items-center my-4"
                       >
                         <FormField
                           control={form.control}

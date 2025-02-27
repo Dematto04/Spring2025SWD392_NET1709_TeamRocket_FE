@@ -16,7 +16,7 @@ function ServiceListPage() {
   const category = searchParams.get("category");
   const { data, isLoading } = useGetServicesQuery({
     pageIndex: 1,
-    pageSize: 10,
+    pageSize: 100,
   });
   if (isLoading) return null;
   console.log({data});

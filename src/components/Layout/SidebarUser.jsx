@@ -1,11 +1,4 @@
-import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Sparkles,
-} from "lucide-react";
+import { Bell, ChevronsUpDown, LogOut } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -26,11 +19,13 @@ import {
 import { useDispatch } from "react-redux";
 import { logout } from "@/redux/features/authSlice";
 import { useNavigate } from "react-router-dom";
+import { UserDropDown } from "./NavbarUser";
 
 export function SidebarUser({ user }) {
   const { isMobile } = useSidebar();
   const dispatch = useDispatch();
   const nav = useNavigate();
+  console.log(user);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -47,10 +42,12 @@ export function SidebarUser({ user }) {
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user?.avatar} alt={user?.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarFallback className="rounded-lg">
+                  {user?.fullName.slice(0, 2)}
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{user?.name}</span>
+                <span className="truncate font-semibold">{user?.fullName}</span>
                 <span className="truncate text-xs">{user?.email}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
@@ -66,31 +63,28 @@ export function SidebarUser({ user }) {
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user?.avatar} alt={user?.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">
+                    {user?.fullName.slice(0, 2)}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{user?.name}</span>
+                  <span className="truncate font-semibold">
+                    {user?.fullName}
+                  </span>
                   <span className="truncate text-xs">{user?.email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
+            {/* <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <Sparkles />
                 Upgrade to Pro
               </DropdownMenuItem>
-            </DropdownMenuGroup>
+            </DropdownMenuGroup> */}
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
+              <UserDropDown role={user.role} />
               <DropdownMenuItem>
                 <Bell />
                 Notifications
