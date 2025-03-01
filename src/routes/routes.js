@@ -23,6 +23,7 @@ import HousekeeperMyService from "@/page/Dashboard/Housekeeper/HousekeeperMyServ
 import HouseKeeperBookingList from "@/page/Dashboard/Housekeeper/HouseKeeperBookingList";
 import HousekeeperWallet from "@/page/Dashboard/Housekeeper/HousekeeperWallet";
 import HousekeeperEarning from "@/page/Dashboard/Housekeeper/HousekeeperEarning";
+import MapGoong from "@/page/MapTest/MapGoong";
 
 const routes = [
   {
@@ -35,6 +36,10 @@ const routes = [
       {
         path: "/service/intro/:name/:id",
         component: ServiceIntroPage,
+      },
+      {
+        path: "/goong-map",
+        component: MapGoong,
       },
       {
         path: "/services",
