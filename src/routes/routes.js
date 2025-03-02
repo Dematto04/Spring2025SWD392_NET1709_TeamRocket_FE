@@ -2,7 +2,7 @@ import MainLayout from "@/components/Layout/MainLayout";
 import SimpleLayout from "@/components/Layout/SimpleLayout";
 import ConfirmEmail from "@/page/ConfirmEmail";
 import DashboardAdmin from "@/page/Dashboard/DashboardAdmin";
-import DashboardStaff from "@/page/Dashboard/DashboardStaff";
+import DashboardStaff from "@/page/Dashboard/Staff/DashboardStaff";
 import ForgotPassword from "@/page/ForgotPassword";
 import HomePage from "@/page/HomePage";
 import HousekeeperRegisterPage from "@/page/HousekeeperRegisterPage";
@@ -23,6 +23,8 @@ import HousekeeperMyService from "@/page/Dashboard/Housekeeper/HousekeeperMyServ
 import HouseKeeperBookingList from "@/page/Dashboard/Housekeeper/HouseKeeperBookingList";
 import HousekeeperWallet from "@/page/Dashboard/Housekeeper/HousekeeperWallet";
 import HousekeeperEarning from "@/page/Dashboard/Housekeeper/HousekeeperEarning";
+import StaffRequestsPage from "@/page/Dashboard/Staff/StaffRequestsPage";
+import RequestDetailPage from "@/page/Dashboard/Staff/RequestDetailPage";
 
 const routes = [
   {
@@ -58,17 +60,6 @@ const routes = [
         path: "/profile/customer",
         component: CustomerProfilePage,
         allowedRoles: ['Customer']
-      },
-      {
-        path: "/dashboard/admin",
-        component: DashboardAdmin,
-        allowedRoles: ["Admin"],
-      },
-      
-      {
-        path: "/dashboard/staff",
-        component: DashboardStaff,
-        allowedRoles: ["Admin", "Staff"],
       },
     ],
   },
@@ -134,6 +125,21 @@ const routes = [
         path: "/dashboard/housekeeper/earning",
         component: HousekeeperEarning,
         allowedRoles: ["Housekeeper"]
+      },
+      {
+        path: "/dashboard/staff",
+        component: DashboardStaff,
+        allowedRoles: ["Staff"]
+      },
+      {
+        path: "/dashboard/staff/requests",
+        component: StaffRequestsPage,
+        allowedRoles: ["Staff"]
+      },
+      {
+        path: "/request/:id",
+        component: RequestDetailPage,
+        allowedRoles: ['Staff']
       },
     ]
   }
