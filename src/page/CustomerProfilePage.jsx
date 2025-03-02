@@ -4,6 +4,7 @@ import Wallet from "@/components/CustomerProfile/Wallet";
 import Profile from "@/components/CustomerProfile/Profile";
 import Transactions from "@/components/CustomerProfile/Transactions";
 import Address from "@/components/CustomerProfile/Address";
+import { BookingList } from "@/components/CustomerProfile/BookingHistory";
 import { useCustomerProfileQuery } from "@/redux/api/customerProfileApi";
 
 export default function CustomerProfilePage() {
@@ -36,6 +37,8 @@ export default function CustomerProfilePage() {
         return <Transactions />;
       case "address":
         return <Address />;
+      case "booking":
+        return <BookingList />;
       default:
         return <div>Select a menu item</div>;
     }

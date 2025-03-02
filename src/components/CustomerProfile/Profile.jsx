@@ -22,22 +22,18 @@ const Profile = ({ profileInfo }) => {
   const [updateProfile, { isLoading }] = useUpdateCustomerProfileMutation();
 
   const getTomorrowDate = (dateString) => {
-    // Extract the date part (e.g., "2024-02-07" from "2024-02-07T00:00:00")
     const [year, month, day] = dateString.split("T")[0].split("-").map(Number);
-    // Create a UTC date object using Date.UTC (month is 0-indexed)
     const utcDate = new Date(Date.UTC(year, month - 1, day));
-    // Add one day (in UTC)
     utcDate.setUTCDate(utcDate.getUTCDate() );
-    // Convert back to ISO string and extract just the date portion
     return utcDate.toISOString().split("T")[0];
   };
   // Transform API data to match form structure
   const defaultValues = profileInfo?.data
     ? {
-        fullName: profileInfo.data.fullName || "",
-        phoneNumber: profileInfo.data.phoneNumber || "",
+        fullName: profileInfo.data.full_name || "",
+        phoneNumber: profileInfo.data.phone || "",
         gender: profileInfo.data.gender ? "Male" : "Female", // Convert boolean to string
-         dob: profileInfo.data.birthday
+         dob: profileInfo.data.birth_date
         ? getTomorrowDate(profileInfo.data.birthday)
         : "",
       }
@@ -69,16 +65,12 @@ const Profile = ({ profileInfo }) => {
   const getDateString = (dateString) => {
     if (!dateString) return "";
   
-    // Split input date manually to avoid time zone shifts
     const [year, month, day] = dateString.split("-").map(Number);
   
-    // Create a new Date object in UTC without unwanted timezone shifts
-    const date = new Date(Date.UTC(year, month - 1, day)); // month is 0-indexed
+    const date = new Date(Date.UTC(year, month - 1, day));
   
-    // Add one day
     date.setUTCDate(date.getUTCDate());
   
-    // Format back to "YYYY-MM-DDT00:00:00"
     const formattedYear = date.getUTCFullYear();
     const formattedMonth = String(date.getUTCMonth() + 1).padStart(2, "0");
     const formattedDay = String(date.getUTCDate()).padStart(2, "0");
