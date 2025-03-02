@@ -90,7 +90,7 @@ function AutoComplete({ form }) {
                           form.setValue("city", 
                             address.compound.province,
                           );
-                          form.setValue("province",
+                          form.setValue("district",
                              address.compound.district,
                           );
                           form.setValue("address_line",
