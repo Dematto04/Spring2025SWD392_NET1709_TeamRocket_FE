@@ -25,13 +25,7 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { Button } from "@/components/ui/button";
 import { CirclePlus, Plus, Trash2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
@@ -41,6 +35,8 @@ import { useCreateServiceMutation, useGetCategoriesQuery } from "@/redux/api/ser
 import { toast } from "@/hooks/use-toast";
 import { formatTime } from "@/lib/utils";
 import BasisInformation from "./BasisInformation";
+import AutoComplete from "@/components/AutoComplete";
+
 const formSchema = z.object({
   service_name: z.string().min(1, { message: "Service name is required" }),
   category_id: z.string().min(1, { message: "Service name is required" }),
@@ -69,6 +65,7 @@ const formSchema = z.object({
   city: z.string().min(1, {message: "City is required"}),
   province: z.string().min(1, {message: "Province is required"}),
   address_line: z.string().min(1, {message: "Address is required"}),
+  place_id: z.string()
 });
 // thiếu field image
 function HousekeeperAddService() {
@@ -90,8 +87,8 @@ function HousekeeperAddService() {
       additionalServices: [],
       city: "",
       province: "",
-      address_line: ""
-
+      address_line: "",
+      place_id: ""
     },
   });
   const { control } = form;
@@ -108,7 +105,6 @@ function HousekeeperAddService() {
     name: "additionalServices",
   });
   const handleSubmit = async (data) => {
-    
 
     const haveSlotDays = dateOfWeek.filter((date) => date.slots.length > 0);
     const serviceTimeSlots = [];
@@ -149,7 +145,11 @@ function HousekeeperAddService() {
   return (
     <div>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)}>
+        <form onSubmit={form.handleSubmit(handleSubmit, (err)=> {
+          console.log(err);
+          
+
+        })}>
           <Card className="bg-background">
             <CardHeader>
               <CardTitle>Add Service</CardTitle>
@@ -401,45 +401,7 @@ function HousekeeperAddService() {
                   </AccordionTrigger>
                   <AccordionContent>
                     <div className="flex flex-wrap w-full gap-6 p-2">
-                      <FormField
-                        control={form.control}
-                        name="city"
-                        render={({ field }) => (
-                          <FormItem className="lg:w-1/5">
-                            <FormLabel>City</FormLabel>
-                            <FormControl>
-                              <Input {...field} placeholder="Enter city" />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="province"
-                        render={({ field }) => (
-                          <FormItem className="lg:w-1/5">
-                            <FormLabel>Province</FormLabel>
-                            <FormControl>
-                              <Input {...field} placeholder="Enter province" />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="address_line"
-                        render={({ field }) => (
-                          <FormItem className="flex-grow">
-                            <FormLabel>Address</FormLabel>
-                            <FormControl>
-                              <Input
-                                {...field}
-                                placeholder="Enter specify address"
-                              />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
+                      <AutoComplete form={form}/>
                     </div>
                   </AccordionContent>
                 </AccordionItem>
