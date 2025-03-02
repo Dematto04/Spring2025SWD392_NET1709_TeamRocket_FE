@@ -8,9 +8,8 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
 
-export default function CheckoutItems() {
+export default function CheckoutItems({address, additionalService, service, user}) {
   return (
     <Card>
       <CardHeader>
@@ -29,11 +28,12 @@ export default function CheckoutItems() {
           <TableBody>
             <TableRow>
               <TableCell className="font-medium">
-                Home Cleaning
+                {service?.name}
                 {/* Additional Services */}
                 <div className="mt-2 space-y-1 text-sm text-gray-500">
-                  <p>- Carpet Cleaning</p>
-                  <p>- Window Washing</p>
+                 {additionalService && additionalService.map((item)=> (
+                  <div>-{item.name}</div>
+                 ))}
                 </div>
               </TableCell>
               <TableCell>
@@ -63,10 +63,9 @@ export default function CheckoutItems() {
         {/* Billing Address */}
         <div className="text-sm space-y-1">
           <p className="font-medium">Billing Address:</p>
-          <p>Vinhomes Grand Park, Nguyễn Xiển, Long Thạnh Mỹ, Quận 9</p>
-          <p>Bình Dương Province, 123456</p>
-          <p>📞 0394388330</p>
-          <p>📧 customerdemo@example.com</p>
+          <p>{address.address_line}</p>
+          <p>📞 {user?.phoneNumber || "0394388330"}</p>
+          <p>📧 {user?.email}</p>
         </div>
       </CardContent>
     </Card>

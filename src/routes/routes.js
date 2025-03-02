@@ -47,12 +47,12 @@ const routes = [
       {
         path: "/service/booking/:id",
         component: ServiceBookingPage,
-        // allowedRoles: ['Customer']
+        allowedRoles: ['Customer']
       },
       {
         path: "/service/checkout",
         component: CheckoutPage,
-        // allowedRoles: ['Customer']
+        allowedRoles: ['Customer']
       },
       {
         path: "/profile/customer",
