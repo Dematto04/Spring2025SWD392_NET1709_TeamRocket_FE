@@ -12,7 +12,12 @@ const addressApi = apiSlice.injectEndpoints({
         },
       }),
     }),
+    getUserAddress: build.query({
+      query: () => ({
+        url: `/Address`,
+      }),
+    }),
   }),
 });
 
-export const { useLazyAutoCompleteAddressQuery } = addressApi
+export const { useLazyAutoCompleteAddressQuery, useGetUserAddressQuery } = addressApi

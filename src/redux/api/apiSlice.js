@@ -15,6 +15,6 @@ const customBaseQuery = () => {
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: customBaseQuery(),
-  tagTypes: ["Auth", "Customer", "Services", "ServiceDetail", "Categories"],
+  tagTypes: ["Auth", "Customer", "Services", "ServiceDetail", "Categories", "AdditionalServices"],
   endpoints: () => ({}),
 });

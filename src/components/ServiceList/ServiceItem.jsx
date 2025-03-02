@@ -54,7 +54,7 @@ function ServiceItem({service}) {
             <div className="flex items-end gap-2">
               <h3 className="text-xl font-medium">$ {service.price}</h3>
             </div>
-            <Link to={`/service/123`}>
+            <Link to={`/service/${service.id}`}>
               <Button className="text-primary bg-[rgba(37,99,235,0.1)] hover:text-white">
                 Book now
               </Button>

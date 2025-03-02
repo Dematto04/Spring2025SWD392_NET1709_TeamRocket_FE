@@ -22,15 +22,19 @@ export const CheckoutSummary = () => {
     <div className="flex flex-col gap-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Order Summary</CardTitle>
+          <CardTitle>Booking Summary</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex justify-between mb-2">
-            <div>Subtotal</div>
+            <div>Service price</div>
             <div>$300.00</div>
           </div>
           <div className="flex justify-between mb-4">
-            <div>Shipping</div>
+            <div>Additional service price</div>
+            <div>$10.00</div>
+          </div>
+          <div className="flex justify-between mb-4">
+            <div>Distance price</div>
             <div>$10.00</div>
           </div>
           <div className="flex justify-between font-bold">

@@ -31,7 +31,7 @@ export default function ForgotPassword() {
     console.log(email);
     const result = await forgotPassword(email);
     if (result.error) {
-      console.log(result.error);
+      form.setError('email', {message: result.error.data.messages.Email[0]})
       return;
     }
     toast({
