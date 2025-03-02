@@ -12,14 +12,6 @@ const addressApi = apiSlice.injectEndpoints({
         },
       }),
     }),
-  }),
-});
-
-export const { useLazyAutoCompleteAddressQuery } = addressApi
-import { apiSlice } from "./apiSlice";
-
-export const addressApi = apiSlice.injectEndpoints({
-  endpoints: (build) => ({
     // GET: Fetch paginated list of addresses
     getAddresses: build.query({
       query: ({ pageIndex, pageSize}) => ({
@@ -55,4 +47,5 @@ export const {
   useGetAddressesQuery,
   useAddAddressMutation,
   useUpdateAddressMutation,
+  useLazyAutoCompleteAddressQuery
 } = addressApi;
