@@ -34,7 +34,7 @@ const Profile = ({ profileInfo }) => {
         phoneNumber: profileInfo.data.phone || "",
         gender: profileInfo.data.gender ? "Male" : "Female", // Convert boolean to string
          dob: profileInfo.data.birth_date
-        ? getTomorrowDate(profileInfo.data.birthday)
+        ? getTomorrowDate(profileInfo.data.birth_date)
         : "",
       }
     : {
@@ -89,11 +89,10 @@ const Profile = ({ profileInfo }) => {
       const formattedBirthdate = data.dob;
 
       const payload = {
-          fullName: data.fullName,
-          phoneNumber: formattedPhoneNumber,
+          full_name: data.fullName,
+          phone: formattedPhoneNumber,
           gender: formattedGender,
-          birthdate: formattedBirthdate,
-          avatar: imagePreview, // Using imagePreview URL. 
+          birth_date: formattedBirthdate 
           // If the API expects the file itself (or a base64 string), you'll need to handle that conversion.
       };
   
