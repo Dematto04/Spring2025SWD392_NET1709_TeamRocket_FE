@@ -4,7 +4,8 @@ const customBaseQuery = () => {
   return fetchBaseQuery({
     baseUrl: import.meta.env.VITE_API_URL,
     prepareHeaders: (headers, { getState }) => {
-      const token = localStorage.getItem("accessToken")
+        const token = localStorage.getItem("accessToken")
+      // If we have a token set in state, let's assume that we should be passing it.
       if (token) {
         headers.set("authorization", `Bearer ${token}`);
       }
@@ -15,6 +16,6 @@ const customBaseQuery = () => {
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: customBaseQuery(),
-  tagTypes: ["Auth", "Customer", "Services", "ServiceDetail", "Categories", "AdditionalServices"],
+  tagTypes: ["Auth", "Customer", "Services", "ServiceDetail", "Booking","Addresses", "Categories","Request", "AdditionalServices"],
   endpoints: () => ({}),
 });

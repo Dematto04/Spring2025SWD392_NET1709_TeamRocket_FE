@@ -21,7 +21,8 @@ import { Link } from "react-router-dom";
 export function DashboardSidebar({ ...props }) {
   const [clickedItem, setClickedItem] = React.useState(localStorage.getItem("dashboard-item") || "Dashboard");
   const user = useSelector(selectUser);
-
+  const navItem = user.role === "Housekeeper" ? data.navHousekeeper : data.navStaff
+  
   const { theme } = useTheme();
 
   return (
@@ -38,7 +39,7 @@ export function DashboardSidebar({ ...props }) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain
-          items={data.navMain}
+          items={navItem}
           clickedItem={clickedItem}
           setClickedItem={setClickedItem}
         />
