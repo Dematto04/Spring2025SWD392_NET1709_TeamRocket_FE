@@ -46,7 +46,7 @@ function ServiceBookingPersonal() {
     }
   };
   const handleInfo = (data) => {
-    console.log(data);
+    console.log({data});
   };
 
   return (

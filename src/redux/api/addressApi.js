@@ -17,7 +17,14 @@ const addressApi = apiSlice.injectEndpoints({
         url: `/Address`,
       }),
     }),
+    addUserAddress: build.mutation({
+      query: (body) => ({
+        url: `/Address`,
+        method: "POST",
+        body
+      }),
+    }),
   }),
 });
 
-export const { useLazyAutoCompleteAddressQuery, useGetUserAddressQuery } = addressApi
+export const { useLazyAutoCompleteAddressQuery, useGetUserAddressQuery, useAddUserAddressMutation } = addressApi

@@ -11,13 +11,17 @@ const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
   phoneNumber: z.string().min(10, { message: "Invalid phone number" }),
   dob: z.string().min(1, { message: "Date of birth is required" }),
-  location: z.string().min(1, {message: "Address is required"})
+  location: z.string().min(1, { message: "Address is required" }),
+  address_line: z.string(),
+  city: z.string(),
+  district: z.string(),
+  place_id: z.string(),
 });
 function ServiceBookProvider({ children }) {
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState();
   const [step, setStep] = useState(0);
-  const user = useSelector(selectUser)
+  const user = useSelector(selectUser);
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -26,6 +30,9 @@ function ServiceBookProvider({ children }) {
       phoneNumber: user?.phoneNumber || "",
       dob: user?.dob || "",
       location: "",
+      city: "",
+      district: "",
+      place_id: "",
     },
   });
   return (
