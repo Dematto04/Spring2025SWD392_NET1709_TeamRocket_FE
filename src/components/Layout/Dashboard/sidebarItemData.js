@@ -12,7 +12,7 @@ export const data = {
     email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
-  navMain: [
+  navHousekeeper: [
     {
       title: "Dashboard",
       url: "/dashboard/housekeeper",
@@ -43,6 +43,19 @@ export const data = {
       title: "Earning",
       url: "/dashboard/housekeeper/earning",
       icon: CircleDollarSign,
+    },
+  ],
+  navStaff: [
+    {
+      title: "Dashboard",
+      url: "/dashboard/staff",
+      icon: LayoutDashboard,
+      isActive: true,
+    },
+    {
+      title: "Request",
+      url: "/dashboard/staff/requests",
+      icon: CirclePlus,
     },
   ],
 };
