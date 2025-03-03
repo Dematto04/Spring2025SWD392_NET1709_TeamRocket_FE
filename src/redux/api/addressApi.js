@@ -12,6 +12,7 @@ const addressApi = apiSlice.injectEndpoints({
         },
       }),
     }),
+
     // GET: Fetch paginated list of addresses
     getAddresses: build.query({
       query: ({ pageIndex, pageSize}) => ({
@@ -40,6 +41,7 @@ const addressApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Addresses"],
     }),
+
     getUserAddress: build.query({
       query: () => ({
         url: `/Address`,
@@ -61,3 +63,4 @@ export const {
   useUpdateAddressMutation,
   useLazyAutoCompleteAddressQuery, useGetUserAddressQuery, useAddUserAddressMutation
 } = addressApi;
+
