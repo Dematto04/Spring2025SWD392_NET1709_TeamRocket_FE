@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { useDispatch } from "react-redux";
 import { addAddress } from "@/redux/features/bookingSlice";
+import { useAddUserAddressMutation } from "@/redux/api/addressApi";
 const Content = ({ step }) => {
   switch (step) {
     case 0:
@@ -25,6 +26,7 @@ function ServiceBook({ step, setStep }) {
   const { form, time } = useContext(ServiceBookContext);
   const nav = useNavigate();
   const dispatch = useDispatch();
+  const [addUserAddress, { isLoading, data }] = useAddUserAddressMutation();
   const handNextStep = async () => {
     //Thêm additional
     if (step === 1) {
@@ -42,21 +44,31 @@ function ServiceBook({ step, setStep }) {
     if (step === 2) {
       const isValid = await form.trigger();
       if (!isValid) return;
-      console.log({
-        address_line: form.getValues("address_line"),
-        place_id: form.getValues("place_id"),
-      });
-
-      dispatch(
-        addAddress({
-          address_line: form.getValues("address_line"),
-          place_id: form.getValues("place_id"),
+      const body = {
+        address: form.getValues("address_line"),
+        city: form.getValues("city"),
+        district: form.getValues("district"),
+        placeId: form.getValues("place_id"),
+        isDefault: false,
+        title: "Home",
+      };
+      console.log({body});
+      const result = await addUserAddress(body)
+      console.log({result});
+      
+      if(result.error){
+        toast({
+          title: "Cannot add address",
+          variant: "destructive",
+          duration: 2000
         })
-      );
+        return
+      }
       dispatch(
         addAddress({
           address_line: form.getValues("address_line"),
           place_id: form.getValues("place_id"),
+          addressId: result.data.data.id
         })
       );
       nav("/service/checkout");

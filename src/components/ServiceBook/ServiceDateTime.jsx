@@ -7,6 +7,8 @@ import { ServiceBookContext } from "./ServiceBookContext";
 import { useGetTimeSlotsMutation } from "@/redux/api/serviceApi";
 import { useParams } from "react-router-dom";
 import { Skeleton } from "../ui/skeleton";
+import { useDispatch } from "react-redux";
+import { timeSlot } from "@/redux/features/bookingSlice";
 const daysOfWeek = [
   "Sunday",
   "Monday",
@@ -21,6 +23,8 @@ function ServiceDateTime() {
   const { time, setTime, date, setDate } = useContext(ServiceBookContext);
   const { id } = useParams();
   const [getTimeSlots, { data, isLoading }] = useGetTimeSlotsMutation();
+  const dispatch = useDispatch();
+
   const handleSelectCalendar = async (data) => {
     console.log(data);
     const date = new Date(data);
@@ -66,7 +70,10 @@ function ServiceDateTime() {
                 <Button
                   key={slot.id}
                   variant={slot.id === time ? "default" : "outline"}
-                  onClick={() => setTime(slot.id)}
+                  onClick={() => {
+                    setTime(slot.id);
+                    dispatch(timeSlot({...slot, startDate: date.targetDate}));
+                  }}
                   className="py-6 px-8"
                 >
                   {slot.timeStart.slice(0, 5)} - {slot.timeEnd.slice(0, 5)}
