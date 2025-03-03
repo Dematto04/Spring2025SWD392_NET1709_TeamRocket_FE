@@ -30,10 +30,39 @@ const serviceApi = apiSlice.injectEndpoints({
     createService: build.mutation({
       query: (body) => ({
         url: `/Service`,
-        method: 'POST',
-        body
+        method: "POST",
+        body,
       }),
       invalidatesTags: ["Services"],
+    }),
+    getAdditionalServices: build.query({
+      query: (params) => ({
+        url: `/Service/GetAllAdditionals`,
+        params,
+      }),
+      providesTags: ["AdditionalServices"],
+    }),
+    getTimeSlots: build.mutation({
+      query: (body) => ({
+        url: `/Service/GetTimeSlots`,
+        method: "POST",
+        body,
+      }),
+    }),
+    getServiceBookingPrice: build.mutation({
+      query: (body) => ({
+        url: `/Payment`,
+        method: "POST",
+        body,
+      }),
+    }),
+    placeOrderService: build.mutation({
+      query: (body, params) => ({
+        url: `/Payment/CreatePayment`,
+        method: "POST",
+        params,
+        body,
+      }),
     }),
   }),
 });
@@ -43,5 +72,9 @@ export const {
   useGetServicesDetailQuery,
   useGetServicesPriceQuery,
   useGetCategoriesQuery,
-  useCreateServiceMutation
+  useCreateServiceMutation,
+  useGetAdditionalServicesQuery,
+  useGetTimeSlotsMutation,
+  useGetServiceBookingPriceMutation,
+  usePlaceOrderServiceMutation
 } = serviceApi;

@@ -25,6 +25,8 @@ import HousekeeperWallet from "@/page/Dashboard/Housekeeper/HousekeeperWallet";
 import HousekeeperEarning from "@/page/Dashboard/Housekeeper/HousekeeperEarning";
 import StaffRequestsPage from "@/page/Dashboard/Staff/StaffRequestsPage";
 import RequestDetailPage from "@/page/Dashboard/Staff/RequestDetailPage";
+import CheckoutSuccess from "@/page/CheckoutSuccess";
+import CheckoutFail from "@/page/CheckoutFail";
 
 const routes = [
   {
@@ -49,17 +51,37 @@ const routes = [
       {
         path: "/service/booking/:id",
         component: ServiceBookingPage,
-        // allowedRoles: ['Customer']
+        allowedRoles: ['Customer']
       },
       {
         path: "/service/checkout",
         component: CheckoutPage,
-        // allowedRoles: ['Customer']
+        allowedRoles: ['Customer']
       },
       {
         path: "/profile/customer",
         component: CustomerProfilePage,
         allowedRoles: ['Customer']
+      },
+      {
+        path: "/dashboard/admin",
+        component: DashboardAdmin,
+        allowedRoles: ["Admin"],
+      },
+      {
+        path: "/dashboard/staff",
+        component: DashboardStaff,
+        allowedRoles: ["Admin", "Staff"],
+      },
+      {
+        path: "/service/checkout/sucess",
+        component: CheckoutSuccess,
+        allowedRoles: ["Customer"],
+      },
+      {
+        path: "/service/checkout/fail",
+        component: CheckoutFail,
+        allowedRoles: ["Customer"],
       },
     ],
   },

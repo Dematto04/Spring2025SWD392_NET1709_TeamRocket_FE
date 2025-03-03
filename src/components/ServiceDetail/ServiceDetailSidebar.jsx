@@ -12,8 +12,11 @@ import {
   Star,
   User,
 } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { serviceBooking } from "@/redux/features/bookingSlice";
 
 function ServiceDetailSidebar({service, housekeeper}) {
+  const dispatch = useDispatch()
   return (
     <>
       <div className="">
@@ -30,6 +33,9 @@ function ServiceDetailSidebar({service, housekeeper}) {
           <Link
             to={`/service/booking/${service.id}`}
             className="flex gap-2 items-center text-lg"
+            onClick={()=> {
+              dispatch(serviceBooking(service))
+            }}
           >
             <Button className="mt-8 w-full py-6">
               <Calendar />

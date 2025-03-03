@@ -1,6 +1,8 @@
+import { selectUser } from "@/redux/features/authSlice";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { createContext, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useSelector } from "react-redux";
 import { z } from "zod";
 
 export const ServiceBookContext = createContext();
@@ -9,18 +11,28 @@ const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
   phoneNumber: z.string().min(10, { message: "Invalid phone number" }),
   dob: z.string().min(1, { message: "Date of birth is required" }),
+  location: z.string().min(1, { message: "Address is required" }),
+  address_line: z.string(),
+  city: z.string(),
+  district: z.string(),
+  place_id: z.string(),
 });
 function ServiceBookProvider({ children }) {
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState();
   const [step, setStep] = useState(0);
+  const user = useSelector(selectUser);
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      fullName: "",
-      email: "",
-      phoneNumber: "",
-      dob: "",
+      fullName: user.fullName,
+      email: user.email,
+      phoneNumber: user?.phoneNumber || "",
+      dob: user?.dob || "",
+      location: "",
+      city: "",
+      district: "",
+      place_id: "",
     },
   });
   return (

@@ -31,11 +31,15 @@ import { CirclePlus, Plus, Trash2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { serviceTimeSlots } from "./slotData";
 import DragAndDropUpload from "@/components/DragAndDropUpload";
-import { useCreateServiceMutation, useGetCategoriesQuery } from "@/redux/api/serviceApi";
+import {
+  useCreateServiceMutation,
+  useGetCategoriesQuery,
+} from "@/redux/api/serviceApi";
 import { toast } from "@/hooks/use-toast";
 import { formatTime } from "@/lib/utils";
 import BasisInformation from "./BasisInformation";
 import AutoComplete from "@/components/AutoComplete";
+import HousekeeperDistanceRule from "@/components/Housekeeper/HousekeeperDistanceRule";
 
 const formSchema = z.object({
   service_name: z.string().min(1, { message: "Service name is required" }),
@@ -62,10 +66,31 @@ const formSchema = z.object({
         .min(1, { message: "Additional service price is required" }),
     })
   ),
-  city: z.string().min(1, {message: "City is required"}),
-  province: z.string().min(1, {message: "Province is required"}),
-  address_line: z.string().min(1, {message: "Address is required"}),
-  place_id: z.string()
+  city: z.string().min(1, { message: "City is required" }),
+  district: z.string().min(1, { message: "District is required" }),
+  address_line: z.string().min(1, { message: "Address is required" }),
+  place_id: z.string(),
+  serviceDistanceRule: z.array(
+    z
+      .object({
+        min_distance: z
+          .string({ message: "Please input" })
+          .min(1, { message: "Please input min distance" }),
+        max_distance: z
+          .string({ message: "Please input" })
+          .min(1, { message: "Please input max distance" }),
+        base_fee: z
+          .string({ message: "Please input" })
+          .min(1, { message: "Please input base fee" }),
+      })
+      .refine(
+        (data) => parseFloat(data.max_distance) > parseFloat(data.min_distance),
+        {
+          message: "Max distance must be greater than min distance",
+          path: ["max_distance"],
+        }
+      )
+  ),
 });
 // thiếu field image
 function HousekeeperAddService() {
@@ -74,7 +99,8 @@ function HousekeeperAddService() {
   //api cateogry
   const { data: categories, isLoading } = useGetCategoriesQuery();
   //api create service
-  const [createService, {isSuccess, isLoading: isCreating}] = useCreateServiceMutation()
+  const [createService, { isSuccess, isLoading: isCreating }] =
+    useCreateServiceMutation();
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -86,9 +112,10 @@ function HousekeeperAddService() {
       serviceSteps: [{ step_order: 1, step_description: "" }],
       additionalServices: [],
       city: "",
-      province: "",
+      district: "",
       address_line: "",
-      place_id: ""
+      place_id: "",
+      serviceDistanceRule: [],
     },
   });
   const { control } = form;
@@ -97,16 +124,32 @@ function HousekeeperAddService() {
     name: "serviceSteps",
   });
   const {
-    fields: addtionalFields,
+    fields: additionalFields,
     append: additionalAppend,
     remove: additionalRemove,
   } = useFieldArray({
     control,
     name: "additionalServices",
   });
-  const handleSubmit = async (data) => {
+  const {
+    fields: ruleFields,
+    append: ruleAppend,
+    remove: ruleRemove,
+  } = useFieldArray({
+    control,
+    name: "serviceDistanceRule",
+  });
 
+  const handleSubmit = async (data) => {
     const haveSlotDays = dateOfWeek.filter((date) => date.slots.length > 0);
+    if (haveSlotDays.length == 0) {
+      toast({
+        title: "Lack of information",
+        description: "Please choose availability",
+        variant: "destructive",
+      });
+      return;
+    }
     const serviceTimeSlots = [];
     haveSlotDays.forEach((date) => {
       date.slots.forEach((slot) => {
@@ -117,39 +160,45 @@ function HousekeeperAddService() {
         });
       });
     });
+    if (serviceTimeSlots.some((slot) => slot.start_time === "")) {
+      toast({
+        title: "Lack of information",
+        description: "Please choose availability",
+        variant: "destructive",
+      });
+      return
+    }
     const body = {
       ...data,
       duration: data.duration,
       price: data.price,
       serviceTimeSlots,
-      serviceImages: files?.map(file => (
-        {
-          link: file
-        }
-      ))
-    }
-    console.log({body});
-    const result = await createService(body)
-    if(result.error){
+      serviceImages: files?.map((file) => ({
+        link: file,
+      })),
+    };
+    console.log({ body });
+    const result = await createService(body);
+    if (result.error) {
       toast({
         title: "Create service fail",
-      })
-      return
+      });
+      return;
     }
     toast({
       title: "Create service sucessfully",
-    })
+    });
   };
   if (isLoading) return null;
 
   return (
     <div>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit, (err)=> {
-          console.log(err);
-          
-
-        })}>
+        <form
+          onSubmit={form.handleSubmit(handleSubmit, (err) => {
+            console.log(err);
+          })}
+        >
           <Card className="bg-background">
             <CardHeader>
               <CardTitle>Add Service</CardTitle>
@@ -169,7 +218,10 @@ function HousekeeperAddService() {
                 ]}
               >
                 {/* Basic Info */}
-                <BasisInformation categories={categories && categories} form={form}/>
+                <BasisInformation
+                  categories={categories && categories}
+                  form={form}
+                />
 
                 {/* Detail and service steps*/}
                 <AccordionItem value="item-2">
@@ -401,7 +453,7 @@ function HousekeeperAddService() {
                   </AccordionTrigger>
                   <AccordionContent>
                     <div className="flex flex-wrap w-full gap-6 p-2">
-                      <AutoComplete form={form}/>
+                      <AutoComplete form={form} />
                     </div>
                   </AccordionContent>
                 </AccordionItem>
@@ -414,6 +466,19 @@ function HousekeeperAddService() {
                     <DragAndDropUpload files={files} setFiles={setFiles} />
                   </AccordionContent>
                 </AccordionItem>
+                <AccordionItem value="item-7">
+                  <AccordionTrigger className="text-lg">
+                    Distance Rule
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <HousekeeperDistanceRule
+                      form={form}
+                      append={ruleAppend}
+                      remove={ruleRemove}
+                      fields={ruleFields}
+                    />
+                  </AccordionContent>
+                </AccordionItem>
 
                 {/* additional Service */}
                 <AccordionItem value="item-6">
@@ -421,7 +486,7 @@ function HousekeeperAddService() {
                     Additional Service
                   </AccordionTrigger>
                   <AccordionContent>
-                    {addtionalFields?.map((field, idx) => (
+                    {additionalFields?.map((field, idx) => (
                       <div
                         key={field.id}
                         className="flex flex-wrap w-full gap-6 items-center my-4"
