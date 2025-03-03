@@ -8,8 +8,9 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
+import { formatSchedule } from "@/lib/utils";
 
-export default function CheckoutItems({address, additionalService, service, user}) {
+export default function CheckoutItems({address, additionalService, service, user, additionalPrice, timeSlot}) {
   return (
     <Card>
       <CardHeader>
@@ -32,7 +33,7 @@ export default function CheckoutItems({address, additionalService, service, user
                 {/* Additional Services */}
                 <div className="mt-2 space-y-1 text-sm text-gray-500">
                  {additionalService && additionalService.map((item)=> (
-                  <div>-{item.name}</div>
+                  <div key={item.name}>-{item.name}</div>
                  ))}
                 </div>
               </TableCell>
@@ -45,7 +46,7 @@ export default function CheckoutItems({address, additionalService, service, user
                   height="50"
                 />
               </TableCell>
-              <TableCell>$100.00</TableCell>
+              <TableCell>${additionalPrice}</TableCell>
             </TableRow>
           </TableBody>
         </Table>
@@ -55,7 +56,7 @@ export default function CheckoutItems({address, additionalService, service, user
         {/* Date & Time */}
         <div className="text-sm">
           <p className="font-medium">Scheduled Date & Time:</p>
-          <p className="text-gray-500">February 25, 2025 - 10:00 AM</p>
+          <p className="text-gray-500">{formatSchedule(timeSlot?.startDate)}</p>
         </div>
 
         <Separator />

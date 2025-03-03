@@ -23,6 +23,8 @@ import HousekeeperMyService from "@/page/Dashboard/Housekeeper/HousekeeperMyServ
 import HouseKeeperBookingList from "@/page/Dashboard/Housekeeper/HouseKeeperBookingList";
 import HousekeeperWallet from "@/page/Dashboard/Housekeeper/HousekeeperWallet";
 import HousekeeperEarning from "@/page/Dashboard/Housekeeper/HousekeeperEarning";
+import CheckoutSuccess from "@/page/CheckoutSuccess";
+import CheckoutFail from "@/page/CheckoutFail";
 
 const routes = [
   {
@@ -64,11 +66,20 @@ const routes = [
         component: DashboardAdmin,
         allowedRoles: ["Admin"],
       },
-      
       {
         path: "/dashboard/staff",
         component: DashboardStaff,
         allowedRoles: ["Admin", "Staff"],
+      },
+      {
+        path: "/service/checkout/sucess",
+        component: CheckoutSuccess,
+        allowedRoles: ["Customer"],
+      },
+      {
+        path: "/service/checkout/fail",
+        component: CheckoutFail,
+        allowedRoles: ["Customer"],
       },
     ],
   },

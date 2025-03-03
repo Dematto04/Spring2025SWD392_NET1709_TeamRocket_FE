@@ -6,6 +6,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 function ServiceDetailOverview({ overview, additionalServices }) {
+  console.log(additionalServices);
+  
   return (
     <>
       <div>
@@ -39,19 +41,16 @@ function ServiceDetailOverview({ overview, additionalServices }) {
                         <div className="flex flex-col justify-between flex-grow">
                           <div>
                             <h2 className="text-xl font-medium">
-                              Home Cleaning
+                              {item?.name}
                             </h2>
-                            <p className="font-medium text-gray-500">
+                            {/* <p className="font-medium text-gray-500">
                               Fixing faulty wiring, outlets, switches, and more
                               to ensure.
-                            </p>
+                            </p> */}
                           </div>
                           <div className="flex flex-col items-end justify-end">
                             <span className="text-lg text-primary font-medium">
-                              $33.00
-                            </span>
-                            <span className="font-medium text-gray-500">
-                              Estimate: 1 hr
+                              ${item?.price}
                             </span>
                           </div>
                         </div>
