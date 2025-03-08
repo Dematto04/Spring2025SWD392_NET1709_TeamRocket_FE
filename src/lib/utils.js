@@ -45,3 +45,21 @@ export const containerVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.3 } },
 };
+export const formatTime = (time) => {
+  return time.includes(":") && time.split(":").length === 2
+    ? `${time}:00`
+    : time;
+};
+export const formatSchedule = (date) => {
+  const date1 = new Date(date);
+  const options = {
+    year: "numeric",
+    month: "long",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  };
+  const formattedDate = date1.toLocaleString("en-US", options);
+  return formattedDate
+};

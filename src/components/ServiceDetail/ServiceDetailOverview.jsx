@@ -7,19 +7,12 @@ import {
 } from "@/components/ui/accordion";
 function ServiceDetailOverview({ overview, additionalServices }) {
   console.log(additionalServices);
+
   return (
     <>
       <div>
         <h1 className="text-2xl font-medium mt-8">Service Overview</h1>
-        <p className="mt-4">
-          Provides reliable and professional electrical solutions for
-          residential and commercial clients. Our licensed electricians are
-          dedicated to delivering top-quality service, ensuring safety, and
-          meeting all your electrical needs. Committed to providing high-quality
-          electrical solutions with a focus on safety and customer satisfaction.
-          Our team of licensed electricians is equipped to handle both
-          residential and commercial projects with expertise and care.
-        </p>
+        <p className="mt-4">{overview}</p>
       </div>
       <div>
         <div className="mt-4">
@@ -59,7 +52,6 @@ function ServiceDetailOverview({ overview, additionalServices }) {
               </AccordionContent>
             </AccordionItem>
           </Accordion>
-          
           ) : (
             <></>
           )}

@@ -17,7 +17,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import MyServiceCard from "../../../../components/Housekeeper/MyServiceCard";
+
+import MyServiceCard from "@/components/Housekeeper/MyServiceCard";
+
 import { Button } from "@/components/ui/button";
 
 const services = [

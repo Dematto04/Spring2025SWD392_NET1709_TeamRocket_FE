@@ -29,7 +29,6 @@ import AddServiceDetail from "@/components/Housekeeper/AddService/AddServiceDeta
 import AddServicePrice from "@/components/Housekeeper/AddService/AddServicePrice";
 import AddServiceAvailability from "@/components/Housekeeper/AddService/AddServiceAvailability";
 import AddServiceAdditionalService from "@/components/Housekeeper/AddService/AddServiceAdditionalService";
-
 const formSchema = z.object({
   service_name: z.string().min(1, { message: "Service name is required" }),
   category_id: z.string().min(1, { message: "Service name is required" }),
@@ -88,7 +87,9 @@ function HousekeeperAddService() {
   //api cateogry
   const { data: categories, isLoading } = useGetCategoriesQuery();
   //api create service
+
   const [createService, {isSuccess, isLoading: isCreating}] = useCreateServiceMutation()
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -105,6 +106,7 @@ function HousekeeperAddService() {
       place_id: "",
       serviceDistanceRule: [],
       serviceTimeSlots: []
+
     },
   });
   const { control } = form;
@@ -113,7 +115,7 @@ function HousekeeperAddService() {
     name: "serviceSteps",
   });
   const {
-    fields: addtionalFields,
+    fields: additionalFields,
     append: additionalAppend,
     remove: additionalRemove,
   } = useFieldArray({
@@ -151,6 +153,7 @@ function HousekeeperAddService() {
         })
       })
     })   
+
     const body = {
       ...data,
       duration: data.duration,
@@ -159,6 +162,7 @@ function HousekeeperAddService() {
         link: file,
       })),
       serviceTimeSlots: temp,
+
     };
     console.log({ body });
     const result = await createService(body);
@@ -174,14 +178,14 @@ function HousekeeperAddService() {
   };
   if (isLoading) return <LoadingScreen />;
 
+
   return (
     <div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit, (err)=> {
           console.log(err);
-          
-
         })}>
+
           <Card className="bg-background">
             <CardHeader>
               <CardTitle>Add Service</CardTitle>
@@ -199,6 +203,7 @@ function HousekeeperAddService() {
                   "item-5",
                   "item-6",
                   "item-7",
+
                 ]}
               >
                 {/* Basic Info */}
@@ -208,6 +213,7 @@ function HousekeeperAddService() {
                 />
 
                 {/* Detail and service steps*/}
+
                 <AddServiceDetail
                   form={form}
                   fields={fields}
@@ -231,6 +237,7 @@ function HousekeeperAddService() {
                   <AccordionContent>
                     <div className="flex flex-wrap w-full gap-6 p-2">
                       <AutoComplete form={form}/>
+
                     </div>
                   </AccordionContent>
                 </AccordionItem>
@@ -245,6 +252,7 @@ function HousekeeperAddService() {
                 </AccordionItem>
                 <AccordionItem value="item-7">
                   <AccordionTrigger className="text-lg text-primary">
+
                     Distance Rule
                   </AccordionTrigger>
                   <AccordionContent>

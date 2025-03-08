@@ -12,24 +12,30 @@ import {
   Star,
   User,
 } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { serviceBooking } from "@/redux/features/bookingSlice";
 
-function ServiceDetailSidebar() {
+function ServiceDetailSidebar({service, housekeeper}) {
+  const dispatch = useDispatch()
   return (
     <>
       <div className="">
         <div>Starts from</div>
         <div className="flex items-end justify-between mb-8">
           <div className="flex items-end gap-1">
-            <h1 className="text-4xl font-bold ">$457</h1>
-            <s className="font-bold text-gray-500">$875</s>
+            <h1 className="text-4xl font-bold ">{service?.price}</h1>
+            {/* <s className="font-bold text-gray-500">$875</s> */}
           </div>
-          <Badge className="bg-green-500 hover:bg-green-500">50% offer</Badge>
+          {/* <Badge className="bg-green-500 hover:bg-green-500">50% offer</Badge> */}
         </div>
         <Separator />
         <div>
           <Link
-            to={"/service/booking/123"}
+            to={`/service/booking/${service.id}`}
             className="flex gap-2 items-center text-lg"
+            onClick={()=> {
+              dispatch(serviceBooking(service))
+            }}
           >
             <Button className="mt-8 w-full py-6">
               <Calendar />
@@ -49,9 +55,9 @@ function ServiceDetailSidebar() {
           {/* housekeeper personal info */}
           <div className="w-full mt-8 py-6 bg-secondary flex flex-col items-center justify-center rounded-lg">
             <div>
-              <img src="/client-1.webp" className="w-20 h-20 rounded-full" />
+              <img src={housekeeper.avatar} className="w-20 h-20 rounded-full" />
             </div>
-            <div className="text-lg font-medium mt-4">Long</div>
+            <div className="text-lg font-medium mt-4">{housekeeper.name}</div>
             <div>
               <div className="flex gap-1 items-center">
                 <Star size={14} color="#ffc107" fill="#ffc107" />
@@ -66,7 +72,7 @@ function ServiceDetailSidebar() {
                 <User size={16} />
                 <span>Member since</span>
               </div>
-              <div>2020</div>
+              <div>{housekeeper.memberSince}</div>
             </div>
 
             <div className="flex justify-between">
@@ -74,7 +80,7 @@ function ServiceDetailSidebar() {
                 <MapPin size={16} />
                 <span>Address</span>
               </div>
-              <div>123 Main Street, City</div>
+              <div>{housekeeper.address}</div>
             </div>
 
             <div className="flex justify-between">
@@ -82,7 +88,7 @@ function ServiceDetailSidebar() {
                 <MailIcon size={16} />
                 <span>Email</span>
               </div>
-              <div>example@email.com</div>
+              <div>{housekeeper.email}</div>
             </div>
 
             <div className="flex justify-between">

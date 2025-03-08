@@ -23,9 +23,9 @@ import {
   AccordionTrigger,
 } from "../ui/accordion";
 import { ServiceBookContext } from "./ServiceBookContext";
+import AutoComplete from "../AutoComplete";
 
 function ServiceBookingPersonal() {
-  const [imagePreview, setImagePreview] = useState(null);
   const [defaultAddress, setDefaultAddress] = useState("123 Main St, City A");
   const [newAddress, setNewAddress] = useState("");
   const [savedAddresses, setSavedAddresses] = useState([
@@ -33,13 +33,6 @@ function ServiceBookingPersonal() {
     "456 Oak Ave, City B",
   ]);
   const { form } = useContext(ServiceBookContext);
-
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setImagePreview(URL.createObjectURL(file));
-    }
-  };
 
   const handleSelectAddress = (address) => {
     setDefaultAddress(address);
@@ -52,49 +45,22 @@ function ServiceBookingPersonal() {
       setNewAddress("");
     }
   };
+  const handleInfo = (data) => {
+    console.log({data});
+  };
 
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="visible">
       <Form {...form}>
-        <form className="rounded-lg shadow-sm space-y-6">
+        <form
+          onSubmit={form.handleSubmit(handleInfo, (err) => {
+            console.log(err);
+          })}
+          className="rounded-lg shadow-sm space-y-6"
+        >
           <h1 className="font-semibold leading-none tracking-tight mb-4">
             Add Personal Information
           </h1>
-
-          {/* Profile Picture */}
-          <div className="mb-8">
-            <div className="flex items-center space-x-4">
-              <div className="w-20 h-20 bg-gray-200 rounded-full overflow-hidden flex items-center justify-center">
-                {imagePreview ? (
-                  <img
-                    src={imagePreview}
-                    alt="Profile Preview"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="text-gray-500">Preview</span>
-                )}
-              </div>
-              <div>
-                <input
-                  type="file"
-                  id="profile-picture"
-                  className="hidden"
-                  onChange={handleImageChange}
-                />
-                <label
-                  htmlFor="profile-picture"
-                  className="px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer hover:bg-blue-600"
-                >
-                  Choose File
-                </label>
-                <p className="text-sm text-gray-500 mt-2">
-                  *Image size should be less than 2MB. Allowed files: .png,
-                  .jpg, .jpeg.
-                </p>
-              </div>
-            </div>
-          </div>
 
           {/* General Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -155,9 +121,9 @@ function ServiceBookingPersonal() {
           {/* Address Section */}
           <div className="mt-6">
             <Label>Address *</Label>
-            <div className="flex justify-between items-center border p-2 mt-3 rounded-md">
-              <span>{defaultAddress}</span>
-              <Dialog>
+            <div className="flex justify-between items-center  mt-3 rounded-md">
+              <AutoComplete form={form}/>
+              {/* <Dialog>
                 <DialogTrigger asChild>
                   <Button variant="outline">Change</Button>
                 </DialogTrigger>
@@ -202,7 +168,7 @@ function ServiceBookingPersonal() {
                     </Accordion>
                   </div>
                 </DialogContent>
-              </Dialog>
+              </Dialog> */}
             </div>
           </div>
         </form>

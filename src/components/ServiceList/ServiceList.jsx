@@ -8,13 +8,14 @@ import {
 } from "@/components/ui/select";
 import ServiceItem from "./ServiceItem";
 
-
-function ServiceList() {
+function ServiceList({ services }) {
   return (
     <div className="">
       {/* header */}
       <div className="flex justify-between items-center p-4 w-full">
-        <div className="text-xl font-bold">Found <span className="text-primary">11 Services</span></div>
+        <div className="text-xl font-bold">
+          Found <span className="text-primary">11 Services</span>
+        </div>
         <div>
           <Select>
             <SelectTrigger className="w-[180px]">
@@ -30,9 +31,10 @@ function ServiceList() {
       {/* service list */}
       <div className="w-full grid md:grid-cols-2 xl:grid-cols-3 gap-y-6 gap-x-3">
         {/* service items */}
-        {Array(16).fill(1).map((item, idx)=> (
-            <ServiceItem key={idx}/>
-        ))}
+        {services
+          .map((item, idx) => (
+            <ServiceItem key={idx} service={item} />
+          ))}
       </div>
     </div>
   );

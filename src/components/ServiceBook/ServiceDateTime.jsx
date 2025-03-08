@@ -4,16 +4,42 @@ import { motion } from "framer-motion";
 import { containerVariants } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { ServiceBookContext } from "./ServiceBookContext";
+import { useGetTimeSlotsMutation } from "@/redux/api/serviceApi";
+import { useParams } from "react-router-dom";
+import { Skeleton } from "../ui/skeleton";
+import { useDispatch } from "react-redux";
+import { timeSlot } from "@/redux/features/bookingSlice";
+const daysOfWeek = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
 
 function ServiceDateTime() {
-    const {time, setTime, date, setDate} = useContext(ServiceBookContext)
-  
-  
-  const handleSelect = (data) => {
-    console.log({ data });
-    setDate(data);
+  const { time, setTime, date, setDate } = useContext(ServiceBookContext);
+  const { id } = useParams();
+  const [getTimeSlots, { data, isLoading }] = useGetTimeSlotsMutation();
+  const dispatch = useDispatch();
+
+  const handleSelectCalendar = async (data) => {
+    console.log(data);
+    const date = new Date(data);
+    const dayOfWeek = daysOfWeek[date.getDay()];
+    const result = await getTimeSlots({
+      serviceId: id,
+      targetDate: data,
+      dayOfWeek: dayOfWeek,
+    });
+    setDate({
+      serviceId: id,
+      targetDate: data,
+      dayOfWeek: dayOfWeek,
+    });
   };
-  
   return (
     <motion.div
       className="min-h-80"
@@ -29,19 +55,33 @@ function ServiceDateTime() {
           <h2 className="text-sm mb-2">Select date</h2>
           <Calendar
             mode="single"
-            selected={date}
-            onSelect={handleSelect}
+            selected={date.targetDate}
+            onSelect={handleSelectCalendar}
             className="rounded-md border w-fit"
           />
         </div>
         <div>
           <h2 className="text-sm mb-2">Select time</h2>
           <div className="grid grid-cols-3 gap-4">
-            {Array(7)
-              .fill(1)
-              .map((_, idx) => (
-                <Button key={idx} variant={idx === time ? "default": "outline"} onClick={()=>setTime(idx)} className="py-6 px-8">9:30 - 10:00</Button>
-              ))}
+            {isLoading ? (
+              <Skeleton className="w-36 h-[50px]" />
+            ) : data?.data && data.data.length > 0 ? (
+              data.data.map((slot, idx) => (
+                <Button
+                  key={slot.id}
+                  variant={slot.id === time ? "default" : "outline"}
+                  onClick={() => {
+                    setTime(slot.id);
+                    dispatch(timeSlot({...slot, startDate: date.targetDate}));
+                  }}
+                  className="py-6 px-8"
+                >
+                  {slot.timeStart.slice(0, 5)} - {slot.timeEnd.slice(0, 5)}
+                </Button>
+              ))
+            ) : (
+              <div className="">There is no time slot for chosen day!</div>
+            )}
           </div>
         </div>
       </div>
