@@ -44,7 +44,7 @@ export default function Navbar({ services }) {
         </Link>
         <NavigationMenuItem>
           <NavigationMenuTrigger>
-            <Link to="/service/12">Category</Link>
+            <Link>Category</Link>
           </NavigationMenuTrigger>
           {/* navbar items */}
           <NavigationMenuContent>
@@ -56,18 +56,27 @@ export default function Navbar({ services }) {
                       className="group flex h-full w-full select-none flex-col justify-start rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
                       to={`/service/intro/${service.name}/${service.id}`}
                     >
-                      <div className="overflow-hidden">
+                      <div className="overflow-hidden min-w-full flex-1">
                         <img
                           loading="lazy"
+<<<<<<< Updated upstream
                           src={service.image}
                           className="duration-200 group-hover:scale-110 h-full w-full object-contain"
+=======
+                          src={service.imgUrl}
+                          className="duration-200 group-hover:scale-110 w-full h-40 object-cover"
+>>>>>>> Stashed changes
                         />
                       </div>
                       <div className="mb-2 mt-4 text-lg font-medium">
                         {service.name}
                       </div>
                       <p className="text-sm leading-tight text-muted-foreground">
+<<<<<<< Updated upstream
                         {service.description}
+=======
+                        {service?.description}
+>>>>>>> Stashed changes
                       </p>
                     </Link>
                   </li>

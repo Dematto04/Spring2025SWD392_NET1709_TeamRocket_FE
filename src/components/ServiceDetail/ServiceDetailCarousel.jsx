@@ -3,6 +3,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import { Button } from "../ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
+<<<<<<< Updated upstream
 const images = [
   "/home-cleaning.webp",
   "/babysitting.webp",
@@ -17,6 +18,11 @@ const images = [
 ];
 
 function ServiceDetailCarousel() {
+=======
+function ServiceDetailCarousel({ images }) {
+  console.log({images});
+  
+>>>>>>> Stashed changes
   const [mainRef, mainApi] = useEmblaCarousel({ align: "start" });
   const [thumbRef, thumbApi] = useEmblaCarousel({
     align: "start",

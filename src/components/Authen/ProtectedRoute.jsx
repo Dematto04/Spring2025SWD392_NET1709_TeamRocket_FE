@@ -1,5 +1,6 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { toast } from "@/hooks/use-toast";
 
 const ProtectedRoute = ({ children, allowedRoles, isRestricted }) => {
   const user = useSelector((state) => state.auth.user);
@@ -8,7 +9,12 @@ const ProtectedRoute = ({ children, allowedRoles, isRestricted }) => {
     return user ? <Navigate to="/" /> : children;
   }
   if (allowedRoles) {
-    if (!user) return <Navigate to="/login" replace />;
+    if (!user) {
+      toast({
+        title: "You have to login first 😊"
+      })
+      return <Navigate to="/login" replace />;
+    }
 
     if (!allowedRoles.includes(user.role)) {
       return <Navigate to="/" replace />;

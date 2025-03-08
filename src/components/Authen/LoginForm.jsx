@@ -15,7 +15,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  
 } from "@/components/ui/dialog";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,7 +23,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Link, useNavigate } from "react-router-dom";
 import GoogleIcon from "./GoogleIcon";
 import { useLoginMutation, useResendEmailMutation } from "@/redux/api/authApi";
-
 
 import { useDispatch } from "react-redux";
 import { login } from "@/redux/features/authSlice";
@@ -65,8 +63,8 @@ export function LoginForm() {
       let errorMessage = error.data?.messages?.Email
         ? error.data?.messages?.Email[0]
         : error.data?.messages.Credentials[0];
-      if(!errorMessage){
-        errorMessage = "Server Error"
+      if (!errorMessage) {
+        errorMessage = "Server Error";
       }
       form.setError("email", {
         message: errorMessage,
@@ -100,6 +98,7 @@ export function LoginForm() {
         },
       })
     );
+
     nav("/");
   };
 
@@ -108,20 +107,19 @@ export function LoginForm() {
   };
   const handleConfirmEmail = async () => {
     console.log(email);
-    const result = await resendEmail({email});
+    const result = await resendEmail({ email });
     if (result.error) {
       console.log(result.error);
       toast({
         title: "Email already confirmed",
-        description: "Please Login"
-      })
-      return
+        description: "Please Login",
+      });
+      return;
     }
     toast({
-      title: 'Send email successfully',
-      description: 'Please check your inbox'
-    })
-
+      title: "Send email successfully",
+      description: "Please check your inbox",
+    });
   };
 
   return (

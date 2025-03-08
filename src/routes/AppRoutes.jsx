@@ -3,6 +3,7 @@ import routes from "./routes";
 
 import NotFound from "@/components/NotFound/NotFound";
 import ProtectedRoute from "@/components/Authen/ProtectedRoute";
+import ScrollToTop from "@/components/ScrollToTop";
 
 const AppRoutes = () => {
   return (
