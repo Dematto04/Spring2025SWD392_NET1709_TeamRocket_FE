@@ -102,7 +102,7 @@ function ServiceDetailSidebar({service, housekeeper}) {
         </div>
         <Separator className="my-4" />
         {/* Bussiness hour */}
-        <div>
+        {/* <div>
           <h1 className="text-3xl font-semibold">Bussiness hours</h1>
           <div className="mt-4 space-y-2">
             {[
@@ -120,7 +120,7 @@ function ServiceDetailSidebar({service, housekeeper}) {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
       </div>
     </>
   );

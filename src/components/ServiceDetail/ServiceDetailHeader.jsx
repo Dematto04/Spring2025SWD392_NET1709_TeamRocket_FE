@@ -26,8 +26,8 @@ function ServiceDetailHeader({detail}) {
             </div>
           </div>
           <div className="mt-2 flex text-sm font-normal items-center hover:text-primary cursor-pointer">
-            <Heart size={14} />
-            <div>Add to wishlist</div>
+            {/* <Heart size={14} />
+            <div>Add to wishlist</div> */}
           </div>
         </div>
       </div>

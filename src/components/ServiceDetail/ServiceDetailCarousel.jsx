@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { Button } from "../ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-
 function ServiceDetailCarousel({ images }) {
   const [mainRef, mainApi] = useEmblaCarousel({ align: "start" });
   const [thumbRef, thumbApi] = useEmblaCarousel({
