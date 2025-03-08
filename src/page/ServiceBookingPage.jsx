@@ -4,9 +4,11 @@ import ServiceBookProvider, {
 } from "@/components/ServiceBook/ServiceBookContext";
 import ServiceBookingSidebar from "@/components/ServiceBook/ServiceBookingSidebar";
 import React, { useContext } from "react";
+import { useDispatch } from "react-redux";
 
 function ServiceBookingContent() {
   const { step, setStep } = useContext(ServiceBookContext);
+  const dispatch = useDispatch();
 
   return (
     <div className="w-full bg-background flex-wrap md:flex-nowrap flex items-start p-4 rounded-xl gap-6">

@@ -12,35 +12,23 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Input } from "@/components/ui/input";
 import { z } from "zod";
-
 import { Button } from "@/components/ui/button";
-import { CirclePlus, Plus, Trash2 } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
 import { serviceTimeSlots } from "./slotData";
 import DragAndDropUpload from "@/components/DragAndDropUpload";
-import {
-  useCreateServiceMutation,
-  useGetCategoriesQuery,
-} from "@/redux/api/serviceApi";
+import { useCreateServiceMutation, useGetCategoriesQuery } from "@/redux/api/serviceApi";
 import { toast } from "@/hooks/use-toast";
-import { formatTime } from "@/lib/utils";
-import BasisInformation from "./BasisInformation";
 import AutoComplete from "@/components/AutoComplete";
 import HousekeeperDistanceRule from "@/components/Housekeeper/HousekeeperDistanceRule";
-
+import BasisInformation from "@/components/Housekeeper/AddService/BasisInformation";
+import LoadingScreen from "@/components/Loading";
+import AddServiceDetail from "@/components/Housekeeper/AddService/AddServiceDetail";
+import AddServicePrice from "@/components/Housekeeper/AddService/AddServicePrice";
+import AddServiceAvailability from "@/components/Housekeeper/AddService/AddServiceAvailability";
+import AddServiceAdditionalService from "@/components/Housekeeper/AddService/AddServiceAdditionalService";
 const formSchema = z.object({
   service_name: z.string().min(1, { message: "Service name is required" }),
   category_id: z.string().min(1, { message: "Service name is required" }),
@@ -99,8 +87,9 @@ function HousekeeperAddService() {
   //api cateogry
   const { data: categories, isLoading } = useGetCategoriesQuery();
   //api create service
-  const [createService, { isSuccess, isLoading: isCreating }] =
-    useCreateServiceMutation();
+
+  const [createService, {isSuccess, isLoading: isCreating}] = useCreateServiceMutation()
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -112,10 +101,12 @@ function HousekeeperAddService() {
       serviceSteps: [{ step_order: 1, step_description: "" }],
       additionalServices: [],
       city: "",
-      district: "",
+      province: "",
       address_line: "",
       place_id: "",
       serviceDistanceRule: [],
+      serviceTimeSlots: []
+
     },
   });
   const { control } = form;
@@ -139,66 +130,62 @@ function HousekeeperAddService() {
     control,
     name: "serviceDistanceRule",
   });
-
   const handleSubmit = async (data) => {
-    const haveSlotDays = dateOfWeek.filter((date) => date.slots.length > 0);
-    if (haveSlotDays.length == 0) {
-      toast({
-        title: "Lack of information",
-        description: "Please choose availability",
-        variant: "destructive",
-      });
-      return;
-    }
-    const serviceTimeSlots = [];
-    haveSlotDays.forEach((date) => {
-      date.slots.forEach((slot) => {
-        serviceTimeSlots.push({
-          start_time: formatTime(slot.start_time),
-          day_of_week: date.dateOfWeek,
-          // date_start: new Date().toISOString(),
-        });
-      });
-    });
-    if (serviceTimeSlots.some((slot) => slot.start_time === "")) {
-      toast({
-        title: "Lack of information",
-        description: "Please choose availability",
-        variant: "destructive",
-      });
-      return
-    }
+    let temp = []
+    const timeSlotField = form.watch('serviceTimeSlots')
+    timeSlotField.forEach((field, index)=> {
+      field.slots.forEach((slot, idx)=> {
+        dateOfWeek.forEach((day, i)=> {
+          if(index === i){
+            if(!slot) {
+              toast({
+                title: `Lack of time start on ${day.dateOfWeek}`,
+                description: `Please fill availability`,
+                variant: "destructive"
+              })
+            }
+            
+            temp.push({
+              start_time: slot,
+              day_of_week: day.dateOfWeek
+            })
+          }
+        })
+      })
+    })   
+
     const body = {
       ...data,
       duration: data.duration,
       price: data.price,
-      serviceTimeSlots,
       serviceImages: files?.map((file) => ({
         link: file,
       })),
+      serviceTimeSlots: temp,
+
     };
     console.log({ body });
     const result = await createService(body);
     if (result.error) {
       toast({
         title: "Create service fail",
-      });
-      return;
+      })
+      return
     }
     toast({
       title: "Create service sucessfully",
-    });
+    })
   };
-  if (isLoading) return null;
+  if (isLoading) return <LoadingScreen />;
+
 
   return (
     <div>
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(handleSubmit, (err) => {
-            console.log(err);
-          })}
-        >
+        <form onSubmit={form.handleSubmit(handleSubmit, (err)=> {
+          console.log(err);
+        })}>
+
           <Card className="bg-background">
             <CardHeader>
               <CardTitle>Add Service</CardTitle>
@@ -215,6 +202,8 @@ function HousekeeperAddService() {
                   "item-4",
                   "item-5",
                   "item-6",
+                  "item-7",
+
                 ]}
               >
                 {/* Basic Info */}
@@ -224,242 +213,37 @@ function HousekeeperAddService() {
                 />
 
                 {/* Detail and service steps*/}
-                <AccordionItem value="item-2">
-                  <AccordionTrigger className="text-lg">
-                    Detail
-                  </AccordionTrigger>
-                  {/* Service Step  */}
-                  <AccordionContent className="">
-                    <FormLabel>Service Steps</FormLabel>
-                    {fields.map((field, index) => {
-                      return (
-                        <div
-                          key={field.id}
-                          className="border p-4 rounded-lg mt-5"
-                        >
-                          <div className="flex flex-wrap items-center gap-3 ">
-                            {/* Step Order */}
-                            <FormField
-                              control={control}
-                              name={`serviceSteps.${index}.step_order`}
-                              render={() => (
-                                <FormItem className="w-1/3 md:w-1/12">
-                                  <FormLabel>Step Order</FormLabel>
-                                  <FormControl>
-                                    <Input
-                                      readOnly
-                                      type="number"
-                                      value={index + 1}
-                                    />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
 
-                            {/* Step Description */}
-                            <FormField
-                              control={control}
-                              name={`serviceSteps.${index}.step_description`}
-                              render={({ field }) => (
-                                <FormItem className="flex-grow">
-                                  <FormLabel>Step Description</FormLabel>
-                                  <FormControl>
-                                    <Input
-                                      {...field}
-                                      placeholder="What you will do in this step"
-                                    />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            {/* Xóa step */}
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              onClick={() => remove(index)}
-                              className="mt-6"
-                            >
-                              <Trash2 size={18} color="red" />
-                            </Button>
-                          </div>
-                        </div>
-                      );
-                    })}
-                    <div></div>
-                    {/* add step */}
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="my-3"
-                      onClick={() =>
-                        append({
-                          step_order:
-                            fields.length === 0 ? 1 : fields.length + 1,
-                          step_description: "",
-                        })
-                      }
-                    >
-                      <Plus size={16} /> Add Step
-                    </Button>
-
-                    <FormField
-                      control={form.control}
-                      name="description"
-                      render={({ field }) => (
-                        <FormItem className="flex-grow">
-                          <FormLabel>Description</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              {...field}
-                              placeholder="Your service overview"
-                              className="focus-visible:ring-0"
-                            />
-                          </FormControl>
-                          <FormDescription />
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </AccordionContent>
-                </AccordionItem>
+                <AddServiceDetail
+                  form={form}
+                  fields={fields}
+                  remove={remove}
+                  append={append}
+                />
                 {/* Pricing  */}
-                <AccordionItem value="item-3">
-                  <AccordionTrigger className="text-lg">
-                    Pricing
-                  </AccordionTrigger>
-                  <AccordionContent className="block lg:flex lg:gap-3">
-                    <FormField
-                      control={form.control}
-                      name="duration"
-                      render={({ field }) => (
-                        <FormItem className="w-1/4 lg:w-1/5">
-                          <FormLabel>Estimate Duration (min)</FormLabel>
-                          <FormControl>
-                            <Input
-                              min={0}
-                              type="number"
-                              {...field}
-                              className="focus-visible:ring-0"
-                            />
-                          </FormControl>
-                          <FormDescription />
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="price"
-                      render={({ field }) => (
-                        <FormItem className="w-1/4 lg:w-1/5">
-                          <FormLabel>Price</FormLabel>
-                          <FormControl>
-                            <Input
-                              min={0}
-                              type="number"
-                              {...field}
-                              className="focus-visible:ring-0"
-                            />
-                          </FormControl>
-                          <FormDescription />
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </AccordionContent>
-                </AccordionItem>
-                {/* Availability  */}
-                <AccordionItem value="item-4">
-                  <AccordionTrigger className="text-lg">
-                    Availability
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    {dateOfWeek.map((day, dayIndex) => (
-                      <div key={dayIndex} className="mb-4">
-                        <div className="flex items-center gap-2">
-                          <FormLabel>{day.dateOfWeek}</FormLabel>
-                          <Plus
-                            size={18}
-                            className="hover:text-primary cursor-pointer duration-100"
-                            onClick={() => {
-                              setDateOfWeek((prev) =>
-                                prev.map((item, i) =>
-                                  i === dayIndex
-                                    ? {
-                                        ...item,
-                                        slots: [
-                                          ...item.slots,
-                                          { start_time: "" },
-                                        ],
-                                      }
-                                    : item
-                                )
-                              );
-                            }}
-                          />
-                        </div>
+                <AddServicePrice form={form} />
 
-                        {day.slots.map((slot, slotIndex) => (
-                          <div
-                            key={slotIndex}
-                            className="flex items-center gap-2 mt-2"
-                          >
-                            <FormControl className="w-full md:1/2 lg:w-1/5">
-                              <Input
-                                type="time"
-                                value={slot.start_time}
-                                onChange={(e) => {
-                                  const updatedSlots = [...dateOfWeek];
-                                  updatedSlots[dayIndex].slots[
-                                    slotIndex
-                                  ].start_time = e.target.value;
-                                  setDateOfWeek([...updatedSlots]);
-                                }}
-                              />
-                            </FormControl>
-                            <Button
-                              variant="icon"
-                              className="p-1"
-                              type="button"
-                              onClick={() => {
-                                setDateOfWeek((prev) =>
-                                  prev.map((item, i) =>
-                                    i === dayIndex
-                                      ? {
-                                          ...item,
-                                          slots: item.slots.filter(
-                                            (_, idx) => idx !== slotIndex
-                                          ),
-                                        }
-                                      : item
-                                  )
-                                );
-                              }}
-                            >
-                              <Trash2 color="red" size={18} />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    ))}
-                  </AccordionContent>
-                </AccordionItem>
+                {/* Availability  */}
+                <AddServiceAvailability
+                  form={form}
+                  dateOfWeek={dateOfWeek}
+                  setDateOfWeek={setDateOfWeek}
+                />
                 {/* Location  */}
                 <AccordionItem value="item-5">
-                  <AccordionTrigger className="text-lg">
+                  <AccordionTrigger className="text-lg text-primary">
                     Location
                   </AccordionTrigger>
                   <AccordionContent>
                     <div className="flex flex-wrap w-full gap-6 p-2">
-                      <AutoComplete form={form} />
+                      <AutoComplete form={form}/>
+
                     </div>
                   </AccordionContent>
                 </AccordionItem>
                 {/* Gallery  */}
                 <AccordionItem value="item-6">
-                  <AccordionTrigger className="text-lg">
+                  <AccordionTrigger className="text-lg text-primary">
                     Gallery
                   </AccordionTrigger>
                   <AccordionContent>
@@ -467,7 +251,8 @@ function HousekeeperAddService() {
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="item-7">
-                  <AccordionTrigger className="text-lg">
+                  <AccordionTrigger className="text-lg text-primary">
+
                     Distance Rule
                   </AccordionTrigger>
                   <AccordionContent>
@@ -481,108 +266,12 @@ function HousekeeperAddService() {
                 </AccordionItem>
 
                 {/* additional Service */}
-                <AccordionItem value="item-6">
-                  <AccordionTrigger className="text-lg">
-                    Additional Service
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    {additionalFields?.map((field, idx) => (
-                      <div
-                        key={field.id}
-                        className="flex flex-wrap w-full gap-6 items-center my-4"
-                      >
-                        <FormField
-                          control={form.control}
-                          name={`additionalServices.${idx}.additionalImage`}
-                          render={({ field }) => (
-                            <FormItem className="flex-grow">
-                              <FormLabel>Image</FormLabel>
-                              <FormControl>
-                                <Input type="file" {...field} />
-                              </FormControl>
-                              <FormDescription />
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name={`additionalServices.${idx}.additional_service_name`}
-                          render={({ field }) => (
-                            <FormItem className="flex-grow">
-                              <FormLabel>Name</FormLabel>
-                              <FormControl>
-                                <Input
-                                  {...field}
-                                  placeholder="Additional service name"
-                                />
-                              </FormControl>
-                              <FormDescription />
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name={`additionalServices.${idx}.amount`}
-                          render={({ field }) => (
-                            <FormItem className="flex-grow">
-                              <FormLabel>Price</FormLabel>
-                              <FormControl>
-                                <Input
-                                  {...field}
-                                  placeholder="Additional service price"
-                                />
-                              </FormControl>
-                              <FormDescription />
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name={`additionalServices.${idx}.duration`}
-                          render={({ field }) => (
-                            <FormItem className="flex-grow">
-                              <FormLabel>Duration</FormLabel>
-                              <FormControl>
-                                <Input
-                                  {...field}
-                                  placeholder="Additional service duration"
-                                />
-                              </FormControl>
-                              <FormDescription />
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <Button
-                          variant="icon"
-                          className="mt-4"
-                          type="button"
-                          onClick={() => additionalRemove(idx)}
-                        >
-                          <Trash2 color="red" />
-                        </Button>
-                      </div>
-                    ))}
-                    <Button
-                      onClick={() =>
-                        additionalAppend({
-                          additionalImage: "",
-                          additional_service_name: "",
-                          amount: "",
-                          duration: "",
-                        })
-                      }
-                      variant="outline"
-                      type="button"
-                    >
-                      <CirclePlus />
-                      <span>Add New</span>
-                    </Button>
-                  </AccordionContent>
-                </AccordionItem>
+                <AddServiceAdditionalService
+                  form={form}
+                  additionalAppend={additionalAppend}
+                  additionalRemove={additionalRemove}
+                  additionalFields={additionalFields}
+                />
               </Accordion>
             </CardContent>
             <CardFooter className="justify-end">

@@ -9,6 +9,7 @@ import { persistor, store } from "./redux/store";
 import { PersistGate } from "redux-persist/integration/react";
 import { Toaster } from "./components/ui/toaster";
 import RefreshToken from "./components/Authen/RefreshToken";
+import ScrollToTop from "./components/ScrollToTop";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -16,9 +17,10 @@ createRoot(document.getElementById("root")).render(
       <PersistGate loading={null} persistor={persistor}>
         <ThemeProvider defaultTheme="dark">
           <BrowserRouter>
+            <ScrollToTop />
             <App />
             <Toaster />
-            <RefreshToken/>
+            <RefreshToken />
           </BrowserRouter>
         </ThemeProvider>
       </PersistGate>
