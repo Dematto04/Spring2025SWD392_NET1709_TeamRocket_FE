@@ -29,19 +29,20 @@ import {
 } from "@/components/ui/popover";
 import { Input } from "./ui/input";
 
-function AutoComplete({ form }) {
+function AutoComplete({ form, defaultAddress, defaultAddressId }) {
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownOptions, setDropdownOptions] = useState([]);
+  const [inputValue, setInputValue] = useState(defaultAddress || "");
   const [getAddress, { isLoading }] = useLazyAutoCompleteAddressQuery();
 
   const handleInputChange = useCallback(
     debounce(async (value) => {
       if (value.length > 2) {
         const result = await getAddress({ input: value });
-        setDropdownOptions(result.data.predictions || []);
+        setDropdownOptions(result.data?.predictions || []);
       }
     }, 500),
-    []
+    [getAddress]
   );
 
   return (
@@ -50,7 +51,7 @@ function AutoComplete({ form }) {
       name="location"
       render={({ field }) => (
         <FormItem className="flex flex-col">
-          <Popover>
+          <Popover open={isOpen} onOpenChange={setIsOpen}>
             <PopoverTrigger asChild>
               <FormControl>
                 <Button
@@ -60,45 +61,51 @@ function AutoComplete({ form }) {
                     "min-w-[300px] justify-between",
                     !field.value && "text-muted-foreground"
                   )}
+                  onClick={() => setIsOpen((prev) => !prev)}
                 >
                   {field.value
                     ? dropdownOptions.find(
                         (address) => address.place_id === field.value
-                      )?.description || "Select your location"
-                    : "Select your location"}
+                      )?.description || defaultAddress
+                    : (defaultAddress || "Select your address")}
                   <ChevronsUpDown className="opacity-50" />
                 </Button>
               </FormControl>
             </PopoverTrigger>
-            <PopoverContent className=" p-0">
-              <Command className="">
+            <PopoverContent className="p-0">
+              <Command>
                 <Input
                   placeholder="Type in your address"
-                  className="h-9 "
-                  onChange={(e) => handleInputChange(e.target.value)}
+                  className="h-9"
+                  value={inputValue}
+                  onChange={(e) => {
+                    setInputValue(e.target.value);
+                    handleInputChange(e.target.value);
+                  }}
                 />
-                <CommandList className="">
+                <CommandList>
                   <CommandEmpty>No address found.</CommandEmpty>
-
-                  <CommandGroup className="">
+                  <CommandGroup>
                     {dropdownOptions.map((address) => (
                       <CommandItem
                         key={address.place_id}
                         value={address.place_id}
                         onSelect={() => {
                           form.setValue("location", address.place_id);
-                          form.setValue("city", 
-                            address.compound.province,
+                          form.setValue(
+                            "city",
+                            address.compound?.province || ""
                           );
-                          form.setValue("district",
-                             address.compound.district,
+                          form.setValue(
+                            "district",
+                            address.compound?.district || ""
                           );
-                          form.setValue("address_line",
-                             address.description,
+                          form.setValue(
+                            "address_line",
+                            address.description || ""
                           );
-                          form.setValue("place_id",
-                             address.place_id,
-                          );
+                          form.setValue("place_id", address.place_id);
+                          setInputValue(address.description || "");
                           setIsOpen(false);
                         }}
                       >
