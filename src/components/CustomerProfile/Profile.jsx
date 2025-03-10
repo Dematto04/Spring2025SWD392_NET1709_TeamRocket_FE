@@ -8,6 +8,13 @@ import { Label } from "@/components/ui/label";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { useUpdateCustomerProfileMutation } from "@/redux/api/customerProfileApi";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 const formSchema = z.object({
   fullName: z.string().min(1, { message: "Full name is required" }),
@@ -122,7 +129,7 @@ const Profile = ({ profileInfo }) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="p-6 bg-white rounded-lg shadow-sm space-y-6">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="p-6 rounded-lg shadow-sm space-y-6">
         <h2 className="text-2xl font-bold">Profile Settings</h2>
 
         {/* Profile Picture */}
@@ -175,10 +182,15 @@ const Profile = ({ profileInfo }) => {
               <FormItem>
                 <Label htmlFor="gender">Gender *</Label>
                 <FormControl>
-                  <select {...field} id="gender" className="border p-2 rounded-md w-full">
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                  </select>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <SelectTrigger id="gender">
+                  <SelectValue placeholder="Select gender" />
+                  </SelectTrigger>
+                  <SelectContent>
+                  <SelectItem value="Male">Male</SelectItem>
+                  <SelectItem value="Female">Female</SelectItem>
+                  </SelectContent>
+                  </Select>
                 </FormControl>
                 <FormMessage />
               </FormItem>
