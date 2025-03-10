@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useGetBookingHistoryQuery, useGetBookingDetailQuery } from "@/redux/api/bookingApi";
@@ -10,8 +9,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 function Badge({ children, variant }) {
   const baseClasses = "inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold";
   const variants = {
-    destructive: "bg-red-500 text-white",
-    success: "bg-green-500 text-white",
+    ongoing: "bg-yellow-500 text-white",
+    finished: "bg-green-500 text-white",
+    canceled: "bg-red-500 text-white",
+    refunded: "bg-purple-500 text-white",
+    confirmed: "bg-blue-500 text-white",
     outline: "border border-gray-200 text-gray-700",
   };
 
@@ -53,7 +55,7 @@ export function BookingList() {
   };
 
   const handleStatusFilterChange = (value) => {
-    setStatusFilter(value === "all" ? "" : value);
+    setStatusFilter(value);
     setCurrentPage(1);
   };
 
@@ -65,6 +67,12 @@ export function BookingList() {
       setSelectedDate(null); // Clear the date if the input is cleared
     }
     setCurrentPage(1);
+  };
+
+  const handleCancelBooking = (bookingId) => {
+    // Add logic to handle booking cancellation
+    console.log("Canceling booking:", bookingId);
+    alert(`Booking ${bookingId} has been canceled.`);
   };
 
   if (isLoading) return <div>Loading...</div>;
@@ -84,10 +92,11 @@ export function BookingList() {
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            <SelectItem value="Confirmed">Confirmed</SelectItem>
-            <SelectItem value="Pending">Pending</SelectItem>
-            <SelectItem value="Cancelled">Cancelled</SelectItem>
+            <SelectItem value="Recently">Recently</SelectItem>
+            <SelectItem value="Ongoing">Ongoing</SelectItem>
+            <SelectItem value="Finished">Finished</SelectItem>
+            <SelectItem value="Canceled">Canceled</SelectItem>
+            <SelectItem value="Refunded">Refunded</SelectItem>
           </SelectContent>
         </Select>
 
@@ -116,7 +125,7 @@ export function BookingList() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
                   <h2 className="font-semibold">{booking.serviceName}</h2>
-                  <Badge variant={booking.status === "Confirmed" ? "success" : "destructive"}>
+                  <Badge variant={booking.status.toLowerCase()}>
                     {booking.status}
                   </Badge>
                 </div>
@@ -166,15 +175,21 @@ export function BookingList() {
                 </button>
               </div>
 
-              {booking.status === "Confirmed" ? (
-                <Button variant="success" className="absolute top-4 right-4 bg-green-500 hover:bg-green-600">
-                  Order Complete
-                </Button>
-              ) : (
-                <Button variant="destructive" className="absolute top-4 right-4">
-                  Cancel
-                </Button>
-              )}
+              {/* Status Button */}
+              <div className="absolute top-4 right-4">
+                {booking.status === "Ongoing" ? (
+                  <Button
+                    variant="destructive"
+                    onClick={() => handleCancelBooking(booking.bookingId)}
+                  >
+                    Cancel
+                  </Button>
+                ) : (
+                  <Badge variant={booking.status.toLowerCase()}>
+                    {booking.status}
+                  </Badge>
+                )}
+              </div>
             </CardContent>
           </Card>
         ))}

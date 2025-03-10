@@ -6,7 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink } from '@/components/ui/navigation-menu';
 import { BadgeDollarSign, MapPinHouse, NotebookPen, UserRoundPen, Wallet } from 'lucide-react';
 
-const CusProfile = ({ selectedMenu, setSelectedMenu }) => {
+const CusProfile = ({ selectedMenu, setSelectedMenu, profileInfo}) => {
   return (
     <Card className="w-full relative z-[0] ">
       <CardHeader>
@@ -16,7 +16,7 @@ const CusProfile = ({ selectedMenu, setSelectedMenu }) => {
             <AvatarFallback>DU</AvatarFallback>
           </Avatar>
           <div>
-            <CardTitle>Demo User</CardTitle>
+            <CardTitle>{profileInfo.data.full_name}</CardTitle>
             <CardDescription>Member Since Dec 2024</CardDescription>
           </div>
         </div>
@@ -29,8 +29,8 @@ const CusProfile = ({ selectedMenu, setSelectedMenu }) => {
               <NavigationMenuLink
                 href="#profile"
                 onClick={() => setSelectedMenu('profile')}
-                className={`flex text-sm ${
-                  selectedMenu === 'profile' ? 'text-blue-500 font-semibold' : 'text-gray-700'
+                className={`flex text-sm justify-start it ${
+                  selectedMenu === 'profile' ? 'text-primary font-semibold' : ''
                 }`}
               >
                 <UserRoundPen/>
@@ -41,8 +41,8 @@ const CusProfile = ({ selectedMenu, setSelectedMenu }) => {
               <NavigationMenuLink
                 href="#wallet"
                 onClick={() => setSelectedMenu('wallet')}
-                className={`flex text-sm ${
-                  selectedMenu === 'wallet' ? 'text-blue-500 font-semibold' : 'text-gray-700'
+                className={`flex text-sm justify-start it ${
+                  selectedMenu === 'wallet' ? 'text-primary font-semibold' : ''
                 }`}
               >
                 <Wallet />
@@ -53,8 +53,8 @@ const CusProfile = ({ selectedMenu, setSelectedMenu }) => {
               <NavigationMenuLink
                 href="#transactions"
                 onClick={() => setSelectedMenu('transactions')}
-                className={`flex text-sm ${
-                  selectedMenu === 'transactions' ? 'text-blue-500 font-semibold' : 'text-gray-700'
+                className={`flex text-sm justify-start it ${
+                  selectedMenu === 'transactions' ? 'text-primary font-semibold' : ''
                 }`}
               >
                 <BadgeDollarSign />
@@ -65,8 +65,8 @@ const CusProfile = ({ selectedMenu, setSelectedMenu }) => {
               <NavigationMenuLink
                 href="#address"
                 onClick={() => setSelectedMenu('address')}
-                className={`flex text-sm ${
-                  selectedMenu === 'address' ? 'text-blue-500 font-semibold' : 'text-gray-700'
+                className={`flex text-sm justify-start it ${
+                  selectedMenu === 'address' ? 'text-primary font-semibold' : ''
                 }`}
               >
                 <MapPinHouse />
@@ -77,8 +77,8 @@ const CusProfile = ({ selectedMenu, setSelectedMenu }) => {
               <NavigationMenuLink
                 href="#booking"
                 onClick={() => setSelectedMenu('booking')}
-                className={`flex text-sm ${
-                  selectedMenu === 'booking' ? 'text-blue-500 font-semibold' : 'text-gray-700'
+                className={`flex text-sm justify-start it ${
+                  selectedMenu === 'booking' ? 'text-primary font-semibold' : ''
                 }`}
               >
                 <NotebookPen />
@@ -99,7 +99,7 @@ const CusProfile = ({ selectedMenu, setSelectedMenu }) => {
                 href="#profile-settings"
                 onClick={() => setSelectedMenu('profile-settings')}
                 className={`text-sm ${
-                  selectedMenu === 'profile-settings' ? 'text-blue-500 font-semibold' : 'text-gray-700'
+                  selectedMenu === 'profile-settings' ? 'text-primary font-semibold' : ''
                 }`}
               >
                 Profile Settings
@@ -110,7 +110,7 @@ const CusProfile = ({ selectedMenu, setSelectedMenu }) => {
                 href="#security-settings"
                 onClick={() => setSelectedMenu('security-settings')}
                 className={`text-sm ${
-                  selectedMenu === 'security-settings' ? 'text-blue-500 font-semibold' : 'text-gray-700'
+                  selectedMenu === 'security-settings' ? 'text-primary font-semibold' : ''
                 }`}
               >
                 Security Settings
@@ -121,7 +121,7 @@ const CusProfile = ({ selectedMenu, setSelectedMenu }) => {
                 href="#delete-account"
                 onClick={() => setSelectedMenu('delete-account')}
                 className={`text-sm ${
-                  selectedMenu === 'delete-account' ? 'text-blue-500 font-semibold' : 'text-gray-700'
+                  selectedMenu === 'delete-account' ? 'text-primary font-semibold' : ''
                 }`}
               >
                 Delete Account

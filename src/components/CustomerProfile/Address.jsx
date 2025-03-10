@@ -1,13 +1,6 @@
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
   Form,
@@ -26,7 +19,12 @@ import {
   useUpdateAddressMutation,
 } from "@/redux/api/addressApi";
 import AutoComplete from "../AutoComplete";
-import { Accordion, AccordionContent,AccordionItem, AccordionTrigger } from "@radix-ui/react-accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@radix-ui/react-accordion";
 
 // Define the form schema using Zod
 const addressSchema = z.object({
@@ -43,7 +41,7 @@ const AddressList = () => {
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const addressesPerPage = 5;
+  const addressesPerPage = 3;
 
   const { data, isLoading, isError } = useGetAddressesQuery({
     pageIndex: currentPage,
@@ -65,22 +63,8 @@ const AddressList = () => {
     },
   });
 
-  const addresses = data?.data?.map((addr) => ({
-    id: addr.id,
-    title: addr.title,
-    address: addr.address,
-    city: addr.city,
-    district: addr.district,
-    placeId: addr.placeId,
-    isDefault: addr.isDefault,
-    details: `${addr.address}, ${addr.city}, ${addr.district}`,
-  })) || [];
-
-  const totalPages = Math.ceil((data?.data?.length || 0) / addressesPerPage);
-  const currentAddresses = addresses.slice(
-    (currentPage - 1) * addressesPerPage,
-    currentPage * addressesPerPage
-  );
+  const totalPages = Math.ceil((data?.data?.totalCount || 0) / addressesPerPage);
+  const currentAddresses = data?.data?.items || [];
 
   const openDialog = (address = null) => {
     console.log("Opening dialog for address:", address); // Debug: Log when opening
@@ -146,7 +130,7 @@ const AddressList = () => {
   if (isError) return <div>Error loading addresses</div>;
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-sm">
+    <div className="p-6 rounded-lg shadow-sm">
       <h2 className="text-2xl font-bold mb-4">Saved Addresses</h2>
       <div className="mb-6">
         <Button
@@ -173,10 +157,8 @@ const AddressList = () => {
         >
           <CardContent className="p-4">
             <h3 className="font-semibold text-lg">{address.title}</h3>
-            <p className="text-gray-600">Address: {address.details}</p>
-            <p className="text-gray-600">
-              Default: {address.isDefault ? "Yes" : "No"}
-            </p>
+            <p>Address: {`${address.address}, ${address.city}, ${address.district}`}</p>
+            <p>Default: {address.isDefault ? "Yes" : "No"}</p>
           </CardContent>
         </Card>
       ))}
@@ -222,98 +204,133 @@ const AddressList = () => {
 
       {/* Debug: Log Dialog state */}
       {console.log("isDialogOpen:", isDialogOpen)}
-          {/* Pop up start */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent
-          onClick={(e) => e.stopPropagation()}
-          onMouseDown={(e) => e.stopPropagation()}
-          onTouchStart={(e) => e.stopPropagation()}
-          style={{ zIndex: 1000, position: "relative" }}
+      {/* Custom Modal Start */}
+      {isDialogOpen && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.5)", // Overlay
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000, // Ensure it appears above other content
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            closeDialog(); // Close modal when clicking outside
+          }}
         >
-          <DialogHeader>
-            <DialogTitle>
+          <div
+            style={{
+              backgroundColor: "white",
+              padding: "20px",
+              borderRadius: "8px",
+              width: "100%",
+              maxWidth: "500px",
+              maxHeight: "80vh",
+              overflowY: "auto",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            }}
+            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
+          >
+            <h2 className="text-xl font-bold mb-4">
               {selectedAddress ? "Edit Address" : "Add Address"}
-            </DialogTitle>
-          </DialogHeader>
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(saveAddress, (err) => {
-                console.log("Validation errors:", err);
-              })}
-              className="space-y-4"
-            >
-              <Accordion
-                type="single"
-                collapsible
-                defaultValue="address-details"
-                className="w-full"
+            </h2>
+            <Form {...form}>
+              <form
+                onSubmit={(e) => {
+                  e.stopPropagation();
+                  form.handleSubmit(saveAddress, (err) => {
+                    console.log("Validation errors:", err);
+                  })(e);
+                }}
+                className="space-y-4"
               >
-                <AccordionItem value="address-details">
-                  <AccordionTrigger className="text-lg">
-                    {selectedAddress
-                      ? `Edit ${selectedAddress.title}`
-                      : "Add New Address"}
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <FormField
-                      control={form.control}
-                      name="title"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Title</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Title" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <div className="flex flex-wrap w-full gap-6 p-2">
+                <Accordion
+                  type="single"
+                  collapsible
+                  defaultValue="address-details"
+                  className="w-full"
+                >
+                  <AccordionItem value="address-details">
+                    <AccordionTrigger className="text-lg">
+                      {selectedAddress
+                        ? `Edit ${selectedAddress.title}`
+                        : "Add New Address"}
+                    </AccordionTrigger>
+                    <AccordionContent>
                       <FormField
                         control={form.control}
-                        name="location"
-                        render={() => (
-                          <FormItem className="flex-grow">
-                            <FormLabel>Address</FormLabel>
+                        name="title"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Title</FormLabel>
                             <FormControl>
-                              <AutoComplete form={form} />
+                              <Input placeholder="Title" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-                    </div>
-                    <FormField
-                      control={form.control}
-                      name="isDefault"
-                      render={({ field }) => (
-                        <FormItem className="flex items-center space-x-2">
-                          <FormControl>
-                            <input
-                              type="checkbox"
-                              checked={field.value}
-                              onChange={(e) => field.onChange(e.target.checked)}
-                            />
-                          </FormControl>
-                          <FormLabel className="m-0">Set as Default</FormLabel>
-                        </FormItem>
-                      )}
-                    />
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-              <DialogFooter>
-                <Button variant="outline" onClick={closeDialog} type="button">
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isAdding || isUpdating}>
-                  {selectedAddress ? "Save Changes" : "Add Address"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+                      <div className="flex flex-wrap w-full gap-6 p-2">
+                        <FormField
+                          control={form.control}
+                          name="location"
+                          render={() => (
+                            <FormItem className="flex-grow">
+                              <FormLabel>Address</FormLabel>
+                              <FormControl>
+                                <AutoComplete form={form} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <FormField
+                        control={form.control}
+                        name="isDefault"
+                        render={({ field }) => (
+                          <FormItem className="flex items-center space-x-2">
+                            <FormControl>
+                              <input
+                                type="checkbox"
+                                checked={field.value}
+                                onChange={(e) => field.onChange(e.target.checked)}
+                              />
+                            </FormControl>
+                            <FormLabel className="m-0">Set as Default</FormLabel>
+                          </FormItem>
+                        )}
+                      />
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+                <div className="flex justify-end gap-2 mt-4">
+                  <Button
+                    variant="outline"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      closeDialog();
+                    }}
+                    type="button"
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={isAdding || isUpdating}>
+                    {selectedAddress ? "Save Changes" : "Add Address"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

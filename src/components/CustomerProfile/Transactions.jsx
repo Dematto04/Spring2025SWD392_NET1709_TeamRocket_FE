@@ -15,7 +15,7 @@ const transactions = [
 
 const Transactions = () => {
   return (
-    <div className="p-6 bg-white rounded-lg shadow-sm">
+    <div className="p-6 rounded-lg shadow-sm">
       <h2 className="text-2xl font-bold mb-6">Booking Transaction</h2>
 
       {/* Leads Transaction Section */}
@@ -24,7 +24,7 @@ const Transactions = () => {
 
         {/* Show Entries and Search */}
         <div className="flex justify-between items-center mb-4">
-          <div className="text-sm text-gray-600">Show 10 entries</div>
+          <div className="text-sm ">Show 10 entries</div>
           <div className="flex space-x-4">
             <input
               type="text"
@@ -36,30 +36,30 @@ const Transactions = () => {
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-200">
+          <table className="min-w-full border border-gray-200">
             <thead>
-              <tr className="bg-gray-50">
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Provider</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Service</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Amount</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Tax</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Date</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Payment Type</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Action</th>
+              <tr>
+                <th className="px-4 py-3 text-left text-sm font-semibol">Provider</th>
+                <th className="px-4 py-3 text-left text-sm font-semibol">Service</th>
+                <th className="px-4 py-3 text-left text-sm font-semibol">Amount</th>
+                <th className="px-4 py-3 text-left text-sm font-semibol">Tax</th>
+                <th className="px-4 py-3 text-left text-sm font-semibol">Date</th>
+                <th className="px-4 py-3 text-left text-sm font-semibol">Payment Type</th>
+                <th className="px-4 py-3 text-left text-sm font-semibol">Status</th>
+                <th className="px-4 py-3 text-left text-sm font-semibol">Action</th>
               </tr>
             </thead>
             <tbody>
             {transactions.map((transaction, index) => (
-                <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
-                <td className="px-4 py-3 text-sm text-gray-700">{transaction.provider}</td>
-                <td className="px-4 py-3 text-sm text-gray-700">{transaction.service}</td>
-                <td className="px-4 py-3 text-sm text-gray-700">{transaction.amount}</td>
-                <td className="px-4 py-3 text-sm text-gray-700">{transaction.tax}</td>
-                <td className="px-4 py-3 text-sm text-gray-700">{transaction.date}</td>
-                <td className="px-4 py-3 text-sm text-gray-700">{transaction.paymentType}</td>
-                <td className="px-4 py-3 text-sm text-gray-700">{transaction.status}</td>
-                <td className="px-4 py-3 text-sm text-gray-700">
+                <tr key={index} className="border-b border-gray-200">
+                <td className="px-4 py-3 text-sm">{transaction.provider}</td>
+                <td className="px-4 py-3 text-sm">{transaction.service}</td>
+                <td className="px-4 py-3 text-sm">{transaction.amount}</td>
+                <td className="px-4 py-3 text-sm">{transaction.tax}</td>
+                <td className="px-4 py-3 text-sm">{transaction.date}</td>
+                <td className="px-4 py-3 text-sm">{transaction.paymentType}</td>
+                <td className="px-4 py-3 text-sm">{transaction.status}</td>
+                <td className="px-4 py-3 text-sm">
                     <button className="text-blue-500 hover:text-blue-700">Edit</button>
                 </td>
                 </tr>
