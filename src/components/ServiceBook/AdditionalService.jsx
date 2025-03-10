@@ -34,7 +34,7 @@ function AdditionalService() {
 
   const dispatch = useDispatch();
   const { data, isLoading } = useGetAdditionalServicesQuery({ serviceId: id });
-  const checkedItem = useSelector(selectAdditional);
+const checkedItem = useSelector(selectAdditional);
   const handleAdd = (additionalService) => {
     dispatch(toggleAdditional(additionalService));
   };

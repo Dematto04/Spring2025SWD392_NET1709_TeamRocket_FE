@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,19 +9,9 @@ import {
 } from "@/components/ui/breadcrumb";
 import Filter from "@/components/ServiceList/Filter";
 import ServiceList from "@/components/ServiceList/ServiceList";
-import { useGetServicesQuery } from "@/redux/api/serviceApi";
-import LoadingScreen from "@/components/Loading";
+
 
 function ServiceListPage() {
-  const [searchParams] = useSearchParams();
-  const category = searchParams.get("category");
-  const { data, isLoading, isError, isSuccess } = useGetServicesQuery({
-    pageIndex: 1,
-    pageSize: 100,
-  });
-  if (isLoading) return <LoadingScreen />;
-  console.log({ data });
-
   return (
     <>
       {/* Hero */}
@@ -55,19 +45,18 @@ function ServiceListPage() {
       </div>
 
       {/* Nội dung chính */}
-      {isSuccess && (
-        <div className="flex flex-col lg:flex-row justify-center mt-14 container mx-auto gap-4 px-6 lg:px-16">
-          {/* Bộ lọc (Filter) */}
-          <div className="w-full lg:w-80 shadow-lg rounded-md shrink-0 h-fit">
-            <Filter />
-          </div>
 
-          {/* Danh sách dịch vụ */}
-          <div className="w-full">
-            <ServiceList services={data.data.items} />
-          </div>
+      <div className="flex flex-col lg:flex-row justify-center mt-14 container mx-auto gap-4 px-6 lg:px-16">
+        {/* Bộ lọc (Filter) */}
+        <div className="w-full lg:w-80 shadow-lg rounded-md shrink-0 h-fit">
+          <Filter />
         </div>
-      )}
+
+        {/* Danh sách dịch vụ */}
+        <div className="w-full">
+          <ServiceList />
+        </div>
+      </div>
     </>
   );
 }

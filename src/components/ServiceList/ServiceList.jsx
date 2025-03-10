@@ -7,8 +7,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import ServiceItem from "./ServiceItem";
+import { useSearchParams } from "react-router-dom";
+import { useGetServicesQuery } from "@/redux/api/serviceApi";
+import LoadingScreen from "../Loading";
 
-function ServiceList({ services }) {
+function ServiceList() {
+  const [searchParams] = useSearchParams();
+  const category = searchParams.get("category");
+  const { data, isLoading, isError, isSuccess } = useGetServicesQuery({
+    pageIndex: 1,
+    pageSize: 100,
+  });
+  if (isLoading) return <LoadingScreen />;
+
   return (
     <div className="">
       {/* header */}
@@ -31,10 +42,9 @@ function ServiceList({ services }) {
       {/* service list */}
       <div className="w-full grid md:grid-cols-2 xl:grid-cols-3 gap-y-6 gap-x-3">
         {/* service items */}
-        {services
-          .map((item, idx) => (
-            <ServiceItem key={idx} service={item} />
-          ))}
+        {data.data.items.map((item, idx) => (
+          <ServiceItem key={idx} service={item} />
+        ))}
       </div>
     </div>
   );
