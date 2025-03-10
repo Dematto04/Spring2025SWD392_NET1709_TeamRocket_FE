@@ -47,8 +47,8 @@ export default function CustomerProfilePage() {
   return (
     <div className="flex">
       {/* Left Sidebar */}
-      <div className="w-64 p-4 bg-gray-50 border-r border-gray-200 mt-20">
-        <CusProfile selectedMenu={selectedMenu} setSelectedMenu={setSelectedMenu} />
+      <div className="w-64 p-4 border-r border-gray-200 mt-20">
+        <CusProfile selectedMenu={selectedMenu} setSelectedMenu={setSelectedMenu} profileInfo={data} />
       </div>
 
       {/* Main Content Area */}

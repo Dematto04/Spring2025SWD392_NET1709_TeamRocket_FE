@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 
 const Wallet = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -47,17 +49,17 @@ const Wallet = () => {
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-sm">
+    <div className="p-6 rounded-lg shadow-sm">
       <h2 className="text-2xl font-bold mb-6">Wallet</h2>
 
       {/* Add Balance Button */}
       <div className="mb-6">
-        <button
+        <Button
           onClick={handleAddBalance}
-          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+          className="px-4 py-2  rounded-md"
         >
           Add Balance
-        </button>
+        </Button>
       </div>
 
       {/* Wallet Transactions Section */}
@@ -66,9 +68,9 @@ const Wallet = () => {
 
         {/* Show Entries and Search */}
         <div className="flex justify-between items-center mb-4">
-          <div className="text-sm text-gray-600">Show 10 entries</div>
+          <div className="text-sm">Show 10 entries</div>
           <div className="flex space-x-4">
-            <input
+            <Input
               type="text"
               placeholder="Search..."
               className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -78,20 +80,20 @@ const Wallet = () => {
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-200">
+          <table className="min-w-full border border-border">
             <thead>
-              <tr className="bg-gray-50">
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Amount</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Payment Type</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Transaction Date</th>
+              <tr className="">
+                <th className="px-4 py-3 text-left text-sm font-semibold">Amount</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">Payment Type</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">Transaction Date</th>
               </tr>
             </thead>
             <tbody>
               {transactions.map((transaction, index) => (
-                <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm text-gray-700">{transaction.amount}</td>
-                  <td className="px-4 py-3 text-sm text-gray-700">{transaction.paymentType}</td>
-                  <td className="px-4 py-3 text-sm text-gray-700">{transaction.transactionDate}</td>
+                <tr key={index} className="border-b border-border">
+                  <td className="px-4 py-3 text-sm ">{transaction.amount}</td>
+                  <td className="px-4 py-3 text-sm ">{transaction.paymentType}</td>
+                  <td className="px-4 py-3 text-sm ">{transaction.transactionDate}</td>
                 </tr>
               ))}
             </tbody>

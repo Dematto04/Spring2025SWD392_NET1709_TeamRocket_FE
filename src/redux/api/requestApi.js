@@ -4,14 +4,21 @@ export const requestApi = apiSlice.injectEndpoints({
   endpoints: (build) => ({
       getPendingRequest: build.query({
         query: () => ({
-          url: "Request/pending-request",
+          url: "Request/service-pending-request",
+          method: "GET",
+        }),
+        providesTags: ["Request"],
+      }),
+      getStaffApprovedRequest: build.query({
+        query: () => ({
+          url: "Staff/staff-requests-approved",
           method: "GET",
         }),
         providesTags: ["Request"],
       }),
       getPendingRequestDetail: build.query({
         query: (id) => ({
-          url: `Request/pending-request/${id}`,
+          url: `Request/service-pending-request/${id}`,
           method: "GET",
         }),
         providesTags: ["Request"],
@@ -30,6 +37,7 @@ export const requestApi = apiSlice.injectEndpoints({
   export const {
     useGetPendingRequestQuery,
     useGetPendingRequestDetailQuery,
-    useAprroveNewRequestMutation
+    useAprroveNewRequestMutation,
+    useGetStaffApprovedRequestQuery
   } = requestApi;
   
