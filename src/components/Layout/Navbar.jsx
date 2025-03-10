@@ -64,9 +64,6 @@ export default function Navbar({ services }) {
 
                           className="duration-200 group-hover:scale-110 h-full w-full object-contain"
 
-                          // src={service.imgUrl}
-                          // className="duration-200 group-hover:scale-110 w-full h-40 object-cover"
-
                         />
                       </div>
                       <div className="mb-2 mt-4 text-lg font-medium">

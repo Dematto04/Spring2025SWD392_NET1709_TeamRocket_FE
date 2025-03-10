@@ -33,7 +33,7 @@ export default function CheckoutItems({address, additionalService, service, user
                 {/* Additional Services */}
                 <div className="mt-2 space-y-1 text-sm text-gray-500">
                  {additionalService && additionalService.map((item)=> (
-                  <div key={item.name}>-{item.name}</div>
+                  <div key={item.addtional_service_id}>-{item.addtional_service_name}</div>
                  ))}
                 </div>
               </TableCell>
@@ -56,7 +56,9 @@ export default function CheckoutItems({address, additionalService, service, user
         {/* Date & Time */}
         <div className="text-sm">
           <p className="font-medium">Scheduled Date & Time:</p>
-          <p className="text-gray-500">{formatSchedule(timeSlot?.startDate)}</p>
+          {/* <p className="text-gray-500">{formatSchedule(timeSlot?.startDate)}</p> */}
+          <p className="text-gray-500">Start time: {timeSlot?.start_time.slice(0,5)}</p>
+          <p className="text-gray-500">End time: {timeSlot?.end_time.slice(0,5)}</p>
         </div>
 
         <Separator />
@@ -64,7 +66,7 @@ export default function CheckoutItems({address, additionalService, service, user
         {/* Billing Address */}
         <div className="text-sm space-y-1">
           <p className="font-medium">Billing Address:</p>
-          <p>{address.address_line}</p>
+          <p>{address}</p>
           <p>📞 {user?.phoneNumber || "0394388330"}</p>
           <p>📧 {user?.email}</p>
         </div>

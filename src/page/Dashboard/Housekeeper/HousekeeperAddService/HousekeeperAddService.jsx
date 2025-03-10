@@ -19,7 +19,10 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { serviceTimeSlots } from "./slotData";
 import DragAndDropUpload from "@/components/DragAndDropUpload";
-import { useCreateServiceMutation, useGetCategoriesQuery } from "@/redux/api/serviceApi";
+import {
+  useCreateServiceMutation,
+  useGetCategoriesQuery,
+} from "@/redux/api/serviceApi";
 import { toast } from "@/hooks/use-toast";
 import AutoComplete from "@/components/AutoComplete";
 import HousekeeperDistanceRule from "@/components/Housekeeper/HousekeeperDistanceRule";
@@ -52,12 +55,22 @@ const formSchema = z.object({
       amount: z
         .string()
         .min(1, { message: "Additional service price is required" }),
+      duration: z
+        .string()
+        .min(1, { message: "Additional service duration is required" }),
+      url: z
+        .string()
+        .min(1, { message: "Additional service image is required" }),
+      description: z
+        .string()
+        .min(1, { message: "Additional service description is required" }),
     })
   ),
   city: z.string().min(1, { message: "City is required" }),
   district: z.string().min(1, { message: "District is required" }),
   address_line: z.string().min(1, { message: "Address is required" }),
   place_id: z.string(),
+  location: z.string().min(1, { message: "Location is required" }),
   serviceDistanceRule: z.array(
     z
       .object({
@@ -79,7 +92,13 @@ const formSchema = z.object({
         }
       )
   ),
+  serviceTimeSlots: z.array(
+    z.object({
+      slots: z.array(z.string().min(1, { message: "Time slot is required" })),
+    })
+  ),
 });
+
 // thiếu field image
 function HousekeeperAddService() {
   const [dateOfWeek, setDateOfWeek] = useState(serviceTimeSlots);
@@ -88,7 +107,8 @@ function HousekeeperAddService() {
   const { data: categories, isLoading } = useGetCategoriesQuery();
   //api create service
 
-  const [createService, {isSuccess, isLoading: isCreating}] = useCreateServiceMutation()
+  const [createService, { isSuccess, isLoading: isCreating }] =
+    useCreateServiceMutation();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -104,9 +124,10 @@ function HousekeeperAddService() {
       province: "",
       address_line: "",
       place_id: "",
-      serviceDistanceRule: [],
-      serviceTimeSlots: []
+      location: "",
 
+      serviceDistanceRule: [],
+      serviceTimeSlots: [],
     },
   });
   const { control } = form;
@@ -131,28 +152,28 @@ function HousekeeperAddService() {
     name: "serviceDistanceRule",
   });
   const handleSubmit = async (data) => {
-    let temp = []
-    const timeSlotField = form.watch('serviceTimeSlots')
-    timeSlotField.forEach((field, index)=> {
-      field.slots.forEach((slot, idx)=> {
-        dateOfWeek.forEach((day, i)=> {
-          if(index === i){
-            if(!slot) {
+    let temp = [];
+    const timeSlotField = form.watch("serviceTimeSlots");
+    timeSlotField.forEach((field, index) => {
+      field.slots.forEach((slot, idx) => {
+        dateOfWeek.forEach((day, i) => {
+          if (index === i) {
+            if (!slot) {
               toast({
                 title: `Lack of time start on ${day.dateOfWeek}`,
                 description: `Please fill availability`,
-                variant: "destructive"
-              })
+                variant: "destructive",
+              });
             }
-            
+
             temp.push({
               start_time: slot,
-              day_of_week: day.dateOfWeek
-            })
+              day_of_week: day.dateOfWeek,
+            });
           }
-        })
-      })
-    })   
+        });
+      });
+    });
 
     const body = {
       ...data,
@@ -162,30 +183,29 @@ function HousekeeperAddService() {
         link: file,
       })),
       serviceTimeSlots: temp,
-
     };
     console.log({ body });
-    const result = await createService(body);
-    if (result.error) {
-      toast({
-        title: "Create service fail",
-      })
-      return
-    }
-    toast({
-      title: "Create service sucessfully",
-    })
+    // const result = await createService(body);
+    // if (result.error) {
+    //   toast({
+    //     title: "Create service fail",
+    //   });
+    //   return;
+    // }
+    // toast({
+    //   title: "Create service sucessfully",
+    // });
   };
   if (isLoading) return <LoadingScreen />;
-
 
   return (
     <div>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit, (err)=> {
-          console.log(err);
-        })}>
-
+        <form
+          onSubmit={form.handleSubmit(handleSubmit, (err) => {
+            console.log(err);
+          })}
+        >
           <Card className="bg-background">
             <CardHeader>
               <CardTitle>Add Service</CardTitle>
@@ -203,7 +223,6 @@ function HousekeeperAddService() {
                   "item-5",
                   "item-6",
                   "item-7",
-
                 ]}
               >
                 {/* Basic Info */}
@@ -236,8 +255,7 @@ function HousekeeperAddService() {
                   </AccordionTrigger>
                   <AccordionContent>
                     <div className="flex flex-wrap w-full gap-6 p-2">
-                      <AutoComplete form={form}/>
-
+                      <AutoComplete form={form} />
                     </div>
                   </AccordionContent>
                 </AccordionItem>
@@ -252,7 +270,6 @@ function HousekeeperAddService() {
                 </AccordionItem>
                 <AccordionItem value="item-7">
                   <AccordionTrigger className="text-lg text-primary">
-
                     Distance Rule
                   </AccordionTrigger>
                   <AccordionContent>

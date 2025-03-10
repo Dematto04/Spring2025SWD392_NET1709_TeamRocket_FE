@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Button } from "../ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Separator } from "../ui/separator";
@@ -7,11 +7,10 @@ import ServiceDateTime from "./ServiceDateTime";
 import ServiceBookingPersonal from "./ServiceBookingPersonal";
 import { ServiceBookContext } from "./ServiceBookContext";
 import { bookingSteps } from "./ServiceBookingSidebar";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { useDispatch } from "react-redux";
-import { addAddress } from "@/redux/features/bookingSlice";
-import { useAddUserAddressMutation } from "@/redux/api/addressApi";
+import { addAddress, serviceBooking } from "@/redux/features/bookingSlice";
 const Content = ({ step }) => {
   switch (step) {
     case 0:
@@ -26,7 +25,14 @@ function ServiceBook({ step, setStep }) {
   const { form, time } = useContext(ServiceBookContext);
   const nav = useNavigate();
   const dispatch = useDispatch();
-  const [addUserAddress, { isLoading, data }] = useAddUserAddressMutation();
+  const { id } = useParams();
+  useEffect(() => {
+    dispatch(
+      serviceBooking({
+        serviceId: id,
+      })
+    );
+  }, []);
   const handNextStep = async () => {
     //Thêm additional
     if (step === 1) {
@@ -45,6 +51,7 @@ function ServiceBook({ step, setStep }) {
       const isValid = await form.trigger();
       if (!isValid) return;
       const body = {
+        id: form.getValues("addressId"),
         address: form.getValues("address_line"),
         city: form.getValues("city"),
         district: form.getValues("district"),
@@ -52,25 +59,19 @@ function ServiceBook({ step, setStep }) {
         isDefault: false,
         title: "Home",
       };
-      console.log({body});
-      const result = await addUserAddress(body)
-      console.log({result});
-      
-      if(result.error){
-        toast({
-          title: "Cannot add address",
-          variant: "destructive",
-          duration: 2000
-        })
-        return
-      }
+      console.log({ body });
       dispatch(
         addAddress({
-          address_line: form.getValues("address_line"),
-          place_id: form.getValues("place_id"),
-          addressId: result.data.data.id
+          addressId: form.getValues("addressId"),
+          address: form.getValues("address_line"),
+          city: form.getValues("city"),
+          district: form.getValues("district"),
+          placeId: form.getValues("place_id"),
+          isDefault: false,
+          title: "Home",
         })
       );
+
       nav("/service/checkout");
     }
     setStep((prev) => prev + 1);

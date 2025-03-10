@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -24,156 +24,134 @@ import {
 } from "../ui/accordion";
 import { ServiceBookContext } from "./ServiceBookContext";
 import AutoComplete from "../AutoComplete";
+import { useCustomerProfileQuery } from "@/redux/api/customerProfileApi";
+import LoadingScreen from "../Loading";
+import { useGetAddressesQuery } from "@/redux/api/addressApi";
+import AddressList from "./AddressList";
 
 function ServiceBookingPersonal() {
-  const [defaultAddress, setDefaultAddress] = useState("123 Main St, City A");
-  const [newAddress, setNewAddress] = useState("");
-  const [savedAddresses, setSavedAddresses] = useState([
-    "123 Main St, City A",
-    "456 Oak Ave, City B",
-  ]);
+  const { data, isLoading, isSuccess } = useCustomerProfileQuery();
+  const {
+    data: address,
+    isLoading: isGetting,
+    isError,
+    isSuccess: isOk,
+  } = useGetAddressesQuery({
+    pageIndex: 1,
+    pageSize: 100,
+  });
+  const [defaultAddress, setDefaultAddress] = useState();
+  
+
   const { form } = useContext(ServiceBookContext);
 
-  const handleSelectAddress = (address) => {
-    setDefaultAddress(address);
-  };
-
-  const handleAddNewAddress = () => {
-    if (newAddress.trim() !== "") {
-      setSavedAddresses([...savedAddresses, newAddress]);
-      setDefaultAddress(newAddress);
-      setNewAddress("");
+  useEffect(() => {
+    if (isSuccess && data?.data) {
+      form.setValue("fullName", data.data.full_name || "");
+      form.setValue("email", data.data.email || "");
+      form.setValue("phoneNumber", data.data.phone || "");
     }
-  };
-  const handleInfo = (data) => {
-    console.log({data});
-  };
+    if (isOk && address?.data) {
+      const defaultValue = address.data.items.find(
+        (address) => address.isDefault
+      );
+      
+      if (defaultValue) {
+        setDefaultAddress({
+          defaultAddress: defaultValue?.address,
+          defaultAddressId: defaultValue?.placeId,
+        });
+        form.setValue("location", defaultValue.placeId);
+        form.setValue("city", defaultValue.city || "");
+        form.setValue("district", defaultValue?.district || "");
+        form.setValue("address_line", defaultValue.address || "");
+        form.setValue("place_id", defaultValue.placeId);
+        form.setValue("addressId", defaultValue.id)
+      }
+    }
+  }, [isSuccess, data, isOk, form]);
+
+  if (isLoading || isGetting) return <LoadingScreen />;
 
   return (
-    <motion.div variants={containerVariants} initial="hidden" animate="visible">
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(handleInfo, (err) => {
-            console.log(err);
-          })}
-          className="rounded-lg shadow-sm space-y-6"
-        >
-          <h1 className="font-semibold leading-none tracking-tight mb-4">
-            Add Personal Information
-          </h1>
+    isSuccess &&
+    isOk &&
+    defaultAddress && (
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit((formData) => console.log(formData))}
+            className="rounded-lg shadow-sm space-y-6"
+          >
+            <h1 className="font-semibold leading-none tracking-tight mb-4">
+              Add Personal Information
+            </h1>
 
-          {/* General Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormField
-              control={form.control}
-              name="fullName"
-              render={({ field }) => (
-                <FormItem>
-                  <Label htmlFor="fullName">Full Name *</Label>
-                  <FormControl>
-                    <Input {...field} id="fullName" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <Label htmlFor="email">Email *</Label>
-                  <FormControl>
-                    <Input {...field} id="email" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="phoneNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <Label htmlFor="phoneNumber">Phone Number *</Label>
-                  <FormControl>
-                    <Input {...field} id="phoneNumber" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="dob"
-              render={({ field }) => (
-                <FormItem>
-                  <Label htmlFor="dob">Date of Birth *</Label>
-                  <FormControl>
-                    <Input {...field} id="dob" type="date" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          {/* Address Section */}
-          <div className="mt-6">
-            <Label>Address *</Label>
-            <div className="flex justify-between items-center  mt-3 rounded-md">
-              <AutoComplete form={form}/>
-              {/* <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline">Change</Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <h2 className="text-lg font-semibold mb-4">
-                    Choose an Address
-                  </h2>
-                  <div className="space-y-3">
-                    {savedAddresses.map((address, index) => (
-                      <div
-                        key={index}
-                        className={`p-3 rounded-md border cursor-pointer ${
-                          defaultAddress === address
-                            ? "bg-blue-500 text-white"
-                            : "bg-gray-100"
-                        }`}
-                        onClick={() => handleSelectAddress(address)}
-                      >
-                        {address}
-                      </div>
-                    ))}
-                    <Accordion type="single" collapsible>
-                      <AccordionItem value={"123"}>
-                        <AccordionTrigger>
-                          <Label className="mb-4">New Address</Label>
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          <Input
-                            value={newAddress}
-                            onChange={(e) => setNewAddress(e.target.value)}
-                            placeholder="Enter new address"
-                            className="py-5 focus:outline-none focus-visible:ring-0"
-                          />
-                          <Button
-                            className="mt-8 w-full"
-                            onClick={handleAddNewAddress}
-                          >
-                            Add Address
-                          </Button>
-                        </AccordionContent>
-                      </AccordionItem>
-                    </Accordion>
-                  </div>
-                </DialogContent>
-              </Dialog> */}
+            {/* General Information */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="fullName"
+                render={({ field }) => (
+                  <FormItem>
+                    <Label htmlFor="fullName">Full Name *</Label>
+                    <FormControl>
+                      <Input {...field} id="fullName" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <Label htmlFor="email">Email *</Label>
+                    <FormControl>
+                      <Input readOnly {...field} id="email" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="phoneNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <Label htmlFor="phoneNumber">Phone Number *</Label>
+                    <FormControl>
+                      <Input {...field} id="phoneNumber" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
-          </div>
-        </form>
-      </Form>
-    </motion.div>
+
+            {/* Address Section */}
+            <div className="mt-6">
+              <Label>Address *</Label>
+              <div className="flex justify-start gap-4 items-start mt-3 rounded-md">
+                <AutoComplete
+                  form={form}
+                  defaultAddress={defaultAddress.defaultAddress}
+                  defaultAddressId={defaultAddress.defaultAddressId}
+                />
+              <AddressList addressList={address.data.items} setDefaultAddress={setDefaultAddress}/>
+
+              </div>
+            </div>
+            
+          </form>
+        </Form>
+      </motion.div>
+    )
   );
 }
 

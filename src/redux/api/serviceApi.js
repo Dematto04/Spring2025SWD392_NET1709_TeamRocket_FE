@@ -49,9 +49,9 @@ const serviceApi = apiSlice.injectEndpoints({
         body,
       }),
     }),
-    getServiceBookingPrice: build.mutation({
+    getServiceCheckoutDetail: build.mutation({
       query: (body) => ({
-        url: `/Payment`,
+        url: `/Checkout`,
         method: "POST",
         body,
       }),
@@ -75,6 +75,6 @@ export const {
   useCreateServiceMutation,
   useGetAdditionalServicesQuery,
   useGetTimeSlotsMutation,
-  useGetServiceBookingPriceMutation,
+  useGetServiceCheckoutDetailMutation,
   usePlaceOrderServiceMutation
 } = serviceApi;
