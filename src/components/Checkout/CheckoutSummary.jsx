@@ -17,7 +17,6 @@ import {
 import { Label } from "../ui/label";
 
 export const CheckoutSummary = ({ summary, handlePlaceOrder }) => {
-  
   return (
     <div className="flex flex-col gap-y-6">
       <Card>
@@ -27,19 +26,19 @@ export const CheckoutSummary = ({ summary, handlePlaceOrder }) => {
         <CardContent>
           <div className="flex justify-between mb-2">
             <div>Service price</div>
-            <div>${summary?.serviceBasePrice}</div>
+            <div>${summary?.base_service_price}</div>
           </div>
           <div className="flex justify-between mb-4">
             <div>Additional service price</div>
-            <div>${summary?.addidionalPrice}</div>
+            <div>${summary?.addtional_price}</div>
           </div>
-          <div className="flex justify-between mb-4">
+          {/* <div className="flex justify-between mb-4">
             <div>Distance price</div>
             <div>${summary?.distancePrice}</div>
-          </div>
+          </div> */}
           <div className="flex justify-between font-bold">
             <div>Total</div>
-            <div>${summary?.totalPrice}</div>
+            <div>${summary?.addtional_price + summary?.base_service_price}</div>
           </div>
           <div className="mt-4">
             <Label htmlFor="payment">Payment Method</Label>
@@ -49,10 +48,8 @@ export const CheckoutSummary = ({ summary, handlePlaceOrder }) => {
                 <SelectValue placeholder="Select payment method" />
               </SelectTrigger>
               <SelectContent>
-                {summary?.paymentMethods &&
-                  summary?.paymentMethods.map((item) => (
-                    <SelectItem key={item.name} value={item.name}>{item.name}</SelectItem>
-                  ))}
+                <SelectItem value="VN Pay">VN Pay</SelectItem>
+                <SelectItem value="Wallet">Wallet</SelectItem>
               </SelectContent>
             </Select>
             <div className="text-sm text-red-600 leading-none tracking-tight font-medium mt-2">
@@ -61,7 +58,9 @@ export const CheckoutSummary = ({ summary, handlePlaceOrder }) => {
           </div>
         </CardContent>
         <CardFooter>
-          <Button type="button" onClick={handlePlaceOrder} className="w-full">Place Order</Button>
+          <Button type="button" onClick={handlePlaceOrder} className="w-full">
+            Place Order
+          </Button>
         </CardFooter>
       </Card>
     </div>

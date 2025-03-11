@@ -77,17 +77,12 @@ const routes = [
       //   allowedRoles: ["Admin", "Staff"],
       // },
       {
-        path: "/service/checkout/sucess",
-        component: CheckoutSuccess,
-        allowedRoles: ["Customer"],
-      },
-      {
-        path: "/service/checkout/fail",
+        path: "/service/Checkout/fail",
         component: CheckoutFail,
         allowedRoles: ["Customer"],
       },
       {
-        path: "/service/checkout/sucess",
+        path: "/service/Checkout/success",
         component: CheckoutSuccess,
         allowedRoles: ["Customer"],
       },

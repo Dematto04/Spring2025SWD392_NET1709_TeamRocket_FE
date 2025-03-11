@@ -5,13 +5,9 @@ import ServiceDetailHero from "@/components/ServiceDetail/ServiceDetailHero";
 import ServiceDetailCarousel from "@/components/ServiceDetail/ServiceDetailCarousel";
 import ServiceDetailSidebar from "@/components/ServiceDetail/ServiceDetailSidebar";
 import ServiceDetailOverview from "@/components/ServiceDetail/ServiceDetailOverview";
-import FAQ from "@/components/Home/FAQ/FAQ";
-import ServiceDetailReview from "@/components/ServiceDetail/ServiceDetailReview";
 import { useGetServicesDetailQuery } from "@/redux/api/serviceApi";
 import { useParams } from "react-router-dom";
-import { Separator } from "@/components/ui/separator";
 import LoadingScreen from "@/components/Loading";
-import { CheckCircle, ChevronRight } from "lucide-react";
 import ServiceDetailSteps from "@/components/ServiceDetail/ServiceDetailSteps";
 function ServiceDetailPage() {
   const { id } = useParams();
@@ -40,13 +36,6 @@ function ServiceDetailPage() {
                 additionalServices={data?.data.additionalServices}
               />
               <ServiceDetailSteps data={data} />
-            </div>
-            <div className="hidden lg:block lg:col-span-4 mt-20 ml-8">
-              {/* service sidebar */}
-              <ServiceDetailSidebar
-                service={data?.data}
-                housekeeper={data?.data.housekeeper}
-              />
             </div>
             <div className="hidden lg:block lg:col-span-4 mt-20 ml-8">
               {/* service sidebar */}

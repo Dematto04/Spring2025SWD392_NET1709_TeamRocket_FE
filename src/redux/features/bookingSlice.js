@@ -36,6 +36,7 @@ const bookingSlice = createSlice({
     addPhoneNumber: (state, action) => {
       state.phoneNumber = action.payload;
     },
+    resetBooking: () => initialState,
   },
 });
 
@@ -52,5 +53,6 @@ export const {
   serviceBooking,
   timeSlot,
   addPhoneNumber,
+  resetBooking,
 } = bookingSlice.actions;
 export default bookingSlice.reducer;
