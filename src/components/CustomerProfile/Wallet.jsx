@@ -1,160 +1,358 @@
 import React, { useState } from 'react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
+import { format } from 'date-fns';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { 
+  useGetWalletTransactionQuery, 
+  useSendWithdrawRequestMutation,
+  useGetBalanceQuery,
+  useCreateDepositPaymentMutation,
+  useProcessDepositMutation
+} from '@/redux/api/walletApi';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { toast } from '@/hooks/use-toast';
+
+const TRANSACTION_TYPES = [
+  { 
+    value: 'WithdrawRequestUser', 
+    label: 'Withdraw Requests',
+    description: 'Show withdraw requests by user'
+  },
+  { 
+    value: 'WithdrawUser', 
+    label: 'Withdrawals',
+    description: 'Show withdrawals by user'
+  },
+  { 
+    value: 'WithdrawRejectUser', 
+    label: 'Rejected Withdrawals',
+    description: 'Show rejected withdrawals by user'
+  },
+  { 
+    value: 'ShowWithdrawHistoryUser', 
+    label: 'Withdrawal History',
+    description: 'Show all withdrawal transactions (including deposit, done/pending/fail withdraw)'
+  },
+  { 
+    value: 'Deposit', 
+    label: 'Deposits',
+    description: 'Show deposit transactions'
+  },
+  { 
+    value: 'ShowAllHistoryUser', 
+    label: 'All Transactions',
+    description: 'Show all transaction history'
+  }
+];
 
 const Wallet = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [amount, setAmount] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('');
+  // States
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [depositAmount, setDepositAmount] = useState('');
+  const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+  const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
+  const [transactionType, setTransactionType] = useState('ShowAllHistoryUser');
 
-  const transactions = [
-    {
-      amount: '$50.00',
-      paymentType: 'Paypal',
-      transactionDate: 'Completed 20/01/2025',
-    },
-    {
-      amount: '$100.00',
-      paymentType: 'stripe',
-      transactionDate: 'Completed 12/02/2025',
-    },
-    {
-      amount: '$2000.00',
-      paymentType: 'stripe',
-      transactionDate: 'Completed 26/01/2025',
-    },
-    {
-      amount: '$900000.00',
-      paymentType: 'Paypal',
-      transactionDate: 'Pending 15/02/2025',
-    },
-  ];
+  // API Hooks
+  const { data: transactions, isLoading: isLoadingTransactions } = useGetWalletTransactionQuery({
+    pageIndex: page,
+    pageSize: pageSize,
+    transactionType: transactionType
+  });
+  const { data: balanceData } = useGetBalanceQuery();
+  const [createDepositPayment] = useCreateDepositPaymentMutation();
+  const [processDeposit] = useProcessDepositMutation();
+  const [sendWithdrawRequest, { isLoading: isWithdrawLoading }] = useSendWithdrawRequestMutation();
 
-  const handleAddBalance = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setAmount('');
-    setPaymentMethod('');
-  };
-
-  const handleSubmit = (e) => {
+  // Handlers
+  const handleDeposit = async (e) => {
     e.preventDefault();
-    // Handle the form submission (e.g., send data to the server)
-    console.log('Amount:', amount);
-    console.log('Payment Method:', paymentMethod);
-    handleCloseModal();
+    try {
+      const result = await createDepositPayment({
+        amount: Number(depositAmount),
+        paymentMethod: 'Vnpay'
+      }).unwrap();
+      
+      if (result.url) {
+        window.location.href = result.url;
+        setIsDepositModalOpen(false);
+        setDepositAmount('');
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create deposit payment",
+        variant: "destructive"
+      });
+    }
   };
+
+  const handleWithdraw = async (e) => {
+    e.preventDefault();
+    try {
+      const result = await sendWithdrawRequest({
+        amount: Number(withdrawAmount)
+      }).unwrap();
+      
+      toast({
+        title: "Success",
+        description: "Withdrawal request sent successfully",
+      });
+      setIsWithdrawModalOpen(false);
+      setWithdrawAmount('');
+    } catch (error) {
+      const errorMessage = error?.data?.messages?.Error?.[0] || 
+                          error?.data?.messages?.[0] ||
+                          error?.data?.title ||
+                          "Failed to send withdrawal request";
+      
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+        duration: 5000
+      });
+    }
+  };
+
+  const handleTransactionTypeChange = (value) => {
+    setTransactionType(value);
+    setPage(1);
+  };
+
+  const formatDate = (dateString) => {
+    return format(new Date(dateString), 'dd/MM/yyyy HH:mm:ss');
+  };
+
+  const formatAmount = (amount) => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(amount);
+  };
+
+  if (isLoadingTransactions) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="p-6 rounded-lg shadow-sm">
-      <h2 className="text-2xl font-bold mb-6">Wallet</h2>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">Wallet</h2>
+        <div className="text-2xl font-bold">
+          Balance: {formatAmount(balanceData?.data || 0)}
+        </div>
+      </div>
 
-      {/* Add Balance Button */}
-      <div className="mb-6">
-        <Button
-          onClick={handleAddBalance}
-          className="px-4 py-2  rounded-md"
-        >
-          Add Balance
+      {/* Action Buttons */}
+      <div className="flex gap-4 mb-6">
+        <Button onClick={() => setIsDepositModalOpen(true)}>
+          Deposit
+        </Button>
+        <Button onClick={() => setIsWithdrawModalOpen(true)} variant="outline">
+          Withdraw
         </Button>
       </div>
 
-      {/* Wallet Transactions Section */}
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Wallet Transactions</h3>
-
-        {/* Show Entries and Search */}
-        <div className="flex justify-between items-center mb-4">
-          <div className="text-sm">Show 10 entries</div>
-          <div className="flex space-x-4">
-            <Input
-              type="text"
-              placeholder="Search..."
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+      {/* Add Transaction Type Filter */}
+      <div className="mb-6">
+        <div className="flex items-center gap-4">
+          <div className="w-72">
+            <Select value={transactionType} onValueChange={handleTransactionTypeChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select transaction type" />
+              </SelectTrigger>
+              <SelectContent>
+                {TRANSACTION_TYPES.map((type) => (
+                  <SelectItem 
+                    key={type.value} 
+                    value={type.value}
+                  >
+                    <div className="flex flex-col">
+                      <span>{type.label}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {type.description}
+                      </span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-        </div>
-
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="min-w-full border border-border">
-            <thead>
-              <tr className="">
-                <th className="px-4 py-3 text-left text-sm font-semibold">Amount</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold">Payment Type</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold">Transaction Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.map((transaction, index) => (
-                <tr key={index} className="border-b border-border">
-                  <td className="px-4 py-3 text-sm ">{transaction.amount}</td>
-                  <td className="px-4 py-3 text-sm ">{transaction.paymentType}</td>
-                  <td className="px-4 py-3 text-sm ">{transaction.transactionDate}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Pagination */}
-        <div className="flex justify-between items-center mt-6">
-          <div className="text-sm text-gray-600">Showing 1 to 4 of 4 entries</div>
         </div>
       </div>
 
-      {/* Add Balance Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h3 className="text-xl font-bold mb-4">Add Balance</h3>
-            <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">Amount</label>
-                <input
+      {/* Transactions Table */}
+      <div className="overflow-x-auto">
+        <table className="min-w-full border border-border">
+          <thead>
+            <tr className="bg-muted">
+              <th className="px-4 py-3 text-left">Type</th>
+              <th className="px-4 py-3 text-left">Amount</th>
+              <th className="px-4 py-3 text-left">Status</th>
+              <th className="px-4 py-3 text-left">Date</th>
+              <th className="px-4 py-3 text-left">Reference ID</th>
+            </tr>
+          </thead>
+          <tbody>
+            {transactions?.data?.items.map((transaction) => (
+              <tr key={transaction.id} className="border-b border-border hover:bg-muted/50">
+                <td className="px-4 py-3">
+                  <span className={`px-2 py-1 rounded-full text-sm ${
+                    transaction.type === 'Deposit' ? 'bg-blue-100 text-blue-800' :
+                    transaction.type === 'Withdraw' ? 'bg-purple-100 text-purple-800' :
+                    'bg-gray-100 text-gray-800'
+                  }`}>
+                    {transaction.type}
+                  </span>
+                </td>
+                <td className="px-4 py-3">
+                  <span className={transaction.type === 'Withdraw' ? 'text-red-600' : 'text-green-600'}>
+                    {transaction.type === 'Withdraw' ? '- ' : '+ '}
+                    {formatAmount(transaction.amount)}
+                  </span>
+                </td>
+                <td className="px-4 py-3">
+                  <span className={`px-2 py-1 rounded-full text-sm ${
+                    transaction.status === 'Done' ? 'bg-green-100 text-green-800' :
+                    transaction.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
+                    transaction.status === 'Rejected' ? 'bg-red-100 text-red-800' :
+                    'bg-gray-100 text-gray-800'
+                  }`}>
+                    {transaction.status}
+                  </span>
+                </td>
+                <td className="px-4 py-3">{formatDate(transaction.createdDate)}</td>
+                <td className="px-4 py-3">
+                  {transaction.referenceId || '-'}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination */}
+      {transactions?.data?.totalPages > 1 && (
+        <div className="flex justify-between items-center mt-4">
+          <Button 
+            onClick={() => setPage(prev => Math.max(1, prev - 1))}
+            disabled={!transactions.data.hasPrevious}
+          >
+            Previous
+          </Button>
+          <span>
+            Page {page} of {transactions.data.totalPages}
+          </span>
+          <Button 
+            onClick={() => setPage(prev => prev + 1)}
+            disabled={!transactions.data.hasNext}
+          >
+            Next
+          </Button>
+        </div>
+      )}
+
+      {/* Deposit Modal */}
+      <Dialog open={isDepositModalOpen} onOpenChange={setIsDepositModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Deposit to Wallet</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleDeposit}>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <label htmlFor="amount">Amount (VND)</label>
+                <Input
+                  id="amount"
                   type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={depositAmount}
+                  onChange={(e) => setDepositAmount(e.target.value)}
+                  min="0"
                   required
                 />
               </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">Payment Method</label>
-                <select
-                  value={paymentMethod}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsDepositModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">
+                Proceed to Payment
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Withdraw Modal */}
+      <Dialog open={isWithdrawModalOpen} onOpenChange={setIsWithdrawModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Withdraw from Wallet</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleWithdraw}>
+            <div className="grid gap-4 py-4">
+              <div className="text-sm text-muted-foreground">
+                Current Balance: {formatAmount(balanceData?.data || 0)}
+              </div>
+              <div className="grid gap-2">
+                <label htmlFor="withdrawAmount">Amount (VND)</label>
+                <Input
+                  id="withdrawAmount"
+                  type="number"
+                  value={withdrawAmount}
+                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                  min="0"
+                  max={balanceData?.data || 0}
                   required
-                >
-                  <option value="">Select a payment method</option>
-                  <option value="Paypal">Paypal</option>
-                  <option value="Stripe">Stripe</option>
-                  <option value="Credit Card">Credit Card</option>
-                </select>
+                  disabled={isWithdrawLoading}
+                />
+                {Number(withdrawAmount) > (balanceData?.data || 0) && (
+                  <p className="text-sm text-destructive">
+                    Amount cannot exceed your current balance
+                  </p>
+                )}
               </div>
-              <div className="flex justify-end space-x-4">
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                >
-                  Add Balance
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            </div>
+            <DialogFooter>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setIsWithdrawModalOpen(false)}
+                disabled={isWithdrawLoading}
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit"
+                disabled={
+                  isWithdrawLoading || 
+                  Number(withdrawAmount) > (balanceData?.data || 0) ||
+                  Number(withdrawAmount) <= 0
+                }
+              >
+                {isWithdrawLoading ? "Processing..." : "Request Withdrawal"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

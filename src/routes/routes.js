@@ -27,6 +27,9 @@ import StaffRequestsPage from "@/page/Dashboard/Staff/StaffRequestsPage";
 import RequestDetailPage from "@/page/Dashboard/Staff/RequestDetailPage";
 import CheckoutSuccess from "@/page/CheckoutSuccess";
 import CheckoutFail from "@/page/CheckoutFail";
+import PaymentSuccess from '@/page/PaymentSuccess';
+import PaymentFail from '@/page/PaymentFail';
+import WithdrawRequestsPage from '@/page/Dashboard/Staff/WithdrawRequestsPage';
 
 const routes = [
   {
@@ -92,6 +95,14 @@ const routes = [
         path: "/service/checkout/fail",
         component: CheckoutFail,
         allowedRoles: ["Customer"],
+      },
+      {
+        path: "/wallet/deposit/success",
+        component: PaymentSuccess ,
+      },
+      {
+        path: "/wallet/deposit/fail",
+        component: PaymentFail ,
       },
     ],
   },
@@ -173,8 +184,13 @@ const routes = [
         component: RequestDetailPage,
         allowedRoles: ['Staff']
       },
+      {
+        path: "/dashboard/staff/withdraw-request",
+        component: WithdrawRequestsPage,
+        allowedRoles: ["Staff"]
+      },
     ]
-  }
+  },
 ];
 
 export default routes;
