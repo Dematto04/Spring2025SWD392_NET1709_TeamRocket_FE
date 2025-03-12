@@ -1,5 +1,6 @@
 import { Edit, Trash2 } from "lucide-react";
 import React from "react";
+import { Link } from "react-router-dom";
 
 const MyServiceCard = ({service}) => {
   return (
@@ -24,9 +25,9 @@ const MyServiceCard = ({service}) => {
         </div>
         {/* Buttons */}
         <div className="flex justify-between mt-4 text-sm">
-          <button className="flex items-center gap-1 text-primary">
+          <Link to={"/dashboard/housekeeper/update-service/0d5234ee-21e7-4bd7-ad14-08dd5a0521f8"} className="flex items-center gap-1 text-primary">
             <Edit /> Edit
-          </button>
+          </Link>
           <span
             className={`px-3 py-1 text-xs rounded-lg ${
               service.status === "Active"
