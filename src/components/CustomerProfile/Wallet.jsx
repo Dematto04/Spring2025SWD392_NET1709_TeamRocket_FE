@@ -61,7 +61,7 @@ const TRANSACTION_TYPES = [
 const Wallet = () => {
   // States
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(5);
   const [depositAmount, setDepositAmount] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);

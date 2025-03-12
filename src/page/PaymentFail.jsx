@@ -22,11 +22,8 @@ export default function PaymentFail() {
           </p>
         </CardContent>
         <CardFooter className="flex justify-center gap-4">
-          <Button variant="outline" onClick={() => navigate('/profile')}>
+          <Button variant="outline" onClick={() => navigate('/profile/customer')}>
             Return to Wallet
-          </Button>
-          <Button onClick={() => navigate(-1)}>
-            Try Again
           </Button>
         </CardFooter>
       </Card>

@@ -5,6 +5,7 @@ import ServiceDetailHero from "@/components/ServiceDetail/ServiceDetailHero";
 import ServiceDetailCarousel from "@/components/ServiceDetail/ServiceDetailCarousel";
 import ServiceDetailSidebar from "@/components/ServiceDetail/ServiceDetailSidebar";
 import ServiceDetailOverview from "@/components/ServiceDetail/ServiceDetailOverview";
+import ServiceDetailRating from "@/components/ServiceDetail/ServiceDetailRating";
 import { useGetServicesDetailQuery } from "@/redux/api/serviceApi";
 import { useParams } from "react-router-dom";
 import LoadingScreen from "@/components/Loading";
@@ -36,6 +37,7 @@ function ServiceDetailPage() {
                 additionalServices={data?.data.additionalServices}
               />
               <ServiceDetailSteps data={data} />
+              <ServiceDetailRating serviceId={id} />
             </div>
             <div className="hidden lg:block lg:col-span-4 mt-20 ml-8">
               {/* service sidebar */}
