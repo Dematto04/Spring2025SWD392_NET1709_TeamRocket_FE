@@ -27,13 +27,10 @@ import StaffRequestsPage from "@/page/Dashboard/Staff/StaffRequestsPage";
 import RequestDetailPage from "@/page/Dashboard/Staff/RequestDetailPage";
 import CheckoutSuccess from "@/page/CheckoutSuccess";
 import CheckoutFail from "@/page/CheckoutFail";
-<<<<<<< Updated upstream
 import PaymentSuccess from '@/page/PaymentSuccess';
 import PaymentFail from '@/page/PaymentFail';
 import WithdrawRequestsPage from '@/page/Dashboard/Staff/WithdrawRequestsPage';
-=======
 import HousekeeperUpdateService from "@/page/Dashboard/Housekeeper/HousekeeperUpdateService/HousekeeperUpdateService";
->>>>>>> Stashed changes
 
 const routes = [
   {
