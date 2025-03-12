@@ -5,6 +5,7 @@ import {
     CirclePlus,
     LayoutDashboard,
     Wallet,
+    ClipboardList,
   } from "lucide-react";
 export const data = {
   user: {
@@ -56,6 +57,11 @@ export const data = {
       title: "Request",
       url: "/dashboard/staff/requests",
       icon: CirclePlus,
+    },
+    {
+      title: "Withdraw Request",
+      url: "/dashboard/staff/withdraw-request",
+      icon: ClipboardList,
     },
   ],
 };

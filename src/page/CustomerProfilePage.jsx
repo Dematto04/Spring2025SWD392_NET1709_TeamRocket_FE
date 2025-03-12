@@ -4,8 +4,9 @@ import Wallet from "@/components/CustomerProfile/Wallet";
 import Profile from "@/components/CustomerProfile/Profile";
 import Transactions from "@/components/CustomerProfile/Transactions";
 import Address from "@/components/CustomerProfile/Address";
-import { BookingList } from "@/components/CustomerProfile/BookingHistory";
+import BookingHistory from "@/components/CustomerProfile/BookingHistory";
 import { useCustomerProfileQuery } from "@/redux/api/customerProfileApi";
+import RatingHistory from "@/components/CustomerProfile/RatingHistory";
 
 export default function CustomerProfilePage() {
   // Retrieve the selected menu from localStorage or default to 'profile'
@@ -38,7 +39,9 @@ export default function CustomerProfilePage() {
       case "address":
         return <Address />;
       case "booking":
-        return <BookingList />;
+        return <BookingHistory />;
+      case "rating":
+        return <RatingHistory />;
       default:
         return <div>Select a menu item</div>;
     }

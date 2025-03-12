@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink } from '@/components/ui/navigation-menu';
-import { BadgeDollarSign, MapPinHouse, NotebookPen, UserRoundPen, Wallet } from 'lucide-react';
+import { BadgeDollarSign, MapPinHouse, NotebookPen, Star, UserRoundPen, Wallet } from 'lucide-react';
 
 const CusProfile = ({ selectedMenu, setSelectedMenu, profileInfo}) => {
   return (
@@ -83,6 +83,18 @@ const CusProfile = ({ selectedMenu, setSelectedMenu, profileInfo}) => {
               >
                 <NotebookPen />
                 Booking
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuLink
+                href="#rating"
+                onClick={() => setSelectedMenu('rating')}
+                className={`flex text-sm justify-start it ${
+                  selectedMenu === 'rating' ? 'text-primary font-semibold' : ''
+                }`}
+              >
+                <Star/>
+                Rating
               </NavigationMenuLink>
             </NavigationMenuItem>
             {/* Add more menu items here */}
