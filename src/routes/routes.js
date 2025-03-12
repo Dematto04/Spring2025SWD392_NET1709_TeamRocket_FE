@@ -30,6 +30,7 @@ import CheckoutFail from "@/page/CheckoutFail";
 import PaymentSuccess from '@/page/PaymentSuccess';
 import PaymentFail from '@/page/PaymentFail';
 import WithdrawRequestsPage from '@/page/Dashboard/Staff/WithdrawRequestsPage';
+import HousekeeperUpdateService from "@/page/Dashboard/Housekeeper/HousekeeperUpdateService/HousekeeperUpdateService";
 
 const routes = [
   {
@@ -142,6 +143,11 @@ const routes = [
       {
         path: "/dashboard/housekeeper/add-service",
         component: HousekeeperAddService,
+        allowedRoles: ["Housekeeper"]
+      },
+      {
+        path: "/dashboard/housekeeper/update-service/:id",
+        component: HousekeeperUpdateService,
         allowedRoles: ["Housekeeper"]
       },
       {
