@@ -5,8 +5,10 @@ import {
     CirclePlus,
     LayoutDashboard,
     Wallet,
+    Calendar,
     ClipboardList,
   } from "lucide-react";
+
 export const data = {
   user: {
     name: "shadcn",
@@ -19,6 +21,11 @@ export const data = {
       url: "/dashboard/housekeeper",
       icon: LayoutDashboard,
       isActive: true,
+    },
+    {
+      title: "Calendar",
+      url: "/dashboard/housekeeper/calendar",
+      icon: Calendar,
     },
     {
       title: "Add service",
