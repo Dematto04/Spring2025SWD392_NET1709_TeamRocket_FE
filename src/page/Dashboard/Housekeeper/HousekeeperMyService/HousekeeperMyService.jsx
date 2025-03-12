@@ -17,89 +17,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-import MyServiceCard from "@/components/Housekeeper/MyServiceCard";
-
 import { Button } from "@/components/ui/button";
+import { useGetMyServicesQuery } from "@/redux/api/serviceApi";
+import LoadingScreen from "@/components/Loading";
 
-const services = [
-  {
-    id: 1,
-    title: "Electric Panel Repairing Service",
-    location: "Vancouver, Washington",
-    category: "Appliance",
-    price: 45,
-    oldPrice: 55,
-    image: "/home-cleaning.webp",
-    status: "Active",
-  },
-  {
-    id: 2,
-    title: "Computer & Server AMC Service",
-    location: "Montana, USA",
-    category: "Computer",
-    price: 150,
-    oldPrice: 150,
-    image: "/home-cleaning.webp",
-    status: "Pending",
-  },
-  {
-    id: 3,
-    title: "AC Repair Services",
-    location: "Hanover, Maryland",
-    category: "Electrical",
-    price: 100,
-    oldPrice: 120,
-    image: "/home-cleaning.webp",
-    status: "Expired",
-  },
-  {
-    id: 4,
-    title: "Car Wash",
-    location: "Los Angeles, USA",
-    category: "Car Wash",
-    price: 20,
-    oldPrice: 25,
-    image: "/home-cleaning.webp",
-    status: "Active",
-  },
-  {
-    id: 5,
-    title: "Painting Service",
-    location: "New York, USA",
-    category: "Appliance",
-    price: 80,
-    oldPrice: 100,
-    image: "/home-cleaning.webp",
-    status: "Pending",
-  },
-  {
-    id: 6,
-    title: "Building Construction",
-    location: "Texas, USA",
-    category: "Construction",
-    price: 5000,
-    oldPrice: 5500,
-    image: "/home-cleaning.webp",
-    status: "Expired",
-  },
-];
 
 export default function MyServices() {
   const [filter, setFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
+  const {data: services, isLoading} = useGetMyServicesQuery({
+    status: "",
+    pageIndex: currentPage,
+    pageSize: itemsPerPage,
+  });
 
-  const filteredServices =
-    filter === "All" ? services : services.filter((s) => s.status === filter);
-
-  // Pagination Logic
-  const totalPages = Math.ceil(filteredServices.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedServices = filteredServices.slice(
-    startIndex,
-    startIndex + itemsPerPage
-  );
+  if (isLoading) return <LoadingScreen/>;
 
   return (
     <div className="relative min-h-screen">
@@ -149,7 +82,7 @@ export default function MyServices() {
 
       {/* Filters */}
       <div className="hidden mt-4 md:flex flex-wrap md:flex-nowrap  gap-4">
-        {["All", "Active", "Pending", "Expired"].map((status) => (
+        {["All", "Active", "Pending", "Rejected"].map((status) => (
           <button
             key={status}
             onClick={() => {
@@ -169,54 +102,13 @@ export default function MyServices() {
 
       {/* Services Grid */}
       <div className="mt-6 grid grid-cols-1  lg:grid-cols-3 gap-6">
-        {paginatedServices.map((service) => (
-          <MyServiceCard service={service} key={service.id} />
-        ))}
+        
       </div>
 
       {/* Pagination Controls */}
-      {totalPages > 1 && (
-        <div className="mt-6 flex justify-end">
-          <Pagination>
-            <PaginationContent>
-              {/* Previous Button */}
-              <PaginationItem>
-                <PaginationPrevious
-                  href="#"
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(prev - 1, 1))
-                  }
-                  disabled={currentPage === 1}
-                />
-              </PaginationItem>
-
-              {/* Page Numbers */}
-              {Array.from({ length: totalPages }, (_, index) => (
-                <PaginationItem key={index + 1}>
-                  <PaginationLink
-                    href="#"
-                    isActive={currentPage === index + 1}
-                    onClick={() => setCurrentPage(index + 1)}
-                  >
-                    {index + 1}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-
-              {/* Next Button */}
-              <PaginationItem>
-                <PaginationNext
-                  href="#"
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                  }
-                  disabled={currentPage === totalPages}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
-      )}
+      
+      
+    
     </div>
   );
 }
