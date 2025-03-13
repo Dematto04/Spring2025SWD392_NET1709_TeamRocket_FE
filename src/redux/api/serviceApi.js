@@ -64,6 +64,25 @@ const serviceApi = apiSlice.injectEndpoints({
         body,
       }),
     }),
+    updateService: build.mutation({
+      query: ({id, body}) => ({
+        url: `/Service/${id}`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["Services"],
+    }),
+    getMyServices: build.query({
+      query: (params) => ({
+        url: "/user/filter",
+        params,
+      }),
+    }),
+    getMyServicesDetail: build.query({
+      query: (id) => ({
+        url: `/Service/detail/${id}`,
+      }),
+    }),
   }),
 });
 
@@ -76,5 +95,8 @@ export const {
   useGetAdditionalServicesQuery,
   useGetTimeSlotsMutation,
   useGetServiceCheckoutDetailMutation,
-  usePlaceOrderServiceMutation
+  usePlaceOrderServiceMutation,
+  useUpdateServiceMutation,
+  useGetMyServicesQuery,
+  useGetMyServicesDetailQuery,
 } = serviceApi;

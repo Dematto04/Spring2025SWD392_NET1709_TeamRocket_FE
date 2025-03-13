@@ -30,6 +30,9 @@ import CheckoutFail from "@/page/CheckoutFail";
 import PaymentSuccess from '@/page/PaymentSuccess';
 import PaymentFail from '@/page/PaymentFail';
 import WithdrawRequestsPage from '@/page/Dashboard/Staff/WithdrawRequestsPage';
+import HousekeeperUpdateService from "@/page/Dashboard/Housekeeper/HousekeeperUpdateService/HousekeeperUpdateService";
+
+import HouseKeeperCalendar from "@/page/Dashboard/Housekeeper/HouseKeeperCalendar";
 
 const routes = [
   {
@@ -134,14 +137,25 @@ const routes = [
   {
     layout: DashboardLayout,
     children: [
+      
       {
         path: "/dashboard/housekeeper",
         component: HousekeeperDashboard,
         allowedRoles: ["Housekeeper"]
       },
       {
+        path: "/dashboard/housekeeper/calendar",
+        component: HouseKeeperCalendar,
+        allowedRoles: ["Housekeeper"]
+      },
+      {
         path: "/dashboard/housekeeper/add-service",
         component: HousekeeperAddService,
+        allowedRoles: ["Housekeeper"]
+      },
+      {
+        path: "/dashboard/housekeeper/update-service/:id",
+        component: HousekeeperUpdateService,
         allowedRoles: ["Housekeeper"]
       },
       {

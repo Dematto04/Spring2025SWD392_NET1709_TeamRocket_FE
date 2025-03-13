@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -20,18 +20,21 @@ import { Button } from "@/components/ui/button";
 import { serviceTimeSlots } from "./slotData";
 import DragAndDropUpload from "@/components/DragAndDropUpload";
 import {
-  useCreateServiceMutation,
   useGetCategoriesQuery,
+  useGetMyServicesDetailQuery,
+  useUpdateServiceMutation,
 } from "@/redux/api/serviceApi";
 import { toast } from "@/hooks/use-toast";
 import AutoComplete from "@/components/AutoComplete";
 import HousekeeperDistanceRule from "@/components/Housekeeper/HousekeeperDistanceRule";
-import BasisInformation from "@/components/Housekeeper/AddService/BasisInformation";
+import BasisInformation from "@/components/Housekeeper/UpdateService/BasisInformation";
 import LoadingScreen from "@/components/Loading";
-import AddServiceDetail from "@/components/Housekeeper/AddService/AddServiceDetail";
-import AddServicePrice from "@/components/Housekeeper/AddService/AddServicePrice";
-import AddServiceAvailability from "@/components/Housekeeper/AddService/AddServiceAvailability";
-import AddServiceAdditionalService from "@/components/Housekeeper/AddService/AddServiceAdditionalService";
+import UpdateServiceDetail from "@/components/Housekeeper/UpdateService/UpdateServiceDetail";
+import UpdateServicePrice from "@/components/Housekeeper/UpdateService/UpdateServicePrice";
+import UpdateServiceAvailability from "@/components/Housekeeper/UpdateService/UpdateServiceAvailability";
+import UpdateServiceAdditionalService from "@/components/Housekeeper/UpdateService/UpdateServiceAdditionalService";
+import { useParams } from "react-router-dom";
+
 const formSchema = z.object({
   service_name: z.string().min(1, { message: "Service name is required" }),
   category_id: z.string().min(1, { message: "Service name is required" }),
@@ -99,16 +102,16 @@ const formSchema = z.object({
   ),
 });
 
-// thiếu field image
-function HousekeeperAddService() {
+function HousekeeperUpdateService() {
   const [dateOfWeek, setDateOfWeek] = useState(serviceTimeSlots);
   const [files, setFiles] = useState([]);
   //api cateogry
+  const { id } = useParams();
   const { data: categories, isLoading } = useGetCategoriesQuery();
-  //api create service
-
-  const [createService, { isSuccess, isLoading: isCreating }] =
-    useCreateServiceMutation();
+  const [updateService, { isSuccess, isLoading: isCreating }] =
+    useUpdateServiceMutation();
+  const { data: myService, isLoading: isGettingMyService, isSuccess: isOk } =
+  useGetMyServicesDetailQuery(id);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -116,8 +119,8 @@ function HousekeeperAddService() {
       service_name: "",
       category_id: "",
       description: "",
-      duration: 0,
-      price: 0,
+      duration: "",
+      price: "",
       serviceSteps: [{ step_order: 1, step_description: "" }],
       additionalServices: [],
       city: "",
@@ -125,11 +128,39 @@ function HousekeeperAddService() {
       address_line: "",
       place_id: "",
       location: "",
-
       serviceDistanceRule: [],
       serviceTimeSlots: [],
     },
   });
+  useEffect(()=> {
+    if(myService && isOk){
+      const service = myService.data;
+      form.setValue("service_name", service?.service_name);
+      form.setValue("category_id", service?.category_id);
+      form.setValue("description", service?.description);
+      form.setValue("duration", String(service?.duration)); 
+      form.setValue("price", String(service?.price));
+      form.setValue("serviceSteps", service?.serviceSteps);
+      form.setValue("city", service?.city);
+      form.setValue("province", service?.province);
+      form.setValue("address_line", service?.address_line);
+      form.setValue("place_id", service?.place_id);
+      form.setValue("location", service?.place_id);
+      form.setValue("serviceDistanceRule", service?.serviceDistanceRule);
+      setFiles(service?.serviceImages.map((image) => image.link));
+      form.setValue("additionalServices", service?.additionalServices);
+
+      dateOfWeek.forEach((day, index) => {
+        const timeSlots = service?.serviceTimeSlots.filter(
+          (slot) => slot.day_of_week === day.dateOfWeek
+        );
+        form.setValue(`serviceTimeSlots.${index}.slots`, timeSlots.map((slot) => slot.start_time));
+      });
+      
+
+    }
+  }, [myService, isOk, isGettingMyService])
+
   const { control } = form;
   const { fields, append, remove } = useFieldArray({
     control,
@@ -185,18 +216,18 @@ function HousekeeperAddService() {
       serviceTimeSlots: temp,
     };
     console.log({ body });
-    const result = await createService(body);
+    const result = await updateService({id, body});
     if (result.error) {
       toast({
-        title: "Create service fail",
+        title: "UpdateUpdate service fail",
       });
       return;
     }
     toast({
-      title: "Create service sucessfully",
+      title: "Update service sucessfully",
     });
   };
-  if (isLoading) return <LoadingScreen />;
+  if (isLoading || isGettingMyService) return <LoadingScreen />;
 
   return (
     <div>
@@ -208,7 +239,7 @@ function HousekeeperAddService() {
         >
           <Card className="bg-background">
             <CardHeader>
-              <CardTitle>Add Service</CardTitle>
+              <CardTitle>Update Service</CardTitle>
             </CardHeader>
 
             <CardContent className="rounded-lg">
@@ -233,17 +264,17 @@ function HousekeeperAddService() {
 
                 {/* Detail and service steps*/}
 
-                <AddServiceDetail
+                <UpdateServiceDetail
                   form={form}
                   fields={fields}
                   remove={remove}
                   append={append}
                 />
                 {/* Pricing  */}
-                <AddServicePrice form={form} />
+                <UpdateServicePrice form={form} />
 
                 {/* Availability  */}
-                <AddServiceAvailability
+                <UpdateServiceAvailability
                   form={form}
                   dateOfWeek={dateOfWeek}
                   setDateOfWeek={setDateOfWeek}
@@ -255,7 +286,7 @@ function HousekeeperAddService() {
                   </AccordionTrigger>
                   <AccordionContent>
                     <div className="flex flex-wrap w-full gap-6 p-2">
-                      <AutoComplete form={form} />
+                      <AutoComplete form={form} defaultAddress={myService?.data?.address_line}/>
                     </div>
                   </AccordionContent>
                 </AccordionItem>
@@ -283,7 +314,7 @@ function HousekeeperAddService() {
                 </AccordionItem>
 
                 {/* additional Service */}
-                <AddServiceAdditionalService
+                <UpdateServiceAdditionalService
                   form={form}
                   additionalAppend={additionalAppend}
                   additionalRemove={additionalRemove}
@@ -301,4 +332,4 @@ function HousekeeperAddService() {
   );
 }
 
-export default HousekeeperAddService;
+export default HousekeeperUpdateService;

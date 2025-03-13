@@ -19,6 +19,7 @@ export const bookingApi = apiSlice.injectEndpoints({
 
         return {
           url: "/Booking/bookingHistory",
+          
           method: "GET",
           params,
         };
