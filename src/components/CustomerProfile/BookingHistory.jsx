@@ -406,9 +406,11 @@ export default function BookingHistory() {
   // Status options
   const STATUS_OPTIONS = [
     { value: "all", label: "All Status" },
+    { value: "Recently", label: "Recently" },
     { value: "Completed", label: "Completed" },
     { value: "OnGoing", label: "On Going" },
     { value: "Cancelled", label: "Cancelled" },
+    { value: "Refunded", label: "Refunded" },
   ];
 
   // Handle filter changes

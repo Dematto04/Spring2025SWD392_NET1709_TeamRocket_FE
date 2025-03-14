@@ -25,8 +25,15 @@ export default function ServiceDetailRating({ serviceId }) {
   const [selectedRating, setSelectedRating] = useState("all");
   const pageSize = 5;
 
-  // Use filtered query when rating is selected, otherwise use general query
-  const { data: ratingData, isLoading } = selectedRating !== "all"
+  // Fetch unfiltered ratings for distribution (static, unaffected by filters)
+  const { data: unfilteredRatingData, isLoading: isUnfilteredLoading } = useGetServiceRatingsQuery({
+    serviceId,
+    pageIndex: 1, // Fetch all ratings (you might need to adjust based on your API)
+    pageSize: 1000, // Use a large pageSize to get all ratings, or modify API to return all
+  });
+
+  // Fetch filtered ratings for the review list (affected by filters)
+  const { data: filteredRatingData, isLoading: isFilteredLoading } = selectedRating !== "all"
     ? useGetFilteredServiceRatingsQuery({
         serviceId,
         rate: Number(selectedRating),
@@ -43,16 +50,20 @@ export default function ServiceDetailRating({ serviceId }) {
     return format(new Date(dateString), 'MMM dd, yyyy HH:mm');
   };
 
-  // Calculate rating distribution
+  // Calculate rating distribution using unfiltered data
   const getRatingDistribution = () => {
-    if (!ratingData?.data?.ratings) return [];
-    const total = ratingData.data["total-count"];
+    if (!unfilteredRatingData?.data?.ratings) return [];
+    const total = unfilteredRatingData.data["total-count"];
     return [5, 4, 3, 2, 1].map(rating => ({
       rating,
-      count: ratingData.data.ratings.filter(r => r.rating === rating).length,
-      percentage: (ratingData.data.ratings.filter(r => r.rating === rating).length / total) * 100
+      count: unfilteredRatingData.data.ratings.filter(r => r.rating === rating).length,
+      percentage: (unfilteredRatingData.data.ratings.filter(r => r.rating === rating).length / total) * 100
     }));
   };
+
+  // Use filtered data for reviews, but unfiltered data for distribution
+  const ratingData = filteredRatingData || unfilteredRatingData;
+  const isLoading = isFilteredLoading || isUnfilteredLoading;
 
   if (isLoading) {
     return (
@@ -72,18 +83,18 @@ export default function ServiceDetailRating({ serviceId }) {
             <div className="flex flex-col items-start gap-2">
               <div className="flex items-center gap-4">
                 <span className="text-4xl font-bold">
-                  {ratingData?.data?.["rating-average"]?.toFixed(1) || 0}
+                  {unfilteredRatingData?.data?.["rating-average"]?.toFixed(1) || 0}
                 </span>
                 <div>
-                  <StarDisplay rating={ratingData?.data?.["rating-average"] || 0} />
+                  <StarDisplay rating={unfilteredRatingData?.data?.["rating-average"] || 0} />
                   <p className="text-sm text-muted-foreground mt-1">
-                    Based on {ratingData?.data?.["total-count"] || 0} reviews
+                    Based on {unfilteredRatingData?.data?.["total-count"] || 0} reviews
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Rating Distribution */}
+            {/* Rating Distribution (Static, using unfiltered data) */}
             <div className="space-y-3">
               {getRatingDistribution().map(({ rating, count, percentage }) => (
                 <div key={rating} className="flex items-center gap-3">
@@ -139,7 +150,7 @@ export default function ServiceDetailRating({ serviceId }) {
 
       <CardContent className="p-6">
         <div className="space-y-6">
-          {/* Reviews List */}
+          {/* Reviews List (Using filtered data) */}
           {ratingData?.data?.ratings.map((rating, index) => (
             <div
               key={index}

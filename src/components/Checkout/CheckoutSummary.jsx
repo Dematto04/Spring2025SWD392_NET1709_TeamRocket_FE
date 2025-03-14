@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Card,
   CardHeader,
@@ -15,51 +15,98 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Label } from "../ui/label";
+import { Loader2 } from "lucide-react";
 
-export const CheckoutSummary = ({ summary, handlePlaceOrder }) => {
+export const CheckoutSummary = ({ summary, handlePlaceOrder, isPlacing }) => {
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [error, setError] = useState("");
+
+  const handleOrder = () => {
+    if (!paymentMethod) {
+      setError("Please select a payment method");
+      return;
+    }
+    handlePlaceOrder();
+  };
+
   return (
     <div className="flex flex-col gap-y-6">
       <Card>
         <CardHeader>
           <CardTitle>Booking Summary</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="flex justify-between mb-2">
-            <div>Service price</div>
-            <div>${summary?.base_service_price}</div>
+        <CardContent className="space-y-6">
+          {/* Price Breakdown */}
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Service price</span>
+              <span>${summary?.base_service_price}</span>
+            </div>
+            {summary?.additional_price > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Additional services</span>
+                <span>${summary?.additional_price}</span>
+              </div>
+            )}
+            {summary?.distance_price > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Distance fee</span>
+                <span>${summary?.distance_price}</span>
+              </div>
+            )}
+            <div className="pt-2 border-t">
+              <div className="flex justify-between font-medium">
+                <span>Total</span>
+                <span>${summary?.total_price}</span>
+              </div>
+            </div>
           </div>
-          <div className="flex justify-between mb-4">
-            <div>Additional service price</div>
-            <div>${summary?.addtional_price}</div>
-          </div>
-          {/* <div className="flex justify-between mb-4">
-            <div>Distance price</div>
-            <div>${summary?.distancePrice}</div>
-          </div> */}
-          <div className="flex justify-between font-bold">
-            <div>Total</div>
-            <div>${summary?.addtional_price + summary?.base_service_price}</div>
-          </div>
-          <div className="mt-4">
+
+          {/* Payment Method */}
+          <div className="space-y-2">
             <Label htmlFor="payment">Payment Method</Label>
-            <div className="mt-4"></div>
-            <Select id="payment">
-              <SelectTrigger>
+            <Select
+              value={paymentMethod}
+              onValueChange={(value) => {
+                setPaymentMethod(value);
+                setError("");
+              }}
+            >
+              <SelectTrigger id="payment">
                 <SelectValue placeholder="Select payment method" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="VN Pay">VN Pay</SelectItem>
-                <SelectItem value="Wallet">Wallet</SelectItem>
+                {summary?.payment_methods?.map((method) => (
+                  <SelectItem
+                    key={method.name}
+                    value={method.name}
+                    disabled={!method.is_choosable}
+                  >
+                    {method.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
-            <div className="text-sm text-red-600 leading-none tracking-tight font-medium mt-2">
-              * Please choose payment method
-            </div>
+            {error && (
+              <p className="text-sm text-destructive">{error}</p>
+            )}
           </div>
         </CardContent>
         <CardFooter>
-          <Button type="button" onClick={handlePlaceOrder} className="w-full">
-            Place Order
+          <Button
+            type="button"
+            onClick={handleOrder}
+            disabled={isPlacing}
+            className="w-full"
+          >
+            {isPlacing ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              "Place Order"
+            )}
           </Button>
         </CardFooter>
       </Card>
