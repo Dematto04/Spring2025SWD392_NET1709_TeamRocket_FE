@@ -9,7 +9,7 @@ import { ServiceBookContext } from "./ServiceBookContext";
 import { bookingSteps } from "./ServiceBookingSidebar";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addAddress, serviceBooking } from "@/redux/features/bookingSlice";
 const Content = ({ step }) => {
   switch (step) {
@@ -22,8 +22,9 @@ const Content = ({ step }) => {
   }
 };
 function ServiceBook({ step, setStep }) {
-  const { form, time } = useContext(ServiceBookContext);
+  const { form } = useContext(ServiceBookContext);
   const nav = useNavigate();
+  const timeSlot = useSelector((state) => state.booking.timeSlot);
   const dispatch = useDispatch();
   const { id } = useParams();
   useEffect(() => {
@@ -34,9 +35,9 @@ function ServiceBook({ step, setStep }) {
     );
   }, []);
   const handNextStep = async () => {
-    //Thêm additional
+    
     if (step === 1) {
-      if (!time) {
+      if (!timeSlot) {
         toast({
           title: "Lack of information",
           description: "Please choose a time slot",

@@ -73,14 +73,23 @@ const serviceApi = apiSlice.injectEndpoints({
       invalidatesTags: ["Services"],
     }),
     getMyServices: build.query({
-      query: (params) => ({
-        url: "/user/filter",
-        params,
+      query: ({status, pageIndex, pageSize}) => ({
+        url: "/Service/user/filter",
+        params: {
+          status,
+          pageIndex,
+          pageSize,
+        },
       }),
     }),
     getMyServicesDetail: build.query({
       query: (id) => ({
         url: `/Service/detail/${id}`,
+      }),
+    }),
+    getFilterOptions: build.query({
+      query: () => ({
+        url: "/Service/filter-options",
       }),
     }),
   }),
@@ -99,4 +108,5 @@ export const {
   useUpdateServiceMutation,
   useGetMyServicesQuery,
   useGetMyServicesDetailQuery,
+  useGetFilterOptionsQuery,
 } = serviceApi;
