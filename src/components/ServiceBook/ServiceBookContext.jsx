@@ -17,8 +17,6 @@ const formSchema = z.object({
   place_id: z.string(),
 });
 function ServiceBookProvider({ children }) {
-  const [date, setDate] = useState(new Date());
-  const [time, setTime] = useState();
   const [step, setStep] = useState(0);
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -35,10 +33,6 @@ function ServiceBookProvider({ children }) {
   return (
     <ServiceBookContext.Provider
       value={{
-        date,
-        setDate,
-        time,
-        setTime,
         step,
         setStep,
         form,

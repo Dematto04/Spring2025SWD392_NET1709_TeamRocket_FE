@@ -1,50 +1,113 @@
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, Star, ImageIcon } from "lucide-react";
 import React from "react";
 import { Link } from "react-router-dom";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
+import { Button } from "../ui/button";
+import { Badge } from "../ui/badge";
 
-const MyServiceCard = ({service}) => {
+const getStatusColor = (status) => {
+  switch (status) {
+    case "Active":
+      return "success";
+    case "Pending":
+      return "warning";
+    case "Rejected":
+      return "destructive";
+    default:
+      return "secondary";
+  }
+};
+
+const MyServiceCard = ({ service }) => {
   return (
-    <div
-      className="bg-background shadow-md rounded-lg overflow-hidden"
-    >
-      <img
-        src={service.image}
-        alt={service.title}
-        className="w-full object-cover"
-      />
-      <div className="p-4">
-        <span className="bg-primary-foreground text-primary px-2 py-1 text-xs rounded-md">
-          {service.category}
-        </span>
-        <h2 className="font-semibold mt-2">{service.title}</h2>
-        <p className="text-sm">{service.location}</p>
-        <div className="flex justify-between items-center mt-2">
-          <p className="text-lg font-bold">
-            ${service.price.toFixed(2)}
-          </p>
+    <Card className="w-full">
+      <CardHeader>
+        <div className="flex justify-between items-start">
+          <div>
+            <CardTitle className="text-xl">{service.service_name}</CardTitle>
+            <CardDescription>{service.description}</CardDescription>
+          </div>
+          <Badge variant={getStatusColor(service.service_status)}>
+            {service.service_status}
+          </Badge>
         </div>
-        {/* Buttons */}
-        <div className="flex justify-between mt-4 text-sm">
-          <Link to={"/dashboard/housekeeper/update-service/0d5234ee-21e7-4bd7-ad14-08dd5a0521f8"} className="flex items-center gap-1 text-primary">
-            <Edit /> Edit
+      </CardHeader>
+      <CardContent>
+        {/* Image Gallery */}
+        <div className="mb-4">
+          {service.images.length > 0 ? (
+            <div className="grid grid-cols-2 gap-2 h-48">
+              {service.images.slice(0, 2).map((image, index) => (
+                <div key={image.id} className="relative h-full w-full overflow-hidden rounded-lg">
+                  <img
+                    src={image.url}
+                    alt={`Service ${index + 1}`}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              ))}
+              {service.images.length > 2 && (
+                <div className="absolute bottom-2 right-2">
+                  <Badge variant="secondary">+{service.images.length - 2} more</Badge>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="h-48 bg-muted rounded-lg flex items-center justify-center">
+              <ImageIcon className="h-12 w-12 text-muted-foreground" />
+            </div>
+          )}
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <p className="text-sm text-muted-foreground">Address</p>
+            <p className="font-medium">{service.service_address}</p>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">Bookings</p>
+            <p className="font-medium">{service.number_of_booking} bookings</p>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">Rating</p>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center">
+                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                <span className="font-medium ml-1">
+                  {service.rating.toFixed(1)}
+                </span>
+              </div>
+              <span className="text-sm text-muted-foreground">
+                ({service.number_of_rating} reviews)
+              </span>
+            </div>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">Images</p>
+            <p className="font-medium">{service.images.length} photos</p>
+          </div>
+        </div>
+      </CardContent>
+      <CardFooter className="flex justify-end gap-2">
+        <Button variant="outline" size="sm" asChild>
+          <Link to={`/housekeeper/services/${service.service_id}/edit`}>
+            <Edit className="w-4 h-4 mr-2" />
+            Edit
           </Link>
-          <span
-            className={`px-3 py-1 text-xs rounded-lg ${
-              service.status === "Active"
-                ? "bg-green-200 text-green-700"
-                : service.status === "Pending"
-                ? "bg-yellow-200 text-yellow-700"
-                : "bg-red-200 text-red-700"
-            }`}
-          >
-            {service.status}
-          </span>
-          <button className="flex items-center gap-1 text-red-500">
-            <Trash2 /> Delete
-          </button>
-        </div>
-      </div>
-    </div>
+        </Button>
+        <Button variant="destructive" size="sm">
+          <Trash2 className="w-4 h-4 mr-2" />
+          Delete
+        </Button>
+      </CardFooter>
+    </Card>
   );
 };
 
