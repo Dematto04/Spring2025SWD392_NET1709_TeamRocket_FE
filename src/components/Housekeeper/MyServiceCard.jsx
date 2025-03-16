@@ -97,15 +97,15 @@ const MyServiceCard = ({ service }) => {
       </CardContent>
       <CardFooter className="flex justify-end gap-2">
         <Button variant="outline" size="sm" asChild>
-          <Link to={`/housekeeper/services/${service.service_id}/edit`}>
+          <Link to={`/dashboard/housekeeper/update-service/${service.service_id}`}>
             <Edit className="w-4 h-4 mr-2" />
             Edit
           </Link>
         </Button>
-        <Button variant="destructive" size="sm">
+        {/* <Button variant="destructive" size="sm">
           <Trash2 className="w-4 h-4 mr-2" />
           Delete
-        </Button>
+        </Button> */}
       </CardFooter>
     </Card>
   );

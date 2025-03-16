@@ -25,15 +25,20 @@ import {
 } from "../ui/accordion";
 import { Slider } from "../ui/slider";
 import { useGetFilterOptionsQuery } from "@/redux/api/serviceApi";
+import { useSearchParams } from "react-router-dom";
+import AutoComplete from "../AutoComplete";
+import { set } from "lodash";
 
-export default function Filter() {
+export default function Filter({ filter, setFilter }) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const category = searchParams.get("category");
   const form = useForm({
     defaultValues: {
-      keyword: "",
+      search: "",
       location: "",
       prices: [0, 100],
       ratings: null,
-      categoryIds: [],
+      categoryIds: category ? [category] : [],
     },
   });
   const {
@@ -43,6 +48,12 @@ export default function Filter() {
   } = useGetFilterOptionsQuery();
   const handleSubmit = (data) => {
     console.log(data);
+    setFilter({
+      ...data,
+      userPlaceId: data.location,
+    });
+  
+
   };
   useEffect(() => {
     if (isSuccess) {
@@ -50,8 +61,28 @@ export default function Filter() {
         filterOptions?.data?.minPrice,
         filterOptions?.data?.maxPrice,
       ]);
+      form.setValue("categoryIds", category ? [category] : []);   
     }
   }, [isSuccess]);
+  useEffect(() => {
+    form.reset({
+      search: "",
+      location: "",
+      prices: [filterOptions?.data?.minPrice, filterOptions?.data?.maxPrice],
+      ratings: null,
+      categoryIds: category ? [category] : [],
+    });
+  }, [searchParams]);
+  const resetFilter = () => {
+    form.reset({
+      search: "",
+      location: "",
+      prices: [filterOptions?.data?.minPrice, filterOptions?.data?.maxPrice],
+      ratings: null,
+      categoryIds: category ? [category] : [],
+    });
+
+  };
   return (
     isSuccess && (
       <Form {...form} className="w-full">
@@ -62,7 +93,10 @@ export default function Filter() {
               <FilterIcon />
               <span className="text-xl font-bold">Filters</span>
             </div>
-            <div className="hover:text-primary duration-200 font-medium cursor-pointer">
+            <div
+              onClick={resetFilter}
+              className="hover:text-primary duration-200 font-medium cursor-pointer"
+            >
               Reset Filter
             </div>
           </div>
@@ -70,14 +104,14 @@ export default function Filter() {
           {/* filter search */}
           <FormField
             control={form.control}
-            name="keyword"
+            name="search"
             render={({ field }) => (
               <FormItem>
-                <FormLabel htmlFor="keyword">Search by keyword</FormLabel>
+                <FormLabel htmlFor="search">Search by search</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
-                    id="keyword"
+                    id="search"
                     placeholder="What are you looking for?"
                     className="h-11"
                   />
@@ -153,12 +187,7 @@ export default function Filter() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input
-                          {...field}
-                          id="location"
-                          placeholder="What are you looking for?"
-                          className="h-11 focus-visible:ring-transparent"
-                        />
+                        <AutoComplete form={form} />
                       </FormControl>
 
                       <FormMessage />

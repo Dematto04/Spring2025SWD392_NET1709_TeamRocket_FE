@@ -16,12 +16,7 @@ import {
 } from "@/components/ui/form";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { containerVariants } from "@/lib/utils";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "../ui/accordion";
+
 import { ServiceBookContext } from "./ServiceBookContext";
 import AutoComplete from "../AutoComplete";
 import { useCustomerProfileQuery } from "@/redux/api/customerProfileApi";
@@ -76,7 +71,7 @@ function ServiceBookingPersonal() {
   return (
     isSuccess &&
     isOk &&
-    defaultAddress && (
+     (
       <motion.div
         variants={containerVariants}
         initial="hidden"
@@ -140,8 +135,8 @@ function ServiceBookingPersonal() {
               <div className="flex justify-start gap-4 items-start mt-3 rounded-md">
                 <AutoComplete
                   form={form}
-                  defaultAddress={defaultAddress.defaultAddress}
-                  defaultAddressId={defaultAddress.defaultAddressId}
+                  defaultAddress={defaultAddress?.defaultAddress}
+                  defaultAddressId={defaultAddress?.defaultAddressId}
                 />
               <AddressList addressList={address.data.items} setDefaultAddress={setDefaultAddress}/>
 

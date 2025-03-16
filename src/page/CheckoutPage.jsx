@@ -94,17 +94,22 @@ function CheckoutPage() {
   const address = useSelector(selectAddress);
   const additionalService = useSelector(selectAdditional);
   const service = useSelector(selectServiceBooking);
-  const user = useSelector(selectUser);
+  const [paymentMethod, setPaymentMethod] = useState([]);
+
   const timeSlot = useSelector(selectServiceBookingTimeSlot);
   const [getCheckoutDetail, { data, isLoading, isError }] =
     useGetServiceCheckoutDetailMutation();
   const [placeOrder, { isLoading: isPlacing, data: order }] =
     usePlaceOrderServiceMutation();
   const [checkout, setCheckout] = useState();
-
+ 
+  
   useEffect(() => {
     const fn = async () => {
-      if (!timeSlot?.id || !address?.addressId || !service?.serviceId) return;
+      if (!timeSlot?.id || !address?.addressId || !service?.serviceId) {
+        
+        return;
+      };
 
       const result = await getCheckoutDetail({
         timeslot_id: timeSlot?.id,
@@ -131,15 +136,10 @@ function CheckoutPage() {
   const handlePlaceOrder = async () => {
     const result = await placeOrder(
       {
-        startDate: checkout?.booking_date,
-        timeSlotId: checkout?.time_slot_id,
-        addressId: address?.addressId,
-        serviceId: checkout?.service_id,
-        bookingAdditionalIds: checkout.additional_services?.map(
-          (item) => item.addtional_service_id
-        ),
+        id: checkout?.checkout_id,
+        paymentMethod: paymentMethod,
+        amount: checkout?.total_price,
       },
-      { paymentMethod: "VNPay" }
     );
     if (result.error) {
       toast({
@@ -150,7 +150,7 @@ function CheckoutPage() {
       });
       return;
     }
-    dispatch(resetBooking());
+    
     window.open(result.data.url);
   };
 
@@ -164,7 +164,7 @@ function CheckoutPage() {
 
   return (
     <div className="w-full min-h-screen bg-secondary mb-48">
-      {checkout && checkout?.status !== "Pending" && <Navigate to={"/"} />}
+      {checkout && checkout?.status !== "Pending" && <Navigate to={"/checkout"} />}
       <div className="container mx-auto px-6 lg:px-16 h-full py-40">
         {isLoading || !checkout ? (
           <CheckoutSkeleton />
@@ -181,6 +181,8 @@ function CheckoutPage() {
               </div>
               <div className="md:w-1/3">
                 <CheckoutSummary
+                  paymentMethod={paymentMethod}
+                  setPaymentMethod={setPaymentMethod}
                   summary={checkout}
                   handlePlaceOrder={handlePlaceOrder}
                   isPlacing={isPlacing}
