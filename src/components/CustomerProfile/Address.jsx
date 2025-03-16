@@ -25,6 +25,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@radix-ui/react-accordion";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
 
 // Define the form schema using Zod
 const addressSchema = z.object({
@@ -39,7 +44,7 @@ const addressSchema = z.object({
 const AddressList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedAddress, setSelectedAddress] = useState(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const addressesPerPage = 3;
 
@@ -66,8 +71,7 @@ const AddressList = () => {
   const totalPages = Math.ceil((data?.data?.totalCount || 0) / addressesPerPage);
   const currentAddresses = data?.data?.items || [];
 
-  const openDialog = (address = null) => {
-    console.log("Opening dialog for address:", address); // Debug: Log when opening
+  const openForm = (address = null) => {
     setSelectedAddress(address);
     if (address) {
       form.reset({
@@ -88,14 +92,7 @@ const AddressList = () => {
         isDefault: false,
       });
     }
-    setIsDialogOpen(true);
-  };
-
-  const closeDialog = () => {
-    console.log("Closing dialog"); // Debug: Log when closing
-    setIsDialogOpen(false);
-    setSelectedAddress(null);
-    form.reset();
+    setIsFormOpen(true);
   };
 
   const saveAddress = async (data) => {
@@ -119,7 +116,9 @@ const AddressList = () => {
         await addAddress(payload).unwrap();
         console.log("Address added successfully!");
       }
-      closeDialog();
+      setIsFormOpen(false);
+      setSelectedAddress(null);
+      form.reset();
     } catch (err) {
       console.error("Failed to save address:", err);
       alert("Failed to save address. Please try again.");
@@ -132,37 +131,122 @@ const AddressList = () => {
   return (
     <div className="p-6 rounded-lg shadow-sm">
       <h2 className="text-2xl font-bold mb-4">Saved Addresses</h2>
-      <div className="mb-6">
-        <Button
-          onClick={(e) => {
-            e.preventDefault(); // Prevent default behavior
-            e.stopPropagation(); // Prevent event bubbling
-            openDialog();
-          }}
-          disabled={isAdding || isUpdating}
-        >
-          Add Address
-        </Button>
-      </div>
+      
+      {/* Address Form Collapsible */}
+      <Collapsible
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        className="mb-6 border rounded-lg p-4"
+      >
+        <CollapsibleTrigger asChild>
+          <Button
+            variant="outline"
+            className="w-full flex justify-between items-center"
+          >
+            <span>{selectedAddress ? "Edit Address" : "Add New Address"}</span>
+            <span className="text-xs">{isFormOpen ? "▼" : "▶"}</span>
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="mt-4">
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(saveAddress)}
+              className="space-y-4"
+            >
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Title" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <div className="flex flex-wrap w-full gap-6">
+                <FormField
+                  control={form.control}
+                  name="location"
+                  render={() => (
+                    <FormItem className="flex-grow">
+                      <FormLabel>Address</FormLabel>
+                      <FormControl>
+                        <AutoComplete form={form} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="isDefault"
+                render={({ field }) => (
+                  <FormItem className="flex items-center space-x-2">
+                    <FormControl>
+                      <input
+                        type="checkbox"
+                        checked={field.value}
+                        onChange={(e) => field.onChange(e.target.checked)}
+                      />
+                    </FormControl>
+                    <FormLabel className="m-0">Set as Default</FormLabel>
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex justify-end gap-2 mt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsFormOpen(false);
+                    setSelectedAddress(null);
+                    form.reset();
+                  }}
+                  type="button"
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={isAdding || isUpdating}>
+                  {selectedAddress ? "Save Changes" : "Add Address"}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </CollapsibleContent>
+      </Collapsible>
+
+      {/* Address List */}
       {currentAddresses.map((address) => (
         <Card
           key={address.id}
-          className="mb-4 border border-gray-300 rounded-lg cursor-pointer"
-          onClick={(e) => {
-            e.preventDefault(); // Prevent default behavior
-            e.stopPropagation(); // Prevent event bubbling
-            openDialog(address);
-          }}
-          disabled={isAdding || isUpdating}
+          className="mb-4 border border-gray-300 rounded-lg"
         >
           <CardContent className="p-4">
-            <h3 className="font-semibold text-lg">{address.title}</h3>
-            <p>Address: {`${address.address}, ${address.city}, ${address.district}`}</p>
-            <p>Default: {address.isDefault ? "Yes" : "No"}</p>
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="font-semibold text-lg">{address.title}</h3>
+                <p>Address: {`${address.address}, ${address.city}, ${address.district}`}</p>
+                <p>Default: {address.isDefault ? "Yes" : "No"}</p>
+              </div>
+              <Button
+                variant="ghost"
+                onClick={() => openForm(address)}
+                className="text-blue-600 hover:text-blue-800"
+              >
+                Edit
+              </Button>
+            </div>
           </CardContent>
         </Card>
       ))}
 
+      {/* Pagination - keep existing pagination code */}
       <div className="flex justify-center items-center gap-2 mt-4">
         <Button
           variant="outline"
@@ -201,136 +285,6 @@ const AddressList = () => {
           {"Next >"}
         </Button>
       </div>
-
-      {/* Debug: Log Dialog state */}
-      {console.log("isDialogOpen:", isDialogOpen)}
-      {/* Custom Modal Start */}
-      {isDialogOpen && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.5)", // Overlay
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 1000, // Ensure it appears above other content
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            closeDialog(); // Close modal when clicking outside
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "white",
-              padding: "20px",
-              borderRadius: "8px",
-              width: "100%",
-              maxWidth: "500px",
-              maxHeight: "80vh",
-              overflowY: "auto",
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-            }}
-            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
-          >
-            <h2 className="text-xl font-bold mb-4">
-              {selectedAddress ? "Edit Address" : "Add Address"}
-            </h2>
-            <Form {...form}>
-              <form
-                onSubmit={(e) => {
-                  e.stopPropagation();
-                  form.handleSubmit(saveAddress, (err) => {
-                    console.log("Validation errors:", err);
-                  })(e);
-                }}
-                className="space-y-4"
-              >
-                <Accordion
-                  type="single"
-                  collapsible
-                  defaultValue="address-details"
-                  className="w-full"
-                >
-                  <AccordionItem value="address-details">
-                    <AccordionTrigger className="text-lg">
-                      {selectedAddress
-                        ? `Edit ${selectedAddress.title}`
-                        : "Add New Address"}
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <FormField
-                        control={form.control}
-                        name="title"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Title</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Title" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <div className="flex flex-wrap w-full gap-6 p-2">
-                        <FormField
-                          control={form.control}
-                          name="location"
-                          render={() => (
-                            <FormItem className="flex-grow">
-                              <FormLabel>Address</FormLabel>
-                              <FormControl>
-                                <AutoComplete form={form} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                      <FormField
-                        control={form.control}
-                        name="isDefault"
-                        render={({ field }) => (
-                          <FormItem className="flex items-center space-x-2">
-                            <FormControl>
-                              <input
-                                type="checkbox"
-                                checked={field.value}
-                                onChange={(e) => field.onChange(e.target.checked)}
-                              />
-                            </FormControl>
-                            <FormLabel className="m-0">Set as Default</FormLabel>
-                          </FormItem>
-                        )}
-                      />
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-                <div className="flex justify-end gap-2 mt-4">
-                  <Button
-                    variant="outline"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      closeDialog();
-                    }}
-                    type="button"
-                  >
-                    Cancel
-                  </Button>
-                  <Button type="submit" disabled={isAdding || isUpdating}>
-                    {selectedAddress ? "Save Changes" : "Add Address"}
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

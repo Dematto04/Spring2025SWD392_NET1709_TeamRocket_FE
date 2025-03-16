@@ -14,7 +14,8 @@ import {
   useSendWithdrawRequestMutation,
   useGetBalanceQuery,
   useCreateDepositPaymentMutation,
-  useProcessDepositMutation
+  useProcessDepositMutation,
+  useGetMoneyExchangeQuery
 } from '@/redux/api/walletApi';
 import {
   Dialog,
@@ -24,6 +25,8 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { toast } from '@/hooks/use-toast';
+import { Label } from '@/components/ui/label';
+import { useDebounce } from '@/hooks/useDebounce';
 
 const TRANSACTION_TYPES = [
   { 
@@ -68,6 +71,10 @@ const Wallet = () => {
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
   const [transactionType, setTransactionType] = useState('ShowAllHistoryUser');
 
+  // Debounced values
+  const debouncedDepositAmount = useDebounce(depositAmount, 500);
+  const debouncedWithdrawAmount = useDebounce(withdrawAmount, 500);
+
   // API Hooks
   const { data: transactions, isLoading: isLoadingTransactions } = useGetWalletTransactionQuery({
     pageIndex: page,
@@ -78,6 +85,15 @@ const Wallet = () => {
   const [createDepositPayment] = useCreateDepositPaymentMutation();
   const [processDeposit] = useProcessDepositMutation();
   const [sendWithdrawRequest, { isLoading: isWithdrawLoading }] = useSendWithdrawRequestMutation();
+
+  // Exchange queries
+  const { data: depositExchangeData } = useGetMoneyExchangeQuery(debouncedDepositAmount || 0, {
+    skip: !debouncedDepositAmount
+  });
+
+  const { data: withdrawExchangeData } = useGetMoneyExchangeQuery(debouncedWithdrawAmount || 0, {
+    skip: !debouncedWithdrawAmount
+  });
 
   // Handlers
   const handleDeposit = async (e) => {
@@ -140,9 +156,9 @@ const Wallet = () => {
   };
 
   const formatAmount = (amount) => {
-    return new Intl.NumberFormat('vi-VN', {
+    return new Intl.NumberFormat('USD', {
       style: 'currency',
-      currency: 'VND'
+      currency: 'USD'
     }).format(amount);
   };
 
@@ -276,16 +292,25 @@ const Wallet = () => {
           </DialogHeader>
           <form onSubmit={handleDeposit}>
             <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <label htmlFor="amount">Amount (VND)</label>
-                <Input
-                  id="amount"
-                  type="number"
-                  value={depositAmount}
-                  onChange={(e) => setDepositAmount(e.target.value)}
-                  min="0"
-                  required
-                />
+              <div className="space-y-2">
+                <Label>Amount (USD)</Label>
+                <div className="relative">
+                  <Input
+                    type="number"
+                    placeholder="0.00"
+                    value={depositAmount}
+                    onChange={(e) => setDepositAmount(e.target.value)}
+                    className="pr-16"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                    USD
+                  </span>
+                </div>
+                {depositAmount && depositExchangeData?.data && (
+                  <span className="text-sm text-muted-foreground">
+                    ≈ {depositExchangeData.data.toLocaleString()} VND
+                  </span>
+                )}
               </div>
             </div>
             <DialogFooter>
@@ -311,24 +336,31 @@ const Wallet = () => {
               <div className="text-sm text-muted-foreground">
                 Current Balance: {formatAmount(balanceData?.data || 0)}
               </div>
-              <div className="grid gap-2">
-                <label htmlFor="withdrawAmount">Amount (VND)</label>
-                <Input
-                  id="withdrawAmount"
-                  type="number"
-                  value={withdrawAmount}
-                  onChange={(e) => setWithdrawAmount(e.target.value)}
-                  min="0"
-                  max={balanceData?.data || 0}
-                  required
-                  disabled={isWithdrawLoading}
-                />
-                {Number(withdrawAmount) > (balanceData?.data || 0) && (
-                  <p className="text-sm text-destructive">
-                    Amount cannot exceed your current balance
-                  </p>
+              <div className="space-y-2">
+                <Label>Amount (USD)</Label>
+                <div className="relative">
+                  <Input
+                    type="number"
+                    placeholder="0.00"
+                    value={withdrawAmount}
+                    onChange={(e) => setWithdrawAmount(e.target.value)}
+                    className="pr-16"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                    USD
+                  </span>
+                </div>
+                {withdrawAmount && withdrawExchangeData?.data && (
+                  <span className="text-sm text-muted-foreground">
+                    ≈ {withdrawExchangeData.data.toLocaleString()} VND
+                  </span>
                 )}
               </div>
+              {Number(withdrawAmount) > (balanceData?.data || 0) && (
+                <p className="text-sm text-destructive">
+                  Amount cannot exceed your current balance
+                </p>
+              )}
             </div>
             <DialogFooter>
               <Button 

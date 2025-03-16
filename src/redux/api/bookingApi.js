@@ -33,11 +33,26 @@ export const bookingApi = apiSlice.injectEndpoints({
         }),
         providesTags: ["Booking"],
       }),
+      getBookingCountHouseKeeper: build.query({
+        query: () => ({
+          url: "/Booking/bookingCountHouseKeeper",
+          method: "GET",
+        }),
+        providesTags: ["Booking"],
+      }),
+    getBookingCountHousekeeper: build.query({
+      query: () => ({
+        url: 'Booking/bookingCountHousekeeper',
+      }),
+      providesTags: ['Booking']
     }),
-  });
+  }),
+});
   
-  export const {
-    useGetBookingHistoryQuery,
-    useGetBookingDetailQuery,
-  } = bookingApi;
+export const {
+  useGetBookingHistoryQuery,
+  useGetBookingDetailQuery,
+  useGetBookingCountHouseKeeperQuery,
+  useGetBookingCountHousekeeperQuery,
+} = bookingApi;
   
