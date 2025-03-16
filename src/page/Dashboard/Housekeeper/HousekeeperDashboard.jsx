@@ -12,7 +12,12 @@ import {
   Calendar,
   MapPin,
   Mail,
+  X,
+  RefreshCcw,
 } from "lucide-react";
+import { useGetBookingCountHousekeeperQuery } from "@/redux/api/bookingApi";
+import RevenueChart from "@/components/HousekeeperDashboard/RevenueChart";
+import TopService from "@/components/HousekeeperDashboard/TopService";
 const data = [
   {
     name: "Jan",
@@ -63,55 +68,84 @@ const data = [
     total: Math.floor(Math.random() * 5000) + 1000,
   },
 ];
+
 function HousekeeperDashboard() {
+  const { data: bookingStats, isLoading } = useGetBookingCountHousekeeperQuery();
+  const stats = bookingStats?.data || {
+    upcomingBookings: 0,
+    completedBookings: 0,
+    canceledBookings: 0,
+    refundedBookings: 0
+  };
+
   return (
     <div className="flex flex-1 flex-col gap-4">
-      {/* dashboard header  */}
-      <div className="flex flex-1 flex-col gap-4">
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {/* Dashboard Header and Top Services Side by Side */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Top Services - Takes 1 column on the left */}
+        <div className="lg:col-span-1">
+          <TopService />
+        </div>
+
+        {/* Dashboard Header Cards - Takes 2 columns on the right */}
+        <div className="lg:col-span-2 grid gap-4 grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                Total Revenue
+                Upcoming Bookings
               </CardTitle>
-              <DollarSign className="h-6 w-6 text-muted-foreground" />
+              <Clock className="h-6 w-6 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">$45,231.89</div>
+              <div className="text-2xl font-bold">{stats.upcomingBookings}</div>
               <p className="text-xs text-muted-foreground">
-                +20.1% from last month
+                Pending appointments
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                Subscriptions
+                Completed Bookings
               </CardTitle>
-              <Users className="h-6 w-6 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">+2350</div>
-              <p className="text-xs text-muted-foreground">
-                +180.1% from last month
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Sales</CardTitle>
               <ListChecks className="h-6 w-6 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">+12,234</div>
+              <div className="text-2xl font-bold">{stats.completedBookings}</div>
               <p className="text-xs text-muted-foreground">
-                +19% from last month
+                Successfully completed
               </p>
             </CardContent>
           </Card>
-        </div>
-        {/* Thống kê tổng quan */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Canceled Bookings
+              </CardTitle>
+              <X className="h-6 w-6 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.canceledBookings}</div>
+              <p className="text-xs text-muted-foreground">
+                Canceled appointments
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Refunded Bookings
+              </CardTitle>
+              <RefreshCcw className="h-6 w-6 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.refundedBookings}</div>
+              <p className="text-xs text-muted-foreground">
+                Refunded appointments
+              </p>
+            </CardContent>
+          </Card>
+          {/* Overview Statistics */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
@@ -143,20 +177,6 @@ function HousekeeperDashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                Completed Jobs
-              </CardTitle>
-              <ListChecks className="h-6 w-6 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">7,892</div>
-              <p className="text-xs text-muted-foreground">
-                +8.5% from last month
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
                 Average Order Value
               </CardTitle>
               <DollarSign className="h-6 w-6 text-muted-foreground" />
@@ -170,35 +190,17 @@ function HousekeeperDashboard() {
           </Card>
         </div>
       </div>
-      {/* dashboard chart  */}
-      <div className="grid grid-cols-2">
-        <Card className="col-span-2">
-          <CardHeader>
-            <CardTitle>Overview</CardTitle>
-          </CardHeader>
-          <CardContent className="pl-2">
-            <ResponsiveContainer width="100%" height={350}>
-              <BarChart data={data}>
-                <XAxis
-                  dataKey="name"
-                  stroke="#888888"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis
-                  stroke="#888888"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(value) => `$${value}`}
-                />
-                <Bar dataKey="total" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
+
+      {/* Loading state */}
+      {isLoading && (
+        <div className="absolute inset-0 bg-background/50 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      )}
+
+      {/* Revenue Chart */}
+      <RevenueChart />
+
       {/* Recent Booking */}
       <Card className="bg-background">
         <CardHeader>

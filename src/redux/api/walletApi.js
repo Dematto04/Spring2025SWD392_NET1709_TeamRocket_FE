@@ -97,6 +97,34 @@ const walletApi = apiSlice.injectEndpoints({
       }),
       providesTags: ['MoneyExchange']
     }),
+    getRevenueHousekeeperChartData: build.query({
+      query: ({ 
+        dayRevenue = false,
+        weekRevenue = false,
+        yearRevenue = false,
+        yearsRevenue = false,
+        dayStart,
+        monthStart,
+        yearStart,
+        dayEnd,
+        monthEnd,
+        yearEnd
+      }) => ({
+        url: '/Wallet/revenueHousekeeperData',
+        params: {
+          dayRevenue,
+          weekRevenue,
+          yearRevenue,
+          yearsRevenue,
+          dayStart,   
+          monthStart,
+          yearStart,
+          dayEnd,
+          monthEnd,
+          yearEnd
+        }
+      }),
+    }),
   }), 
 });
 
@@ -106,4 +134,5 @@ export const { useGetWalletTransactionQuery,
    useCreateDepositPaymentMutation, 
    useProcessDepositMutation,
    useProcessWithdrawMutation,
-   useGetMoneyExchangeQuery } = walletApi;
+   useGetMoneyExchangeQuery,
+   useGetRevenueHousekeeperChartDataQuery } = walletApi;

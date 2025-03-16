@@ -112,6 +112,22 @@ const adminApi = apiSlice.injectEndpoints({
         }
       }),
     }),
+    getServiceCategoryChart: build.query({
+      query: (params) => ({
+        url: 'Admin/serviceCategoryChart',
+        params: {
+          dayChart: params.dayChart,
+          yearChart: params.yearChart,
+          yearsChart: params.yearsChart,
+          dayStart: params.dayStart,
+          monthStart: params.monthStart,
+          yearStart: params.yearStart,
+          dayEnd: params.dayEnd,
+          monthEnd: params.monthEnd,
+          yearEnd: params.yearEnd
+        }
+      })
+    }),
   }),
 });
 
@@ -121,4 +137,6 @@ export const {
   useGetServiceCategoriesQuery,
   useGetRevenueChartDataQuery,
   useGetBookingsAdminViewQuery,
+  useGetTopServicesQuery,
+  useGetServiceCategoryChartQuery,
 } = adminApi;

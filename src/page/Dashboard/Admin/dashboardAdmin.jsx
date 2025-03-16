@@ -10,6 +10,7 @@ import {
   ArrowUp,
   ArrowDown,
   Clock,
+  Calendar1Icon
 } from "lucide-react";
 import {
   LineChart,
@@ -28,33 +29,22 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useGetRevenueChartDataQuery } from "@/redux/api/adminApi";
-import { format } from "date-fns";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
 import RevenueChart from "@/components/AdminDashboard/RevenueChart";
+import React from "react";
+import ServiceDistribution from "@/components/AdminDashboard/ServiceDistribution";
+const DatePickerTrigger = React.forwardRef(({ children, ...props }, ref) => (
+  <div
+    ref={ref}
+    {...props}
+    className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 w-[150px] cursor-pointer"
+  >
+    {children}
+  </div>
+));
+DatePickerTrigger.displayName = "DatePickerTrigger";
 
 export function DashboardAdmin() {
-  const [timeRange, setTimeRange] = useState("weekly");
-  const [chartConfig, setChartConfig] = useState({
-    type: "year",
-    yearStart: new Date().getFullYear(),
-    monthStart: new Date().getMonth() + 1,
-    dayStart: new Date().getDate(),
-    yearEnd: new Date().getFullYear(),
-    monthEnd: new Date().getMonth() + 1,
-    dayEnd: new Date().getDate(),
-  });
-
-  // Add state for date pickers
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
+  
 
   // Example data - replace with actual API data
   const stats = {
@@ -79,6 +69,7 @@ export function DashboardAdmin() {
       isPositive: true
     }
   };
+
 
   const renderTrendIndicator = (trend, isPositive) => (
     <div className={`flex items-center gap-1 text-sm ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
@@ -196,71 +187,7 @@ export function DashboardAdmin() {
         <RevenueChart/>
 
         {/* Service Distribution */}
-        <Card className="hover:shadow-lg transition-shadow">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-primary" />
-                  Service Distribution
-                </CardTitle>
-                <CardDescription>Active services by category</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col items-center">
-              {/* Chart Container */}
-              <div className="w-full h-[250px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={serviceData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      {serviceData.map((entry, index) => (
-                        <Cell 
-                          key={`cell-${index}`} 
-                          fill={COLORS[index % COLORS.length]}
-                          stroke="white"
-                          strokeWidth={2}
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip 
-                      contentStyle={{
-                        backgroundColor: "white",
-                        border: "1px solid #f0f0f0",
-                        borderRadius: "8px",
-                        padding: "8px"
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-
-              {/* Legend */}
-              <div className="grid grid-cols-2 gap-x-8 gap-y-2 mt-6">
-                {serviceData.map((item, index) => (
-                  <div key={item.name} className="flex items-center gap-2">
-                    <div 
-                      className="w-3 h-3 rounded-full" 
-                      style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                    />
-                    <span className="text-sm text-muted-foreground">
-                      {item.name} ({item.value})
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <ServiceDistribution/>
       </div>
 
       {/* Recent Activity */}
@@ -293,25 +220,6 @@ export function DashboardAdmin() {
   );
 }
 
-// Example data
-const revenueData = [
-  { name: 'Mon', revenue: 4000 },
-  { name: 'Tue', revenue: 3000 },
-  { name: 'Wed', revenue: 5000 },
-  { name: 'Thu', revenue: 4500 },
-  { name: 'Fri', revenue: 6000 },
-  { name: 'Sat', revenue: 5500 },
-  { name: 'Sun', revenue: 7000 },
-];
-
-const COLORS = ['#0ea5e9', '#10b981', '#f59e0b', '#ef4444'];
-
-const serviceData = [
-  { name: 'Cleaning', value: 40 },
-  { name: 'Plumbing', value: 30 },
-  { name: 'Electrical', value: 20 },
-  { name: 'Other', value: 10 },
-];
 
 const recentActivities = [
   {
@@ -330,24 +238,5 @@ const recentActivities = [
   },
   // Add more activities as needed
 ];
-
-// Add utility functions
-const calculateTotal = (data) => {
-  return data.reduce((sum, item) => sum + item.revenue, 0);
-};
-
-const calculateAverage = (data) => {
-  const activePeriods = data.filter(item => item.revenue >= 0).length;
-  const total = calculateTotal(data);
-  return activePeriods ? Math.round(total / activePeriods) : 0;
-};
-
-const findHighest = (data) => {
-  return Math.max(...data.map(item => item.revenue));
-};
-
-const countActivePeriods = (data) => {
-  return data.filter(item => item.revenue >= 0).length;
-};
 
 export default DashboardAdmin;

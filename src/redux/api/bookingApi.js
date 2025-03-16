@@ -40,12 +40,19 @@ export const bookingApi = apiSlice.injectEndpoints({
         }),
         providesTags: ["Booking"],
       }),
+    getBookingCountHousekeeper: build.query({
+      query: () => ({
+        url: 'Booking/bookingCountHousekeeper',
+      }),
+      providesTags: ['Booking']
     }),
-  });
+  }),
+});
   
-  export const {
-    useGetBookingHistoryQuery,
-    useGetBookingDetailQuery,
-    useGetBookingCountHouseKeeperQuery,
-  } = bookingApi;
+export const {
+  useGetBookingHistoryQuery,
+  useGetBookingDetailQuery,
+  useGetBookingCountHouseKeeperQuery,
+  useGetBookingCountHousekeeperQuery,
+} = bookingApi;
   
