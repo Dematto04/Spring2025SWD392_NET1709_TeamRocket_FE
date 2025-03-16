@@ -108,7 +108,7 @@ function HousekeeperUpdateService() {
   //api cateogry
   const { id } = useParams();
   const { data: categories, isLoading } = useGetCategoriesQuery();
-  const [updateService, { isSuccess, isLoading: isCreating }] =
+  const [updateService, { isSuccess, isLoading: isUpdating }] =
     useUpdateServiceMutation();
   const { data: myService, isLoading: isGettingMyService, isSuccess: isOk } =
   useGetMyServicesDetailQuery(id);
@@ -124,7 +124,7 @@ function HousekeeperUpdateService() {
       serviceSteps: [{ step_order: 1, step_description: "" }],
       additionalServices: [],
       city: "",
-      province: "",
+      district: "",
       address_line: "",
       place_id: "",
       location: "",
@@ -142,7 +142,7 @@ function HousekeeperUpdateService() {
       form.setValue("price", String(service?.price));
       form.setValue("serviceSteps", service?.serviceSteps);
       form.setValue("city", service?.city);
-      form.setValue("province", service?.province);
+      form.setValue("district", service?.district);
       form.setValue("address_line", service?.address_line);
       form.setValue("place_id", service?.place_id);
       form.setValue("location", service?.place_id);
@@ -323,7 +323,7 @@ function HousekeeperUpdateService() {
               </Accordion>
             </CardContent>
             <CardFooter className="justify-end">
-              <Button>Submit</Button>
+              <Button disabled={isUpdating} type="submit">Submit</Button>
             </CardFooter>
           </Card>
         </form>

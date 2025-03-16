@@ -69,16 +69,6 @@ const routes = [
         component: CustomerProfilePage,
         allowedRoles: ['Customer']
       },
-      // {
-      //   path: "/dashboard/admin",
-      //   component: DashboardAdmin,
-      //   allowedRoles: ["Admin"],
-      // },
-      // {
-      //   path: "/dashboard/staff",
-      //   component: DashboardStaff,
-      //   allowedRoles: ["Admin", "Staff"],
-      // },
       {
         path: "/service/Checkout/fail",
         component: CheckoutFail,

@@ -1,5 +1,5 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -10,8 +10,26 @@ import {
 import Filter from "@/components/ServiceList/Filter";
 import ServiceList from "@/components/ServiceList/ServiceList";
 
-
 function ServiceListPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const category = searchParams.get("category");
+  const [filter, setFilter] = useState({
+    keyword: "",
+    location: "",
+    prices: [0, 100],
+    ratings: null,
+    categoryIds: category ? [category] : [],
+  });
+  useEffect(() => {
+    setFilter({
+      keyword: "",
+      location: "",
+      prices: [0, 100],
+      ratings: null,
+      categoryIds: category ? [category] : [],
+    });
+  }, [searchParams]);
+
   return (
     <>
       {/* Hero */}
@@ -49,12 +67,12 @@ function ServiceListPage() {
       <div className="flex flex-col lg:flex-row justify-center mt-14 container mx-auto gap-4 px-6 lg:px-16">
         {/* Bộ lọc (Filter) */}
         <div className="w-full lg:w-80 shadow-lg rounded-md shrink-0 h-fit">
-          <Filter />
+          <Filter filter={filter} setFilter={setFilter} />
         </div>
 
         {/* Danh sách dịch vụ */}
         <div className="w-full">
-          <ServiceList />
+          <ServiceList filter={filter} />
         </div>
       </div>
     </>

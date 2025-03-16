@@ -17,8 +17,8 @@ import {
 import { Label } from "../ui/label";
 import { Loader2 } from "lucide-react";
 
-export const CheckoutSummary = ({ summary, handlePlaceOrder, isPlacing }) => {
-  const [paymentMethod, setPaymentMethod] = useState("");
+export const CheckoutSummary = ({ summary, handlePlaceOrder, isPlacing, paymentMethod, setPaymentMethod }) => {
+  
   const [error, setError] = useState("");
 
   const handleOrder = () => {

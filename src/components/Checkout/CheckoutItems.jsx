@@ -9,8 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
-import { MapPin, Clock, ImageIcon } from "lucide-react";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { MapPin, Phone, Mail, Clock } from "lucide-react";
 
 export default function CheckoutItems({ checkout }) {
   const bookingDate = checkout?.booking_date ? new Date(checkout.booking_date) : null;
@@ -21,77 +20,43 @@ export default function CheckoutItems({ checkout }) {
         <CardTitle>Your Booking Information</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Service Information */}
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4">
-            <div className="space-y-4">
-              <h3 className="font-medium text-lg">{checkout?.service_name}</h3>
-              <div className="flex items-center gap-2">
-                <span className="font-medium">Base Price:</span>
-                <span className="text-muted-foreground">${checkout?.base_service_price}</span>
-              </div>
-            </div>
-            <div className="w-full md:w-40 h-40 rounded-lg overflow-hidden border bg-muted">
-              {checkout?.url ? (
-                <AspectRatio ratio={1}>
-                  <img
-                    src={checkout.url}
-                    alt={checkout?.service_name}
-                    className="object-cover w-full h-full"
-                  />
-                </AspectRatio>
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <ImageIcon className="h-10 w-10 text-muted-foreground" />
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Additional Services */}
-          {checkout?.additional_services && checkout.additional_services.length > 0 && (
-            <div className="space-y-3">
-              <h4 className="font-medium">Additional Services</h4>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {checkout.additional_services.map((item) => (
-                  <div
-                    key={item.additional_service_id}
-                    className="flex gap-3 p-3 rounded-lg border bg-card"
-                  >
-                    <div className="w-16 h-16 rounded-md overflow-hidden bg-muted flex-shrink-0">
-                      {item.url ? (
-                        <AspectRatio ratio={1}>
-                          <img
-                            src={item.url}
-                            alt={item.additional_service_name}
-                            className="object-cover w-full h-full"
-                          />
-                        </AspectRatio>
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <ImageIcon className="h-6 w-6 text-muted-foreground" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium truncate">
-                        {item.additional_service_name}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        ${item.additional_service_price}
-                      </p>
-                      {item.duration && (
-                        <p className="text-xs text-muted-foreground">
-                          Duration: {item.duration} minutes
-                        </p>
-                      )}
-                    </div>
+        {/* Service Table */}
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Service</TableHead>
+              <TableHead className="text-right">Price</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow>
+              <TableCell className="font-medium">
+                {checkout?.service_name}
+                {/* Additional Services */}
+                {checkout?.additional_services && checkout.additional_services.length > 0 && (
+                  <div className="mt-2 space-y-1.5 text-sm text-muted-foreground">
+                    {checkout.additional_services.map((item) => (
+                      <div key={item.additional_service_id} className="flex items-center gap-2">
+                        <span>• {item.additional_service_name}</span>
+                        <span className="text-xs text-muted-foreground">
+                          (${item.additional_service_price})
+                        </span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+                )}
+              </TableCell>
+              <TableCell className="text-right">
+                <div className="font-medium">${checkout?.base_service_price}</div>
+                {checkout?.additional_price > 0 && (
+                  <div className="text-sm text-muted-foreground mt-1">
+                    +${checkout.additional_price} additional
+                  </div>
+                )}
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
 
         <Separator />
 

@@ -3,9 +3,10 @@ import { apiSlice } from "./apiSlice";
 const serviceApi = apiSlice.injectEndpoints({
   endpoints: (build) => ({
     getServices: build.query({
-      query: (params) => ({
-        url: "/Service",
-        params,
+      query: (body) => ({
+        url: "/Service/get-all-services",
+        method: "POST",
+        body,
       }),
       providesTags: ["Services"],
     }),
@@ -57,10 +58,9 @@ const serviceApi = apiSlice.injectEndpoints({
       }),
     }),
     placeOrderService: build.mutation({
-      query: (body, params) => ({
+      query: (body) => ({
         url: `/Payment/CreatePayment`,
         method: "POST",
-        params,
         body,
       }),
     }),
