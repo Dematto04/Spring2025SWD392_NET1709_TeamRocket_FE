@@ -4,7 +4,7 @@ import "./homefeature.css";
 const ServiceCard = ({service}) => {
   return (
     <Link className="service-feat group relative w-full h-44 bg-card p-6 flex justify-center items-center flex-col rounded-2xl overflow-hidden"
-      to={service ? `/service/intro/${service.name}/${service.id}` : "/"}
+      to={service ? `/services?category=${service.id}` : "/"}
     >
       <div className="relative z-[2] rounded-full bg-accent w-24 h-24 flex justify-center items-center">
         <img
@@ -17,7 +17,7 @@ const ServiceCard = ({service}) => {
         {service.name}
       </h1>
       <div className="feature-overlay">
-        <img className="service-img" src="/home-cleaning-feat.webp" />
+        <img className="service-img" src={service.img} />
       </div>
       <div className="absolute rounded-2xl bg-[rgba(0,0,0,0.2)] group-hover:block hidden z-[1] w-full h-full duration-300"></div>
     </Link>

@@ -25,15 +25,18 @@ import {
 } from "../ui/accordion";
 import { Slider } from "../ui/slider";
 import { useGetFilterOptionsQuery } from "@/redux/api/serviceApi";
+import { useSearchParams } from "react-router-dom";
 
-export default function Filter() {
+export default function Filter({ filter, setFilter }) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const category = searchParams.get("category");
   const form = useForm({
     defaultValues: {
       keyword: "",
       location: "",
       prices: [0, 100],
       ratings: null,
-      categoryIds: [],
+      categoryIds: category ? [category] : [],
     },
   });
   const {
@@ -43,6 +46,7 @@ export default function Filter() {
   } = useGetFilterOptionsQuery();
   const handleSubmit = (data) => {
     console.log(data);
+    setFilter(data);
   };
   useEffect(() => {
     if (isSuccess) {
@@ -50,8 +54,28 @@ export default function Filter() {
         filterOptions?.data?.minPrice,
         filterOptions?.data?.maxPrice,
       ]);
+      form.setValue("categoryIds", category ? [category] : []);   
     }
   }, [isSuccess]);
+  useEffect(() => {
+    form.reset({
+      keyword: "",
+      location: "",
+      prices: [filterOptions?.data?.minPrice, filterOptions?.data?.maxPrice],
+      ratings: null,
+      categoryIds: category ? [category] : [],
+    });
+  }, [searchParams]);
+  const resetFilter = () => {
+    form.reset({
+      keyword: "",
+      location: "",
+      prices: [filterOptions?.data?.minPrice, filterOptions?.data?.maxPrice],
+      ratings: null,
+      categoryIds: category ? [category] : [],
+    });
+    setSearchParams({});
+  };
   return (
     isSuccess && (
       <Form {...form} className="w-full">
@@ -62,7 +86,10 @@ export default function Filter() {
               <FilterIcon />
               <span className="text-xl font-bold">Filters</span>
             </div>
-            <div className="hover:text-primary duration-200 font-medium cursor-pointer">
+            <div
+              onClick={resetFilter}
+              className="hover:text-primary duration-200 font-medium cursor-pointer"
+            >
               Reset Filter
             </div>
           </div>

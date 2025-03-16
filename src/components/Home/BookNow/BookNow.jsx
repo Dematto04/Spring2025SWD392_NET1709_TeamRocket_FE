@@ -22,7 +22,7 @@ function BookNow() {
             and more comfortable living space. Book now and enjoy a fresh start!
           </div>
           <Button variant="secondary" className="mt-8">
-            <Link className="">
+            <Link to="/services" className="">
               <div className="flex items-center justify-center gap-3">
                 <span>Make it Clean</span> <CircleChevronRight />
               </div>
