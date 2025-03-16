@@ -37,6 +37,8 @@ import UserManagement from "@/page/Dashboard/Admin/userManagement";
 import ServiceManagement from "@/page/Dashboard/Admin/serviceManagement";
 import CategoryManagement from "@/page/Dashboard/Admin/categoryManagement";
 import AdminBookings from "@/page/Dashboard/Admin/adminBookings";
+import RefundRequestPage from "@/page/Dashboard/Staff/refundRequestPage";
+import RefundRequestDetail from "@/page/Dashboard/Staff/refundRequestDetail";
 const routes = [
   {
     layout: MainLayout,
@@ -192,6 +194,16 @@ const routes = [
         component: WithdrawRequestsPage,
         allowedRoles: ["Staff"]
       },
+      {
+        path: "/dashboard/staff/refund-request",
+        component: RefundRequestPage,
+        allowedRoles: ["Staff"]
+      },
+      {
+        path: "/dashboard/staff/refund-request/:id",
+        component: RefundRequestDetail,
+        allowedRoles: ["Staff"]
+      },
       //Admin routes
       {
         path: "/dashboard/admin",
@@ -218,6 +230,7 @@ const routes = [
         component: AdminBookings,
         allowedRoles: ["Admin"]
       },
+
     ]
   },
 ];

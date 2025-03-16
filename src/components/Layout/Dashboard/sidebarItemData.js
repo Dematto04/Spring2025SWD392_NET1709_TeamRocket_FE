@@ -77,6 +77,11 @@ export const data = {
       url: "/dashboard/staff/withdraw-request",
       icon: ClipboardList,
     },
+    {
+      title: "Refund Request",
+      url: "/dashboard/staff/refund-request",
+      icon: CircleDollarSign,
+    },
   ],
 
   //Admin routes

@@ -30,7 +30,26 @@ export const requestApi = apiSlice.injectEndpoints({
             body: data,
         }),
         invalidatesTags: ["Request"],
-    })
+    }),
+    getRefundRequests: build.query({
+      query: (params) => ({
+        url: 'Wallet/getRefundRequest',
+        params: {
+          search: params.search,
+          pageIndex: params.pageIndex,
+          pageSize: params.pageSize,
+          status: params.status,
+        },
+      }),
+      providesTags: ['RefundRequest'],
+    }),
+    getRefundRequestDetail: build.query({
+      query: (refundRequestId) => ({
+        url: 'Wallet/getRefundRequestDetail',
+        params: { refundRequestId },
+      }),
+      providesTags: ['RefundRequest'],
+    }),
     }),
   });
   
@@ -38,6 +57,8 @@ export const requestApi = apiSlice.injectEndpoints({
     useGetPendingRequestQuery,
     useGetPendingRequestDetailQuery,
     useAprroveNewRequestMutation,
-    useGetStaffApprovedRequestQuery
+    useGetStaffApprovedRequestQuery,
+    useGetRefundRequestsQuery,
+    useGetRefundRequestDetailQuery,
   } = requestApi;
   
