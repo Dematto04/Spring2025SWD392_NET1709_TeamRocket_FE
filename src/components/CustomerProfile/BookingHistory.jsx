@@ -86,7 +86,7 @@ export default function BookingHistory() {
 
   const getQueryParams = () => {
     const params = {
-      pageIndex: currentPage,
+    pageIndex: currentPage,
       pageSize: pageSize,
     };
 

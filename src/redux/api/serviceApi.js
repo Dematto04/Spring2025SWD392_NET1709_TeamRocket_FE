@@ -92,6 +92,26 @@ const serviceApi = apiSlice.injectEndpoints({
         url: "/Service/filter-options",
       }),
     }),
+    getTopServices: build.query({
+      query: (params) => ({
+        url: 'Service/gettopservices',
+        params: {
+          dayTop: params.dayTop,
+          weekTop: params.weekTop,
+          yearTop: params.yearTop,
+          pageIndex: params.pageIndex,
+          pageSize: params.pageSize,
+          dayStart: params.dayStart,
+          monthStart: params.monthStart,
+          yearStart: params.yearStart,
+          dayEnd: params.dayEnd,
+          monthEnd: params.monthEnd,
+          yearEnd: params.yearEnd,
+          search: params.search,
+          topservice: params.topservice,
+        }
+      }),
+    }),
   }),
 });
 
@@ -109,4 +129,5 @@ export const {
   useGetMyServicesQuery,
   useGetMyServicesDetailQuery,
   useGetFilterOptionsQuery,
+  useGetTopServicesQuery,
 } = serviceApi;

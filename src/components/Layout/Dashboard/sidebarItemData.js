@@ -7,6 +7,9 @@ import {
     Wallet,
     Calendar,
     ClipboardList,
+    Users,
+    Building2,
+    List,
   } from "lucide-react";
 
 export const data = {
@@ -15,6 +18,8 @@ export const data = {
     email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
+
+  //Housekeeper routes
   navHousekeeper: [
     {
       title: "Dashboard",
@@ -53,6 +58,8 @@ export const data = {
       icon: CircleDollarSign,
     },
   ],
+
+  //Staff routes
   navStaff: [
     {
       title: "Dashboard",
@@ -61,7 +68,7 @@ export const data = {
       isActive: true,
     },
     {
-      title: "Request",
+      title: "Service Request",
       url: "/dashboard/staff/requests",
       icon: CirclePlus,
     },
@@ -69,6 +76,31 @@ export const data = {
       title: "Withdraw Request",
       url: "/dashboard/staff/withdraw-request",
       icon: ClipboardList,
+    },
+  ],
+
+  //Admin routes
+  navAdmin: [
+    {
+      title: "Dashboard",
+      url: "/dashboard/admin",
+      icon: LayoutDashboard,
+      isActive: true,
+    },
+    {
+      title: "User Management",
+      url: "/dashboard/admin/user-management",
+      icon: Users,
+    },
+    {
+      title: "Service Management",
+      url: "/dashboard/admin/service-management",
+      icon: Building2,
+    },
+    {
+      title: "Category Management",
+      url: "/dashboard/admin/category-management",
+      icon: List,
     },
   ],
 };

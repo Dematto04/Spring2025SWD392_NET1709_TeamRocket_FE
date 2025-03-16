@@ -33,7 +33,7 @@ const CusProfile = ({ selectedMenu, setSelectedMenu, profileInfo}) => {
                   selectedMenu === 'profile' ? 'text-primary font-semibold' : ''
                 }`}
               >
-                <UserRoundPen/>
+                &nbsp;<UserRoundPen/>
                 Profile
               </NavigationMenuLink>
             </NavigationMenuItem>
