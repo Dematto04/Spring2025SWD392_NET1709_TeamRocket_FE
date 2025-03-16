@@ -50,6 +50,18 @@ export const requestApi = apiSlice.injectEndpoints({
       }),
       providesTags: ['RefundRequest'],
     }),
+    // Process refund request (approve or reject)
+    processRefund: build.mutation({
+      query: ({ refundRequestId, action }) => ({
+        url: 'Wallet/processRefund',
+        method: 'POST',
+        params: { 
+          refundRequestId,
+          action
+        },
+      }),
+      invalidatesTags: ['RefundRequest'],
+    }),
     }),
   });
   
@@ -60,5 +72,6 @@ export const requestApi = apiSlice.injectEndpoints({
     useGetStaffApprovedRequestQuery,
     useGetRefundRequestsQuery,
     useGetRefundRequestDetailQuery,
+    useProcessRefundMutation,
   } = requestApi;
   
