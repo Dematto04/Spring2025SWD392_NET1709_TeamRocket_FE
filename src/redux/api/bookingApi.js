@@ -46,6 +46,26 @@ export const bookingApi = apiSlice.injectEndpoints({
       }),
       providesTags: ['Booking']
     }),
+    cancelBooking: build.mutation({
+      query: (bookingId) => ({
+        url: `Booking/cancelBooking`,
+        method: 'DELETE',
+        params: { bookingId },
+      }),
+      invalidatesTags: ['Booking'],
+    }),
+    sendRefundRequest: build.mutation({
+      query: ({ bookingId, proofOfPayment, reason }) => ({
+        url: `Wallet/sendRefundRequest`,
+        method: 'POST',
+        params: { 
+          bookingId,
+          ProofOfPayment: proofOfPayment,
+          Reason: reason 
+        },
+      }),
+      invalidatesTags: ['Booking'],
+    }),
   }),
 });
   
@@ -54,5 +74,7 @@ export const {
   useGetBookingDetailQuery,
   useGetBookingCountHouseKeeperQuery,
   useGetBookingCountHousekeeperQuery,
+  useCancelBookingMutation,
+  useSendRefundRequestMutation,
 } = bookingApi;
   

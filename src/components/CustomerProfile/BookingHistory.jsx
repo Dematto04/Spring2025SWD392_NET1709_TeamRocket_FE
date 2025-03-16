@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { format } from 'date-fns';
-import { useGetBookingHistoryQuery, useGetBookingDetailQuery } from '@/redux/api/bookingApi';
+import { useGetBookingHistoryQuery, useGetBookingDetailQuery, useCancelBookingMutation, useSendRefundRequestMutation } from '@/redux/api/bookingApi';
 import { useCreateRatingMutation } from '@/redux/api/ratingApi';
 import { Button } from '../ui/button';
 import { 
@@ -12,8 +12,6 @@ import {
   Timer,
   ChevronLeft,
   ChevronRight,
-  Mail,
-  Phone,
   User,
   CreditCard,
   CheckCircle2,
@@ -23,7 +21,8 @@ import {
   Plus,
   DollarSign,
   Calendar as CalendarIcon,
-  Search
+  Search,
+  RefreshCcw
 } from 'lucide-react';
 import {
   Dialog,
@@ -57,6 +56,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
+import DragAndDropUpload from '@/components/DragAndDropUpload';
 
 function Badge({ children, variant }) {
   const baseClasses = "inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold";
@@ -82,6 +82,13 @@ export default function BookingHistory() {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedDate, setSelectedDate] = useState(null);
+  const [cancelBookingId, setCancelBookingId] = useState(null);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [refundBookingId, setRefundBookingId] = useState(null);
+  const [isRefundModalOpen, setIsRefundModalOpen] = useState(false);
+  const [refundReason, setRefundReason] = useState('');
+  const [proofOfPaymentFiles, setProofOfPaymentFiles] = useState([]);
+  const [imagePreview, setImagePreview] = useState(null);
   const pageSize = 5;
 
   const getQueryParams = () => {
@@ -112,6 +119,10 @@ export default function BookingHistory() {
     selectedBookingId,
     { skip: !selectedBookingId }
   );
+
+  const [cancelBooking, { isLoading: isCanceling }] = useCancelBookingMutation();
+
+  const [sendRefundRequest, { isLoading: isRefunding }] = useSendRefundRequestMutation();
 
   const handleRatingClick = (booking) => {
     setSelectedBooking(booking);
@@ -149,7 +160,7 @@ export default function BookingHistory() {
         return 'bg-green-100 text-green-800';
       case 'OnGoing':
         return 'bg-blue-100 text-blue-800';
-      case 'Cancelled':
+      case 'Canceled':
         return 'bg-red-100 text-red-800';
       default:
         return 'bg-gray-100 text-gray-800';
@@ -166,6 +177,90 @@ export default function BookingHistory() {
   const handleBookingClick = (bookingId) => {
     setSelectedBookingId(bookingId);
     setIsDetailModalOpen(true);
+  };
+
+  const handleCancelBooking = async () => {
+    if (!cancelBookingId) return;
+    
+    try {
+      await cancelBooking(cancelBookingId).unwrap();
+      
+      toast({
+        title: "Booking Canceled",
+        description: "Your booking has been successfully canceled.",
+      });
+      
+      setIsCancelModalOpen(false);
+      setCancelBookingId(null);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.data?.message || "Failed to cancel booking. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+  
+  const openCancelModal = (e, bookingId) => {
+    e.stopPropagation();
+    setCancelBookingId(bookingId);
+    setIsCancelModalOpen(true);
+  };
+
+  const handleRefundRequest = async () => {
+    if (!refundBookingId || !refundReason || proofOfPaymentFiles.length === 0) {
+      toast({
+        title: "Missing Information",
+        description: "Please provide all required information for the refund request.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    try {
+      await sendRefundRequest({
+        bookingId: refundBookingId,
+        proofOfPayment: proofOfPaymentFiles[0],
+        reason: refundReason
+      }).unwrap();
+      
+      toast({
+        title: "Refund Requested",
+        description: "Your refund request has been submitted successfully.",
+      });
+      
+      setIsRefundModalOpen(false);
+      setRefundBookingId(null);
+      setRefundReason('');
+      setProofOfPaymentFiles([]);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.data?.message || "Failed to submit refund request. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+  
+  const openRefundModal = (e, bookingId) => {
+    e.stopPropagation();
+    setRefundBookingId(bookingId);
+    setRefundReason('');
+    setProofOfPaymentFiles([]);
+    setIsRefundModalOpen(true);
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+      
+      setProofOfPaymentFiles([URL.createObjectURL(file)]);
+    }
   };
 
   const BookingDetailModal = () => {
@@ -409,8 +504,10 @@ export default function BookingHistory() {
     { value: "Recently", label: "Recently" },
     { value: "Completed", label: "Completed" },
     { value: "OnGoing", label: "On Going" },
-    { value: "Cancelled", label: "Cancelled" },
+    { value: "Canceled", label: "Canceled" },
     { value: "Refunded", label: "Refunded" },
+    { value: "OnRefunding", label: "On Refunding" },
+    { value: "RefundRejected", label: "Refund Rejected" },
   ];
 
   // Handle filter changes
@@ -616,18 +713,43 @@ export default function BookingHistory() {
                             <div className="text-2xl font-bold text-primary">
                               {formatPrice(booking.totalPrice)}
               </div>
-                            {booking.status === 'Completed' && !booking.isRating && (
+                            <div className="flex flex-col gap-2">
+                              {booking.status === 'Completed' && !booking.isRating && (
+                                <Button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRatingClick(booking);
+                                  }}
+                                  className="bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+                                >
+                                  <Star className="w-4 h-4 mr-2" />
+                                  Rate Service
+                                </Button>
+                              )}
+                              
+                              {booking.status === 'OnGoing' && booking.isCancelable && (
                   <Button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleRatingClick(booking);
-                                }}
-                                className="bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
-                              >
-                                <Star className="w-4 h-4 mr-2" />
-                                Rate Service
+                                  onClick={(e) => openCancelModal(e, booking.bookingId)}
+                    variant="destructive"
+                                  className="transition-colors"
+                                  size="sm"
+                  >
+                                  <XCircle className="w-4 h-4 mr-2" />
+                                  Cancel Booking
                   </Button>
                 )}
+                              {booking.status === 'Completed' && (
+                                <Button
+                                  onClick={(e) => openRefundModal(e, booking.bookingId)}
+                                  variant="outline"
+                                  className="border-purple-500 text-purple-600 hover:bg-purple-50"
+                                  size="sm"
+                                >
+                                  <RefreshCcw className="w-4 h-4 mr-2" />
+                                  Request Refund
+                                </Button>
+                              )}
+                            </div>
                           </div>
               </div>
             </CardContent>
@@ -739,6 +861,121 @@ export default function BookingHistory() {
                 </span>
               ) : (
                 "Submit Review"
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Cancel Confirmation Modal */}
+      <Dialog open={isCancelModalOpen} onOpenChange={setIsCancelModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-red-600">Cancel Booking</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to cancel this booking? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-muted-foreground">
+              Canceling a booking may be subject to your service provider's cancellation policy. 
+              You may receive a partial refund depending on how close the cancellation is to the scheduled service time.
+            </p>
+          </div>
+          <div className="flex justify-end gap-4">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsCancelModalOpen(false);
+                setCancelBookingId(null);
+              }}
+              disabled={isCanceling}
+            >
+              Keep Booking
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleCancelBooking}
+              disabled={isCanceling}
+              className="min-w-[120px]"
+            >
+              {isCanceling ? (
+                <span className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Canceling...
+                </span>
+              ) : (
+                "Yes, Cancel"
+              )}
+            </Button>
+                </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Refund Request Modal with DragAndDropUpload */}
+      <Dialog open={isRefundModalOpen} onOpenChange={setIsRefundModalOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-purple-600">Request Refund</DialogTitle>
+            <DialogDescription>
+              Please provide the necessary information to process your refund request.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Proof of Payment</label>
+              <DragAndDropUpload
+                files={proofOfPaymentFiles}
+                setFiles={setProofOfPaymentFiles}
+                maxFiles={1}
+                title="Drag and drop payment proof or click to upload"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Please upload a screenshot or photo of your payment receipt
+              </p>
+                </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Reason for Refund</label>
+              <Textarea
+                value={refundReason}
+                onChange={(e) => setRefundReason(e.target.value)}
+                placeholder="Please explain why you're requesting a refund..."
+                className="min-h-[100px] resize-none"
+              />
+                </div>
+            
+            <div className="bg-amber-50 p-3 rounded-md border border-amber-200">
+              <p className="text-sm text-amber-800">
+                <strong>Note:</strong> Refund requests are subject to review. You will be notified once your request has been processed.
+              </p>
+                </div>
+              </div>
+          <div className="flex justify-end gap-4">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsRefundModalOpen(false);
+                setRefundBookingId(null);
+                setRefundReason('');
+                setProofOfPaymentFiles([]);
+              }}
+              disabled={isRefunding}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleRefundRequest}
+              disabled={isRefunding || !refundReason || proofOfPaymentFiles.length === 0}
+              className="bg-purple-600 hover:bg-purple-700 min-w-[120px]"
+            >
+              {isRefunding ? (
+                <span className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Submitting...
+                </span>
+              ) : (
+                "Submit Request"
               )}
             </Button>
           </div>
