@@ -10,6 +10,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Trash2 } from "lucide-react";
 
 export default function HousekeeperDistanceRule({
   form,
@@ -21,10 +22,10 @@ export default function HousekeeperDistanceRule({
 
   useEffect(() => {
     serviceDistanceRule.forEach((rule, index) => {
-      if (index < serviceDistanceRule.length - 1) { 
+      if (index < serviceDistanceRule.length - 1) {
         form.setValue(
           `serviceDistanceRule.${index + 1}.min_distance`,
-          String(parseFloat(rule.max_distance) + 1) || 0
+          String(parseFloat(rule.max_distance)) || 0
         );
       }
     });
@@ -35,7 +36,9 @@ export default function HousekeeperDistanceRule({
     if (isValid) {
       const lastMaxDistance =
         serviceDistanceRule.length > 0
-          ? parseFloat(serviceDistanceRule[serviceDistanceRule.length - 1]?.max_distance)
+          ? parseFloat(
+              serviceDistanceRule[serviceDistanceRule.length - 1]?.max_distance
+            )
           : 0;
 
       append({
@@ -50,7 +53,7 @@ export default function HousekeeperDistanceRule({
     <>
       {fields.map((rule, index) => (
         <Card key={rule.id} className="mb-4">
-          <CardContent className="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <CardContent className="flex flex-wrap items-center gap-3 p-4">
             <FormField
               control={form.control}
               name={`serviceDistanceRule.${index}.min_distance`}
@@ -58,7 +61,7 @@ export default function HousekeeperDistanceRule({
                 <FormItem className="flex-grow">
                   <FormLabel>Min Distance</FormLabel>
                   <FormControl>
-                    <Input type="number" {...field}  />
+                    <Input type="number" readOnly={index > 0} {...field} />
                   </FormControl>
                   <FormDescription />
                   <FormMessage />
@@ -106,6 +109,14 @@ export default function HousekeeperDistanceRule({
                 </FormItem>
               )}
             />
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => remove(index)}
+              className="mt-6"
+            >
+              <Trash2 size={18} color="red" />
+            </Button>
           </CardContent>
         </Card>
       ))}

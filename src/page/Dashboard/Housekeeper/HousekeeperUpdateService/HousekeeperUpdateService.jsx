@@ -205,7 +205,13 @@ function HousekeeperUpdateService() {
         });
       });
     });
-
+    if(data.serviceDistanceRule.length === 0){
+      toast({
+        title: "Please add distance rule",
+        variant: "destructive",
+      });
+      return
+    }
     const body = {
       ...data,
       duration: data.duration,
@@ -215,7 +221,7 @@ function HousekeeperUpdateService() {
       })),
       serviceTimeSlots: temp,
     };
-    console.log({ body });
+    
     const result = await updateService({id, body});
     if (result.error) {
       toast({

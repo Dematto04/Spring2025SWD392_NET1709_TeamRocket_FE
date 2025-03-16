@@ -102,11 +102,14 @@ function CheckoutPage() {
   const [placeOrder, { isLoading: isPlacing, data: order }] =
     usePlaceOrderServiceMutation();
   const [checkout, setCheckout] = useState();
-  console.log(checkout);
+ 
   
   useEffect(() => {
     const fn = async () => {
-      if (!timeSlot?.id || !address?.addressId || !service?.serviceId) return;
+      if (!timeSlot?.id || !address?.addressId || !service?.serviceId) {
+        
+        return;
+      };
 
       const result = await getCheckoutDetail({
         timeslot_id: timeSlot?.id,
@@ -147,7 +150,7 @@ function CheckoutPage() {
       });
       return;
     }
-    dispatch(resetBooking());
+    
     window.open(result.data.url);
   };
 
@@ -161,7 +164,7 @@ function CheckoutPage() {
 
   return (
     <div className="w-full min-h-screen bg-secondary mb-48">
-      {checkout && checkout?.status !== "Pending" && <Navigate to={"/"} />}
+      {checkout && checkout?.status !== "Pending" && <Navigate to={"/checkout"} />}
       <div className="container mx-auto px-6 lg:px-16 h-full py-40">
         {isLoading || !checkout ? (
           <CheckoutSkeleton />
