@@ -89,6 +89,14 @@ const walletApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Wallet"],
     }),
+
+    getMoneyExchange: build.query({
+      query: (amount) => ({
+        url: '/Wallet/moneyExchange',
+        params: { amount }
+      }),
+      providesTags: ['MoneyExchange']
+    }),
   }), 
 });
 
@@ -97,4 +105,5 @@ export const { useGetWalletTransactionQuery,
    useGetBalanceQuery, 
    useCreateDepositPaymentMutation, 
    useProcessDepositMutation,
-   useProcessWithdrawMutation } = walletApi;
+   useProcessWithdrawMutation,
+   useGetMoneyExchangeQuery } = walletApi;

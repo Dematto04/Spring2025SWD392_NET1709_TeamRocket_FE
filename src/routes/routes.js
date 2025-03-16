@@ -1,7 +1,7 @@
 import MainLayout from "@/components/Layout/MainLayout";
 import SimpleLayout from "@/components/Layout/SimpleLayout";
 import ConfirmEmail from "@/page/ConfirmEmail";
-import DashboardAdmin from "@/page/Dashboard/DashboardAdmin";
+import DashboardAdmin from "@/page/Dashboard/Admin/DashboardAdmin";
 import DashboardStaff from "@/page/Dashboard/Staff/DashboardStaff";
 import ForgotPassword from "@/page/ForgotPassword";
 import HomePage from "@/page/HomePage";
@@ -33,7 +33,10 @@ import WithdrawRequestsPage from '@/page/Dashboard/Staff/WithdrawRequestsPage';
 import HousekeeperUpdateService from "@/page/Dashboard/Housekeeper/HousekeeperUpdateService/HousekeeperUpdateService";
 
 import HouseKeeperCalendar from "@/page/Dashboard/Housekeeper/HouseKeeperCalendar";
-
+import UserManagement from "@/page/Dashboard/Admin/userManagement";
+import ServiceManagement from "@/page/Dashboard/Admin/serviceManagement";
+import CategoryManagement from "@/page/Dashboard/Admin/categoryManagement";
+import AdminBookings from "@/page/Dashboard/Admin/adminBookings";
 const routes = [
   {
     layout: MainLayout,
@@ -178,6 +181,7 @@ const routes = [
         component: HousekeeperEarning,
         allowedRoles: ["Housekeeper"]
       },
+      //Staff routes
       {
         path: "/dashboard/staff",
         component: DashboardStaff,
@@ -197,6 +201,32 @@ const routes = [
         path: "/dashboard/staff/withdraw-request",
         component: WithdrawRequestsPage,
         allowedRoles: ["Staff"]
+      },
+      //Admin routes
+      {
+        path: "/dashboard/admin",
+        component: DashboardAdmin,
+        allowedRoles: ["Admin"]
+      },
+      {
+        path: "/dashboard/admin/user-management",
+        component: UserManagement,
+        allowedRoles: ["Admin"]
+      },
+      {
+        path: "/dashboard/admin/service-management",
+        component: ServiceManagement,
+        allowedRoles: ["Admin"]
+      },
+      {
+        path: "/dashboard/admin/category-management",
+        component: CategoryManagement,
+        allowedRoles: ["Admin"]
+      },
+      {
+        path: "/dashboard/admin/bookings/:id",
+        component: AdminBookings,
+        allowedRoles: ["Admin"]
       },
     ]
   },

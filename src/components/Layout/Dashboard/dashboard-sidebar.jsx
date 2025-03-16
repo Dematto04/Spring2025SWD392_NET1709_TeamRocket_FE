@@ -21,7 +21,18 @@ import { Link } from "react-router-dom";
 export function DashboardSidebar({ ...props }) {
   const [clickedItem, setClickedItem] = React.useState(localStorage.getItem("dashboard-item") || "Dashboard");
   const user = useSelector(selectUser);
-  const navItem = user.role === "Housekeeper" ? data.navHousekeeper : data.navStaff
+  let navItem;
+  switch(user.role){
+    case "Housekeeper":
+      navItem = data.navHousekeeper;
+      break;
+    case "Staff":
+      navItem = data.navStaff;
+      break;
+    default:
+      navItem = data.navAdmin;
+      break;
+  }
   
   const { theme } = useTheme();
 
