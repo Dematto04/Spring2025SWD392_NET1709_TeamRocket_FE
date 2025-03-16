@@ -26,13 +26,15 @@ import {
 import { Slider } from "../ui/slider";
 import { useGetFilterOptionsQuery } from "@/redux/api/serviceApi";
 import { useSearchParams } from "react-router-dom";
+import AutoComplete from "../AutoComplete";
+import { set } from "lodash";
 
 export default function Filter({ filter, setFilter }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const category = searchParams.get("category");
   const form = useForm({
     defaultValues: {
-      keyword: "",
+      search: "",
       location: "",
       prices: [0, 100],
       ratings: null,
@@ -46,7 +48,12 @@ export default function Filter({ filter, setFilter }) {
   } = useGetFilterOptionsQuery();
   const handleSubmit = (data) => {
     console.log(data);
-    setFilter(data);
+    setFilter({
+      ...data,
+      userPlaceId: data.location,
+    });
+  
+
   };
   useEffect(() => {
     if (isSuccess) {
@@ -59,7 +66,7 @@ export default function Filter({ filter, setFilter }) {
   }, [isSuccess]);
   useEffect(() => {
     form.reset({
-      keyword: "",
+      search: "",
       location: "",
       prices: [filterOptions?.data?.minPrice, filterOptions?.data?.maxPrice],
       ratings: null,
@@ -68,13 +75,13 @@ export default function Filter({ filter, setFilter }) {
   }, [searchParams]);
   const resetFilter = () => {
     form.reset({
-      keyword: "",
+      search: "",
       location: "",
       prices: [filterOptions?.data?.minPrice, filterOptions?.data?.maxPrice],
       ratings: null,
       categoryIds: category ? [category] : [],
     });
-    setSearchParams({});
+
   };
   return (
     isSuccess && (
@@ -97,14 +104,14 @@ export default function Filter({ filter, setFilter }) {
           {/* filter search */}
           <FormField
             control={form.control}
-            name="keyword"
+            name="search"
             render={({ field }) => (
               <FormItem>
-                <FormLabel htmlFor="keyword">Search by keyword</FormLabel>
+                <FormLabel htmlFor="search">Search by search</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
-                    id="keyword"
+                    id="search"
                     placeholder="What are you looking for?"
                     className="h-11"
                   />
@@ -180,12 +187,7 @@ export default function Filter({ filter, setFilter }) {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input
-                          {...field}
-                          id="location"
-                          placeholder="What are you looking for?"
-                          className="h-11 focus-visible:ring-transparent"
-                        />
+                        <AutoComplete form={form} />
                       </FormControl>
 
                       <FormMessage />
