@@ -80,7 +80,7 @@ export function NavbarUser({ user, onSignOut }) {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <UserDropDown role={user.role} />
+        <UserDropDown role={user?.role} />
 
         <DropdownMenuSeparator />
 

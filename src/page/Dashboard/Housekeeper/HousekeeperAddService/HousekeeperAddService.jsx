@@ -185,6 +185,13 @@ function HousekeeperAddService() {
       serviceTimeSlots: temp,
     };
     console.log({ body });
+    if (data.serviceDistanceRule.length === 0) {
+      toast({
+        title: "Please add distance rule",
+        variant: "destructive",
+      });
+      return;
+    }
     const result = await createService(body);
     if (result.error) {
       toast({
