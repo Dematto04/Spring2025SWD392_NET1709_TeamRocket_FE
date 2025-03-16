@@ -118,6 +118,11 @@ function HousekeeperMyService() {
           <PaginationLink
             onClick={() => handlePageChange(i)}
             isActive={page === i}
+            style={{
+              backgroundColor: page === i ? "#2563EB" : "transparent",
+              color: page === i ? "#fff" : "#000",
+              cursor: "pointer",
+            }}
           >
             {i}
           </PaginationLink>
@@ -150,6 +155,9 @@ function HousekeeperMyService() {
             <PaginationPrevious
               onClick={() => handlePageChange(page - 1)}
               disabled={page === 1}
+              style={{
+                cursor: page === 1 ? "not-allowed" : "pointer",
+              }}
             />
           </PaginationItem>
           {pages}
@@ -157,6 +165,9 @@ function HousekeeperMyService() {
             <PaginationNext
               onClick={() => handlePageChange(page + 1)}
               disabled={page === totalPages}
+              style={{
+                cursor: page === totalPages ? "not-allowed" : "pointer",
+              }}
             />
           </PaginationItem>
         </PaginationContent>
