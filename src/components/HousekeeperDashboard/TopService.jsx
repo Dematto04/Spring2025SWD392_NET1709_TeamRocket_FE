@@ -1,11 +1,21 @@
 import React, { useState } from 'react';
 import { useGetTopServicesQuery } from '@/redux/api/serviceApi';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, 
+  CardContent, 
+  CardHeader, 
+  CardTitle, 
+  CardDescription } from "@/components/ui/card";
+import { Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Popover, 
+  PopoverContent, 
+  PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { Activity, Calendar as Calendar1Icon } from "lucide-react";
+import { Activity, Calendar as Calendar1Icon, Trophy, Medal, Award, Star } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -56,10 +66,53 @@ export default function TopService() {
     }));
   };
 
+  // Function to get rank styling
+  const getRankStyle = (index) => {
+    switch(index) {
+      case 0:
+        return {
+          icon: <Trophy className="h-5 w-5 text-yellow-500" />,
+          background: 'bg-yellow-50',
+          border: 'border-yellow-200',
+          hover: 'hover:bg-yellow-100',
+          text: 'text-yellow-700'
+        };
+      case 1:
+        return {
+          icon: <Medal className="h-5 w-5 text-gray-400" />,
+          background: 'bg-gray-50',
+          border: 'border-gray-200',
+          hover: 'hover:bg-gray-100',
+          text: 'text-gray-700'
+        };
+      case 2:
+        return {
+          icon: <Award className="h-5 w-5 text-amber-600" />,
+          background: 'bg-amber-50',
+          border: 'border-amber-200',
+          hover: 'hover:bg-amber-100',
+          text: 'text-amber-700'
+        };
+      default:
+        return {
+          icon: <Star className="h-4 w-4 text-blue-400" />,
+          background: 'bg-white',
+          border: 'border-gray-100',
+          hover: 'hover:bg-gray-50',
+          text: 'text-gray-600'
+        };
+    }
+  };
+
   return (
     <Card className="h-full">
       <CardHeader className="pb-2">
         <div className="flex flex-col space-y-1.5">
+          <CardTitle className="flex items-center gap-2 text-xl">
+            <Trophy className="h-6 w-6 text-yellow-500" />
+            Service Rankings
+          </CardTitle>
+          <CardDescription>Top performing services by revenue</CardDescription>
           <CardTitle className="flex items-center gap-2">
             <Activity className="h-5 w-5 text-primary" />
             Top Services
