@@ -22,7 +22,7 @@ const housekeeperRegisterFormSchema = {
     fullName: z.string().min(1, "Full name is required"),
     dob: z.string().min(1, "Date of birth is required"),
     phone: z.string().min(1, "Phone number is required"),
-    address: z.string().min(1, "Address is required"),
+    location: z.string().min(1, "Address is required"),
     services: z.array(z.string()).refine((value) => value.some((item) => item), {
       message: "You have to select at least one item.",
     }),

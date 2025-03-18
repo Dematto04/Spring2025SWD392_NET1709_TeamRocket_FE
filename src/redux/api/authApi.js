@@ -58,6 +58,13 @@ export const authApi = apiSlice.injectEndpoints({
         body,
       }),
     }),
+    housekeeperRegister: build.mutation({
+      query: (body) => ({
+        url: "/Authentication/register/housekeeper",
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
@@ -68,5 +75,6 @@ export const {
   useRefreshTokenMutation,
   useResendEmailMutation,
   useForgotPasswordMutation,
-  useResetPasswordMutation
+  useResetPasswordMutation,
+  useHousekeeperRegisterMutation,
 } = authApi;

@@ -43,6 +43,9 @@ export const selectUser = (state) => {
 export const selectRegisterProfile = (state) => {
   return state.housekeeperRegisterProfile.profile;
 };
+export const selectEmail = (state) => {
+  return state.housekeeperRegister.email;
+};
 export const { housekeeperRegister } = housekeeperRegisterSlice.actions;
 export const { registerCV, registerProfile } =
   housekeeperRegisterProfileSlice.actions;
