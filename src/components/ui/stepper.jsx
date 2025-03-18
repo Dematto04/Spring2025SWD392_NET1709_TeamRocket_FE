@@ -76,9 +76,9 @@ export function StepperExample({
         <Button
           type="submit"
           onClick={handlePrev}
-          disabled={currentStep === 0}
+          disabled={currentStep === 0}  
           variant="outline"
-          className="w-full sm:w-auto"
+          className={`w-full sm:w-auto ${currentStep === steps.length - 1 ? "hidden" : ""}`}
         >
           Previous
         </Button>

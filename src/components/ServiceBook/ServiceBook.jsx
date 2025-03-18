@@ -60,7 +60,7 @@ function ServiceBook({ step, setStep }) {
         isDefault: false,
         title: "Home",
       };
-      console.log({ body });
+
       dispatch(
         addAddress({
           addressId: form.getValues("addressId"),

@@ -6,7 +6,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 function ServiceDetailOverview({ overview, additionalServices }) {
-  console.log(additionalServices);
 
   return (
     <>

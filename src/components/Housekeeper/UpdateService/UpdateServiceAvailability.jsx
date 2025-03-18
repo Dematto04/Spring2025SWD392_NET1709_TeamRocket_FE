@@ -18,7 +18,6 @@ import { useFieldArray } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
 
 function UpdateServiceAvailability({ form, dateOfWeek }) {
-  console.log(form.watch("serviceTimeSlots"));
 
   const handleAppend = (append) => {
     const isFilledDuration = form.getValues("duration");

@@ -58,6 +58,9 @@ export const UserDropDown = ({ role }) => {
   }
 };
 export function NavbarUser({ user, onSignOut }) {
+  console.log({user});
+  
+  
   const [isOpen, setIsOpen] = useState(false);
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>

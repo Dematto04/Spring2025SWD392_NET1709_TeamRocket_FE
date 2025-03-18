@@ -76,7 +76,6 @@ export function LoginForm() {
     }
     const account = result.data;
     const userData = jwtDecode(account.accessToken);
-    console.log(jwtDecode(account.accessToken));
     localStorage.setItem("accessToken", account.accessToken);
     localStorage.setItem("refreshToken", account.refreshToken);
     toast({
@@ -106,7 +105,6 @@ export function LoginForm() {
     loginWithGoogle();
   };
   const handleConfirmEmail = async () => {
-    console.log(email);
     const result = await resendEmail({ email });
     if (result.error) {
       console.log(result.error);

@@ -25,7 +25,6 @@ export function SidebarUser({ user }) {
   const { isMobile } = useSidebar();
   const dispatch = useDispatch();
   const nav = useNavigate();
-  console.log(user);
 
   const handleLogout = () => {
     dispatch(logout());
