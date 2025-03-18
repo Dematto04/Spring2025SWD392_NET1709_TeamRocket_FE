@@ -111,10 +111,8 @@ const AddressList = () => {
           id: selectedAddress.id,
           ...payload,
         }).unwrap();
-        console.log("Address updated successfully!");
       } else {
         await addAddress(payload).unwrap();
-        console.log("Address added successfully!");
       }
       setIsFormOpen(false);
       setSelectedAddress(null);

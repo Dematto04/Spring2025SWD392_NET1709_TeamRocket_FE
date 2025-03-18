@@ -39,7 +39,7 @@ const TimeSlotGrid = ({
     );
   }
 
-  console.log(selectedSlot);
+  
 
   return (
     <div className="grid grid-cols-3 gap-3">
@@ -92,7 +92,7 @@ function ServiceDateTime() {
 
   const handleSelectDate = async (selectedDate) => {
     if (!selectedDate) return;
-    console.log({ selectedDate });
+
 
     const utcDate = new Date(
       Date.UTC(
@@ -111,7 +111,7 @@ function ServiceDateTime() {
       targetDate: formattedDate,
       dayOfWeek: dayOfWeek,
     });
-    console.log({ response });
+
 
     if (response?.data?.data?.length === 0) {
       setSelectedDate(null);

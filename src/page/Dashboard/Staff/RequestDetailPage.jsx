@@ -9,7 +9,7 @@ import { useParams } from "react-router-dom";
 function RequestDetailPage() {
   const { id } = useParams();
   const { data, isLoading } = useGetPendingRequestDetailQuery(id);
-  console.log({ service: data });
+
 
   if (isLoading) return null;
   return (

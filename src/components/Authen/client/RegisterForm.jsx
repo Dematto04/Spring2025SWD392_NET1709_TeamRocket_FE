@@ -73,7 +73,6 @@ function RegisterForm() {
       }
       return;
     }
-    console.log(result);
     setOpen(true);
   };
 

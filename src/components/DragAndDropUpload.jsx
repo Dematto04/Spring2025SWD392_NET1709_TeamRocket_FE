@@ -15,7 +15,6 @@ const DragAndDropUpload = ({
     accept: { "image/*": [] },
     onDrop: async (acceptedFiles) => {
       if (acceptedFiles.length === 0) {
-        console.log("No files selected");
         return;
       }
       if (acceptedFiles.length > maxFiles) {
