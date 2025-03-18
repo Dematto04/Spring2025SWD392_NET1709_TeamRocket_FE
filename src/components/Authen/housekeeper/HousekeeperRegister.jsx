@@ -18,7 +18,8 @@ import HousekeeperUploadForm from "./HousekeeperUploadForm";
 import HousekeeperRegisterComplete from "./HousekeeperRegisterComplete";
 import HousekeeperWelcome from "./HousekeeperWelcome";
 import { login } from "@/redux/features/authSlice";
-
+import { toast } from "@/hooks/use-toast";
+import { useHousekeeperRegisterMutation } from "@/redux/api/authApi";
 const HousekeeperRegister = () => {
   const profile = useSelector(selectRegisterProfile);
   const [idFront, setIdFront] = useState(profile?.cv?.idFront || null);
@@ -26,6 +27,8 @@ const HousekeeperRegister = () => {
   const [cv, setCv] = useState(profile?.cv?.cv || null);
   const dispatch = useDispatch();
   const nav = useNavigate();
+  const [housekeeperRegisterMutation, { isSuccess: isRegisterSuccess }] =
+    useHousekeeperRegisterMutation();
 
   const registerForm = useForm({
     resolver: zodResolver(schema.register),
@@ -43,9 +46,15 @@ const HousekeeperRegister = () => {
       dob: profile?.dob || "",
       phone: profile?.phone || "",
       address: profile?.address || "",
-      services: profile?.services || [],
+      services: [],
       workingTime: profile?.workingTime || "",
       salary: profile?.salary || "",
+      location: profile?.location || "",
+      place_id: "",
+      district: "",
+      address_line: "",
+      city: "",
+      title: "Home",
     },
   });
   const steps = [
@@ -108,22 +117,68 @@ const HousekeeperRegister = () => {
           fullName: selfForm.getValues("fullName"),
           dob: selfForm.getValues("dob"),
           phone: selfForm.getValues("phone"),
-          address: selfForm.getValues("address"),
           services: selfForm.getValues("services"),
           workingTime: selfForm.getValues("workingTime"),
           salary: selfForm.getValues("salary"),
+          location: selfForm.getValues("location"),
+          place_id: selfForm.getValues("place_id"),
+          district: selfForm.getValues("district"),
+          city: selfForm.getValues("city"),
+          title: selfForm.getValues("title"),
+          address_line: selfForm.getValues("address_line"),
         })
       );
+      console.log({
+        fullName: selfForm.getValues("fullName"),
+        dob: selfForm.getValues("dob"),
+        phone: selfForm.getValues("phone"),
+        services: selfForm.getValues("services"),
+        workingTime: selfForm.getValues("workingTime"),
+        salary: selfForm.getValues("salary"),
+        location: selfForm.getValues("location"),
+        place_id: selfForm.getValues("place_id"),
+        district: selfForm.getValues("district"),
+        city: selfForm.getValues("city"),
+        title: selfForm.getValues("title"),
+      });
+
       return isValid;
     },
     //cv
     async () => {
-      // if (!cv || !idFront || !idBack) return false;
+      if (!cv || !idFront || !idBack) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Please upload all required files",
+          duration: 3000,
+        });
+        return false;
+      }
       return true;
     },
     // review cv
-
     async () => {
+      const res = await housekeeperRegisterMutation({
+        full_name: selfForm.getValues("fullName"),
+        email: registerForm.getValues("email"),
+        phone_number: selfForm.getValues("phone"),
+        password: registerForm.getValues("password"),
+        confirm_password: registerForm.getValues("confirmPassword"),
+        certificate_picture: cv,
+        id_card_front: idFront,
+        id_card_back: idBack,
+        housekeeper_categories: selfForm.getValues("services"),
+        housekeeper_address_line: selfForm.getValues("address_line"),
+        housekeeper_city: selfForm.getValues("city"),
+        housekeeper_place_id: selfForm.getValues("place_id"),
+        housekeeper_district: selfForm.getValues("district"),
+        housekeeper_address_title: selfForm.getValues("title"),
+      });
+      if(res.error){
+        return false
+      }
+
       return true;
     },
     // review complete
