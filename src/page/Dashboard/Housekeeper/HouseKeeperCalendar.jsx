@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ChevronLeft,
   ChevronRight,
@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, 
-  startOfWeek, endOfWeek, addDays, parseISO, setHours, setMinutes, addHours } from 'date-fns';
+  startOfWeek, endOfWeek, addDays, parseISO, setHours } from 'date-fns';
 import { cn } from '@/lib/utils';
 import {
   Dialog,
@@ -20,46 +20,95 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { mockBookings } from './mockCalendarData';
+import { useGetBookingCalendarQuery } from '@/redux/api/serviceApi';
 
 function HouseKeeperCalendar() {
-  const [currentDate, setCurrentDate] = useState(new Date(2024, 2, 1));
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [view, setView] = useState('month');
+  const [navigationMode, setNavigationMode] = useState('today');
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [selectedDateBookings, setSelectedDateBookings] = useState(null);
 
+  // Map view state to API viewMode
+  const viewModeMap = {
+    month: 'Month',
+    week: 'Week',
+    day: 'Day'
+  };
+
+  // Format Date to ISO 8601 string (e.g., "2025-03-12T13:55:41.420Z")
+  const formatToISO = (date) => date.toISOString();
+
+  // Fetch bookings from API
+  const { data, isLoading } = useGetBookingCalendarQuery({
+    referenceDate: formatToISO(currentDate),
+    navigationMode: navigationMode,
+    viewMode: viewModeMap[view]
+  });
+
+  const bookingsData = data?.data?.days || [];
+
+  // Update currentDate based on API response
+  useEffect(() => {
+    if (data?.data?.days?.length) {
+      const firstDay = parseISO(data.data.days[0].date);
+      if (navigationMode === 'next') {
+        setCurrentDate(view === 'month' ? addMonths(currentDate, 1) :
+                       view === 'week' ? addDays(currentDate, 7) :
+                       addDays(currentDate, 1));
+      } else if (navigationMode === 'previous') {
+        setCurrentDate(view === 'month' ? subMonths(currentDate, 1) :
+                       view === 'week' ? addDays(currentDate, -7) :
+                       addDays(currentDate, -1));
+      }
+      // Reset navigationMode to 'today' after updating currentDate
+      setNavigationMode('today');
+    }
+  }, [data, navigationMode, view]);
+
+  useEffect(() => {
+    // Reset navigationMode to 'today' when view changes
+    setNavigationMode('today');
+  }, [view]);
+
   const getBookingsForDate = (date) => {
     const dateStr = format(date, 'yyyy-MM-dd');
-    return mockBookings.filter(booking => booking.date === dateStr);
+    const dayData = bookingsData.find(day => format(parseISO(day.date), 'yyyy-MM-dd') === dateStr);
+    return dayData?.bookings.map(booking => ({
+      id: booking.id,
+      date: format(parseISO(booking.preferDateStart), 'yyyy-MM-dd'),
+      timeStart: booking.timeStart.slice(0, 5), // Trim to HH:mm
+      timeEnd: booking.timeEnd.slice(0, 5),   // Trim to HH:mm
+      serviceName: booking.serviceName,
+      status: 'pending', // API doesn't provide status, assuming pending as default
+      customer: {
+        name: booking.customerName,
+        avatar: '', // Add logic if API provides avatar
+        phone: ''   // Add if API provides phone
+      },
+      location: booking.address,
+      price: booking.totalPrice,
+      note: '' // Add if API provides notes
+    })) || [];
   };
 
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
-      case 'completed':
-        return 'bg-green-500';
-      case 'pending':
-        return 'bg-pink-500';
-      case 'cancelled':
-        return 'bg-red-500';
-      case 'in_progress':
-        return 'bg-blue-500';
-      default:
-        return 'bg-gray-500';
+      case 'completed': return 'bg-green-500';
+      case 'pending': return 'bg-pink-500';
+      case 'cancelled': return 'bg-red-500';
+      case 'in_progress': return 'bg-blue-500';
+      default: return 'bg-gray-500';
     }
   };
 
   const getStatusBadgeVariant = (status) => {
     switch (status.toLowerCase()) {
-      case 'completed':
-        return 'success';
-      case 'pending':
-        return 'secondary';
-      case 'cancelled':
-        return 'destructive';
-      case 'in_progress':
-        return 'default';
-      default:
-        return 'secondary';
+      case 'completed': return 'success';
+      case 'pending': return 'secondary';
+      case 'cancelled': return 'destructive';
+      case 'in_progress': return 'default';
+      default: return 'secondary';
     }
   };
 
@@ -74,7 +123,7 @@ function HouseKeeperCalendar() {
 
     return (
       <div className={cn("mt-1 space-y-1", isWeekView && "ml-16")}>
-        {visibleBookings.map((booking, index) => (
+        {visibleBookings.map((booking) => (
           <div
             key={booking.id}
             className={cn(
@@ -103,7 +152,7 @@ function HouseKeeperCalendar() {
               e.stopPropagation();
               setSelectedDateBookings({ 
                 date: format(date, 'yyyy-MM-dd'),
-                bookings: bookings,
+                bookings,
                 formattedDate: format(date, 'MMMM d, yyyy')
               });
             }}
@@ -189,7 +238,6 @@ function HouseKeeperCalendar() {
           const timeSlot = setHours(currentDate, hour);
           const slotBookings = dayBookings.filter(booking => {
             const bookingStart = parseISO(`${booking.date}T${booking.timeStart}`);
-            const bookingEnd = parseISO(`${booking.date}T${booking.timeEnd}`);
             return format(bookingStart, 'H') === format(timeSlot, 'H');
           });
 
@@ -226,32 +274,20 @@ function HouseKeeperCalendar() {
   };
 
   const previousPeriod = () => {
-    switch (view) {
-      case 'month':
-        setCurrentDate(subMonths(currentDate, 1));
-        break;
-      case 'week':
-        setCurrentDate(addDays(currentDate, -7));
-        break;
-      case 'day':
-        setCurrentDate(addDays(currentDate, -1));
-        break;
-    }
+    setNavigationMode('previous'); // Set navigationMode first to trigger API call
   };
 
   const nextPeriod = () => {
-    switch (view) {
-      case 'month':
-        setCurrentDate(addMonths(currentDate, 1));
-        break;
-      case 'week':
-        setCurrentDate(addDays(currentDate, 7));
-        break;
-      case 'day':
-        setCurrentDate(addDays(currentDate, 1));
-        break;
-    }
+    setNavigationMode('next'); // Set navigationMode first to trigger API call
   };
+
+  const goToToday = () => {
+    const today = new Date();
+    setCurrentDate(today);
+    setNavigationMode('today');
+  };
+
+  if (isLoading) return <div>Loading...</div>;
 
   return (
     <div className="p-4">
@@ -260,33 +296,19 @@ function HouseKeeperCalendar() {
         
         <div className="flex items-center gap-2">
           <div className="flex">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={previousPeriod}
-            >
+            <Button variant="outline" size="icon" onClick={previousPeriod}>
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <Button
-              variant="outline"
-              className="mx-2"
-              onClick={() => setCurrentDate(new Date())}
-            >
+            <Button variant="outline" className="mx-2" onClick={goToToday}>
               today
             </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={nextPeriod}
-            >
+            <Button variant="outline" size="icon" onClick={nextPeriod}>
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
 
           <h2 className="text-xl font-semibold mx-4">
-            {view === 'month' && format(currentDate, 'MMMM yyyy')}
-            {view === 'week' && `Week of ${format(startOfWeek(currentDate), 'MMM d')} - ${format(endOfWeek(currentDate), 'MMM d, yyyy')}`}
-            {view === 'day' && format(currentDate, 'EEEE, MMMM d, yyyy')}
+            {data?.data?.displayRange || format(currentDate, 'MMMM yyyy')}
           </h2>
 
           <div className="flex rounded-md shadow-sm">
@@ -320,10 +342,7 @@ function HouseKeeperCalendar() {
           <>
             <div className="grid grid-cols-7 gap-px bg-gray-200">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                <div
-                  key={day}
-                  className="bg-white p-2 text-center text-sm font-semibold"
-                >
+                <div key={day} className="bg-white p-2 text-center text-sm font-semibold">
                   {day}
                 </div>
               ))}
@@ -373,7 +392,7 @@ function HouseKeeperCalendar() {
                   </Avatar>
                   <div>
                     <div className="font-medium">{selectedBooking.customer.name}</div>
-                    <div className="text-sm text-gray-600">{selectedBooking.customer.phone}</div>
+                    <div className="text-sm text-gray-600">{selectedBooking.customer.phone || 'N/A'}</div>
                   </div>
                 </div>
 
@@ -450,4 +469,4 @@ function HouseKeeperCalendar() {
   );
 }
 
-export default HouseKeeperCalendar; 
+export default HouseKeeperCalendar;

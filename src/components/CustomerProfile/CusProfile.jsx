@@ -101,50 +101,6 @@ const CusProfile = ({ selectedMenu, setSelectedMenu, profileInfo}) => {
           </NavigationMenuList>
         </NavigationMenu>
       </CardContent>
-      <Separator className="my-4" />
-      <CardContent>
-        <h3 className="text-lg font-semibold mb-2">Settings</h3>
-        <NavigationMenu>
-          <NavigationMenuList className="flex flex-col space-y-2">
-            <NavigationMenuItem>
-              <NavigationMenuLink
-                href="#profile-settings"
-                onClick={() => setSelectedMenu('profile-settings')}
-                className={`text-sm ${
-                  selectedMenu === 'profile-settings' ? 'text-primary font-semibold' : ''
-                }`}
-              >
-                Profile Settings
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink
-                href="#security-settings"
-                onClick={() => setSelectedMenu('security-settings')}
-                className={`text-sm ${
-                  selectedMenu === 'security-settings' ? 'text-primary font-semibold' : ''
-                }`}
-              >
-                Security Settings
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink
-                href="#delete-account"
-                onClick={() => setSelectedMenu('delete-account')}
-                className={`text-sm ${
-                  selectedMenu === 'delete-account' ? 'text-primary font-semibold' : ''
-                }`}
-              >
-                Delete Account
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
-      </CardContent>
-      <CardFooter className="flex justify-center">
-        <Button variant="destructive">Logout</Button>
-      </CardFooter>
     </Card>
   );
 };

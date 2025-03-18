@@ -30,6 +30,7 @@ function HousekeeperWelcome() {
       <h1 className="relative z-10 text-3xl font-bold text-primary">
         Thanks for apply in Purrfect Clean! 🎉
       </h1>
+      <h2>Please check your email to comfirm email!</h2>
       <h1 className="relative z-10 text-2xl font-bold mt-6 ">
         Staff will annouce u soon!
       </h1>
