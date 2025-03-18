@@ -39,8 +39,8 @@ import CategoryManagement from "@/page/Dashboard/Admin/categoryManagement";
 import AdminBookings from "@/page/Dashboard/Admin/adminBookings";
 import RefundRequestPage from "@/page/Dashboard/Staff/refundRequestPage";
 import RefundRequestDetail from "@/page/Dashboard/Staff/refundRequestDetail";
-import RegisterApprovePage from "@/page/dashboard/Staff/RegisterApprovePage";
-import RegisterApproveDetail from "@/page/dashboard/Staff/RegisterApproveDetail";
+import RegisterApprovePage from "@/page/Dashboard/Staff/RegisterApprovePage";
+import RegisterApproveDetail from "@/page/Dashboard/Staff/RegisterApproveDetail";
 
 
 const routes = [
