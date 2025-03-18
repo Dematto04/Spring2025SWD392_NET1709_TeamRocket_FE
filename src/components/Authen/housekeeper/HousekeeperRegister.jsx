@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   housekeeperRegister,
   registerProfile,
+  resetRegisterProfile,
   selectRegisterProfile,
 } from "@/redux/features/housekeeperRegisterSlice";
 import HousekeeperSelfForm from "./HousekeeperSelfForm";
@@ -19,7 +20,7 @@ import HousekeeperRegisterComplete from "./HousekeeperRegisterComplete";
 import HousekeeperWelcome from "./HousekeeperWelcome";
 import { login } from "@/redux/features/authSlice";
 import { toast } from "@/hooks/use-toast";
-import { useHousekeeperRegisterMutation } from "@/redux/api/authApi";
+import { useCheckEmailMutation, useHousekeeperRegisterMutation } from "@/redux/api/authApi";
 const HousekeeperRegister = () => {
   const profile = useSelector(selectRegisterProfile);
   const [idFront, setIdFront] = useState(profile?.cv?.idFront || null);
@@ -29,6 +30,7 @@ const HousekeeperRegister = () => {
   const nav = useNavigate();
   const [housekeeperRegisterMutation, { isSuccess: isRegisterSuccess }] =
     useHousekeeperRegisterMutation();
+  const [checkEmail, { isSuccess: isCheckEmailSuccess }] = useCheckEmailMutation();
 
   const registerForm = useForm({
     resolver: zodResolver(schema.register),
@@ -99,19 +101,29 @@ const HousekeeperRegister = () => {
     async () => {
       const isValid = await registerForm.trigger();
       if (isValid) {
+        const res = await checkEmail(registerForm.getValues("email"));
+        if(res.error){
+          registerForm.setError("email", {
+            message: res.error.data.messages.Error[0] || "Email already exists",
+          });
+         
+          return false;
+        }
         dispatch(
           housekeeperRegister({
             email: registerForm.getValues("email"),
             password: registerForm.getValues("password"),
           })
         );
-        console.log("step 1");
       }
       return isValid;
     },
     //profile
     async () => {
       const isValid = await selfForm.trigger();
+      console.log(isValid);
+      
+      
       dispatch(
         registerProfile({
           fullName: selfForm.getValues("fullName"),
@@ -128,19 +140,6 @@ const HousekeeperRegister = () => {
           address_line: selfForm.getValues("address_line"),
         })
       );
-      console.log({
-        fullName: selfForm.getValues("fullName"),
-        dob: selfForm.getValues("dob"),
-        phone: selfForm.getValues("phone"),
-        services: selfForm.getValues("services"),
-        workingTime: selfForm.getValues("workingTime"),
-        salary: selfForm.getValues("salary"),
-        location: selfForm.getValues("location"),
-        place_id: selfForm.getValues("place_id"),
-        district: selfForm.getValues("district"),
-        city: selfForm.getValues("city"),
-        title: selfForm.getValues("title"),
-      });
 
       return isValid;
     },
@@ -157,7 +156,7 @@ const HousekeeperRegister = () => {
       }
       return true;
     },
-    // review cv
+    // review application
     async () => {
       const res = await housekeeperRegisterMutation({
         full_name: selfForm.getValues("fullName"),
@@ -176,14 +175,20 @@ const HousekeeperRegister = () => {
         housekeeper_address_title: selfForm.getValues("title"),
       });
       if(res.error){
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: res.error.data.messages.Validate[0] || "Invalid information",
+        });
         return false
       }
 
       return true;
     },
-    // review complete
+    // complete
     async () => {
-      dispatch(login({ email: "long" }));
+      dispatch(resetRegisterProfile());
+      
       nav("/", { replace: true });
       return true;
     },

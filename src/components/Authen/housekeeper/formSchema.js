@@ -26,8 +26,6 @@ const housekeeperRegisterFormSchema = {
     services: z.array(z.string()).refine((value) => value.some((item) => item), {
       message: "You have to select at least one item.",
     }),
-    workingTime: z.string().min(1, "Working time is required"),
-    salary: z.string().min(1, "Expected salary is required"),
   }),
 };
 

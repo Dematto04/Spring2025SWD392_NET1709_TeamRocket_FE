@@ -30,7 +30,6 @@ export default function ForgotPassword() {
   });
   const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
   const handleSumbit = async (email) => {
-    console.log(email);
     const result = await forgotPassword(email);
     if (result.error) {
       form.setError('email', {message: result.error.data.messages.Email[0]})

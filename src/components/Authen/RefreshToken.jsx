@@ -44,7 +44,6 @@ function RefreshToken() {
           console.log(result.error);
           return;
         }
-        console.log({ result });
         localStorage.setItem("accessToken", result.data.data.accessToken);
         localStorage.setItem("refreshToken", result.data.data.refreshToken);
       }

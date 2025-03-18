@@ -22,7 +22,8 @@ import { useGetCategoriesQuery } from "@/redux/api/serviceApi";
 
 export default function HousekeeperSelfForm({ form }) {
   const { data: services, isSuccess } = useGetCategoriesQuery();
-
+  const hehe = form.watch("services");
+  console.log(hehe);
   return (
     isSuccess && (
       <Form

@@ -58,7 +58,7 @@ export default function ServiceIntroPage() {
   const { data: service, isLoading } = useGetServicesDetailQuery(id);
   const { data: prices, isLoading: isPricesLoading } =
     useGetServicesPriceQuery(id);
-  console.log({ prices });
+
 
   return (
     !isLoading && (
