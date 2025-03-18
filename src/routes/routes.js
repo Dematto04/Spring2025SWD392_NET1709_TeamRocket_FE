@@ -41,6 +41,8 @@ import RefundRequestPage from "@/page/Dashboard/Staff/refundRequestPage";
 import RefundRequestDetail from "@/page/Dashboard/Staff/refundRequestDetail";
 import RegisterApprovePage from "@/page/dashboard/staff/RegisterApprovePage";
 import RegisterApproveDetail from "@/page/dashboard/staff/RegisterApproveDetail";
+
+
 const routes = [
   {
     layout: MainLayout,
