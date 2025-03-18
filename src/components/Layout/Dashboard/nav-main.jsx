@@ -4,9 +4,11 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export function NavMain({ items, clickedItem, setClickedItem }) {
+  const location = useLocation();
+
   return (
     <SidebarGroup>
       <SidebarMenu>
@@ -24,8 +26,8 @@ export function NavMain({ items, clickedItem, setClickedItem }) {
               <SidebarMenuButton
                 tooltip={item.title}
                 className={
-                  item.title === clickedItem
-                    ? "bg-primary font-medium text-primary-foreground hover:bg-primary hover:text-primary-foreground "
+                  location.pathname === item.url
+                    ? "bg-primary font-medium text-primary-foreground hover:bg-primary hover:text-primary-foreground"
                     : ""
                 }
               >

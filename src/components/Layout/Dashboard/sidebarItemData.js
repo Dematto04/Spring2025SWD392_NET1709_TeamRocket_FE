@@ -10,6 +10,7 @@ import {
     Users,
     Building2,
     List,
+    UserCheck,
   } from "lucide-react";
 
 export const data = {
@@ -81,6 +82,11 @@ export const data = {
       title: "Refund Request",
       url: "/dashboard/staff/refund-request",
       icon: CircleDollarSign,
+    },
+    {
+      title: "Register Request",
+      url: "/dashboard/staff/register-approve",
+      icon: UserCheck ,
     },
   ],
 
