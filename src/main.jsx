@@ -12,18 +12,16 @@ import RefreshToken from "./components/Authen/RefreshToken";
 import ScrollToTop from "./components/ScrollToTop";
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <ThemeProvider defaultTheme="dark">
-          <BrowserRouter>
-            <ScrollToTop />
-            <App />
-            <Toaster />
-            <RefreshToken />
-          </BrowserRouter>
-        </ThemeProvider>
-      </PersistGate>
-    </Provider>
-  </StrictMode>
+  <Provider store={store}>
+    <PersistGate loading={null} persistor={persistor}>
+      <ThemeProvider defaultTheme="dark">
+        <BrowserRouter>
+          <ScrollToTop />
+          <App />
+          <Toaster />
+          <RefreshToken />
+        </BrowserRouter>
+      </ThemeProvider>
+    </PersistGate>
+  </Provider>
 );

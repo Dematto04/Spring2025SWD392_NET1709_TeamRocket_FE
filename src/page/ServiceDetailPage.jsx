@@ -13,7 +13,8 @@ import ServiceDetailSteps from "@/components/ServiceDetail/ServiceDetailSteps";
 function ServiceDetailPage() {
   const { id } = useParams();
   const { data, isLoading, isError, isSuccess } = useGetServicesDetailQuery(id);
-
+  console.log(data);
+  
 
   if (isLoading) return <LoadingScreen />;
 
