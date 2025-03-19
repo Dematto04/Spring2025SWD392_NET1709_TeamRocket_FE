@@ -66,6 +66,31 @@ export const bookingApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['Booking'],
     }),
+    getHousekeeperBookings: build.query({
+      query: (params) => {
+        const { page = 1, pageSize = 10, status } = params || {};
+        let url = `/Booking/GetHousekeeperBookings?page=${page}&pageSize=${pageSize}`;
+        
+        // Add status filter if provided
+        if (status) {
+          url += `&status=${status}`;
+        }
+        
+        return {
+          url,
+          method: "GET",
+        };
+      },
+      providesTags: ["Booking"],
+    }),
+    submitProof: build.mutation({
+      query: (payload) => ({
+        url: "/Booking/submit-proof",
+        method: "POST",
+        body: payload,
+      }),
+      invalidatesTags: ["Booking"],
+    }),
   }),
 });
   
@@ -76,5 +101,7 @@ export const {
   useGetBookingCountHousekeeperQuery,
   useCancelBookingMutation,
   useSendRefundRequestMutation,
+  useGetHousekeeperBookingsQuery,
+  useSubmitProofMutation,
 } = bookingApi;
   
