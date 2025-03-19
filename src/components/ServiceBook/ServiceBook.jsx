@@ -73,6 +73,7 @@ function ServiceBook({ step, setStep }) {
         })
       );
 
+      
       nav("/service/checkout");
     }
     setStep((prev) => prev + 1);

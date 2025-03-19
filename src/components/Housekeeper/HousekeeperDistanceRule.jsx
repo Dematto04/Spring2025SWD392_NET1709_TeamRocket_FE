@@ -59,7 +59,7 @@ export default function HousekeeperDistanceRule({
               name={`serviceDistanceRule.${index}.min_distance`}
               render={({ field }) => (
                 <FormItem className="flex-grow">
-                  <FormLabel>Min Distance</FormLabel>
+                  <FormLabel>Min Distance (km)</FormLabel>
                   <FormControl>
                     <Input type="number" readOnly={index > 0} {...field} />
                   </FormControl>
@@ -73,7 +73,7 @@ export default function HousekeeperDistanceRule({
               name={`serviceDistanceRule.${index}.max_distance`}
               render={({ field }) => (
                 <FormItem className="flex-grow">
-                  <FormLabel>Max Distance</FormLabel>
+                  <FormLabel>Max Distance (km)</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
