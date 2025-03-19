@@ -1,5 +1,9 @@
-import React, { useState } from 'react';
-import { useGetBookingHistoryQuery, useGetBookingDetailQuery } from '@/redux/api/bookingApi';
+import React, { useState, useRef } from 'react';
+import { 
+  useGetHousekeeperBookingsQuery, 
+  useGetBookingDetailQuery, 
+  useSubmitProofMutation 
+} from '@/redux/api/bookingApi';
 import {
   Card,
   CardContent,
@@ -30,8 +34,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
-import { format } from 'date-fns';
-import { Loader2, ChevronLeft, ChevronRight, ImageIcon } from 'lucide-react';
+import { format, parseISO } from 'date-fns';
+import { Loader2, ChevronLeft, ChevronRight, ImageIcon, AlertCircle } from 'lucide-react';
 import { CalendarIcon, UserIcon, MapPinIcon, StarIcon } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -39,115 +43,49 @@ import { PhoneIcon } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from '@/hooks/use-toast';
 
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE = 10;
 
 function HouseKeeperBookingList() {
+  // Hooks
+  const { toast } = useToast();
+  const fileInputRef = useRef(null);
+
   // State management
   const [pageIndex, setPageIndex] = useState(1);
-  const [status, setStatus] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('');
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedBookingId, setSelectedBookingId] = useState(null);
   const [finishDialogOpen, setFinishDialogOpen] = useState(false);
   const [selectedFinishBooking, setSelectedFinishBooking] = useState(null);
-  const [completionProof, setCompletionProof] = useState({
-    proofs: []  // Array of { title: string, imgUrl: string }
+  const [proofImages, setProofImages] = useState([]);
+
+  // API queries
+  const { 
+    data: bookingsResponse, 
+    isLoading: isBookingsLoading,
+    isFetching: isBookingsFetching 
+  } = useGetHousekeeperBookingsQuery({
+    page: pageIndex,
+    pageSize: ITEMS_PER_PAGE,
+    status: statusFilter || undefined
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Example data structure for bookings
-  const mockBookings = {
-    data: [
-      {
-        id: 1,
-        preferDateStart: "2025-04-25",
-        timeStart: "09:00:00",
-        timeEnd: "11:00:00",
-        status: "in progress",
-        isFinishable: true,
-        totalPrice: 75,
-        servicePrice: 65,
-        distancePrice: 5,
-        additionalPrice: 5,
-        customerId: "user123",
-        customer: {
-          fullName: "Demouser",
-          email: "demouser@gmail.com",
-          phoneNumber: "9941636316"
-        },
-        cleaningService: {
-          name: "Laser tattoo removal",
-          description: "Professional laser tattoo removal service"
-        },
-        addressLine1: "123 Main Street",
-        city: "Singapore",
-        district: "Central",
-        note: "Please arrive on time"
-      },
-      {
-        id: 2,
-        preferDateStart: "2025-04-26",
-        timeStart: "14:00:00",
-        timeEnd: "16:00:00",
-        status: "pending",
-        totalPrice: 90,
-        servicePrice: 80,
-        distancePrice: 5,
-        additionalPrice: 5,
-        customerId: "user124",
-        customer: {
-          fullName: "John Smith",
-          email: "john@gmail.com",
-          phoneNumber: "9941636317"
-        },
-        cleaningService: {
-          name: "Deep house cleaning",
-          description: "Complete house deep cleaning service"
-        },
-        addressLine1: "456 Marina Bay Drive",
-        city: "Singapore",
-        district: "Marina Bay",
-        note: "Need extra attention to kitchen area"
-      }
-    ],
-    totalCount: 2,
-    isLoading: false
-  };
+  const {
+    data: bookingDetailResponse,
+    isLoading: isDetailLoading
+  } = useGetBookingDetailQuery(
+    selectedBookingId, 
+    { skip: !selectedBookingId }
+  );
 
-  // Example booking detail data
-  const mockBookingDetail = {
-    data: {
-      id: 1,
-      preferDateStart: "2025-04-25",
-      timeStart: "09:00:00",
-      timeEnd: "11:00:00",
-      createdDate: "2024-03-15",
-      status: "completed",
-      totalPrice: 75,
-      servicePrice: 65,
-      distancePrice: 5,
-      additionalPrice: 5,
-      rating: 4.5,
-      feedback: "Great service!",
-      customer: {
-        fullName: "Demouser",
-        email: "demouser@gmail.com",
-        phoneNumber: "9941636316"
-      },
-      cleaningService: {
-        name: "Laser tattoo removal",
-        description: "Professional laser tattoo removal service"
-      },
-      note: "Please arrive on time",
-      addressLine1: "123 Main Street",
-      city: "Singapore",
-      district: "Central",
-      bookingAdditionals: [
-        { name: "Extra cleaning", price: 5 }
-      ]
-    },
-    isLoading: false
-  };
+  const [submitProof, { isLoading: isSubmittingProof }] = useSubmitProofMutation();
+
+  // Extract data from response
+  const bookings = bookingsResponse?.data?.items || [];
+  const totalPages = bookingsResponse?.data?.totalPages || 1;
+  const bookingDetail = bookingDetailResponse?.data;
 
   // Pagination handlers
   const handlePreviousPage = () => {
@@ -157,34 +95,23 @@ function HouseKeeperBookingList() {
   };
 
   const handleNextPage = () => {
-    const totalPages = Math.ceil(mockBookings.totalCount / ITEMS_PER_PAGE);
-    if (pageIndex < totalPages) {
+    if (bookingsResponse?.data?.hasNext) {
       setPageIndex(pageIndex + 1);
     }
   };
 
   // Status badge color mapping
-  const getStatusBadgeColor = (status) => {
-    const colors = {
-      "in progress": "bg-purple-100 text-purple-800",
-      pending: "bg-purple-100 text-purple-800",
-      confirmed: "bg-purple-100 text-purple-800",
-      cancelled: "bg-red-50 text-red-700",
-      completed: "bg-green-100 text-green-800",
-    };
-    return colors[status] || "bg-gray-100 text-gray-800";
-  };
-
   const getStatusVariant = (status) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case "completed":
         return "success";
+      case "canceled":
       case "cancelled":
         return "destructive";
-      case "in progress":
-      case "pending":
-      case "confirmed":
+      case "ongoing":
         return "purple";
+      case "refunded":
+        return "blue";
       default:
         return "secondary";
     }
@@ -193,64 +120,127 @@ function HouseKeeperBookingList() {
   const handleFinishClick = (e, booking) => {
     e.stopPropagation(); // Prevent card click
     setSelectedFinishBooking(booking);
+    setProofImages([]);
     setFinishDialogOpen(true);
+  };
+
+  const handleImageUpload = (event) => {
+    const files = Array.from(event.target.files);
+    if (files.length === 0) return;
+
+    // Add preview URLs for the images
+    const newProofImages = files.map(file => ({
+      file,
+      title: '',
+      preview: URL.createObjectURL(file)
+    }));
+
+    setProofImages(prevImages => [...prevImages, ...newProofImages]);
   };
 
   const handleFinishSubmit = async () => {
     try {
-      setIsSubmitting(true);
-      
-      // First upload the image and get the URL
-      // TODO: Implement image upload to get imgUrl
-      const imgUrls = []; // This should come from your image upload service
+      if (proofImages.length === 0) {
+        toast({
+          title: "Error",
+          description: "Please upload at least one proof image",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Check if all proof images have titles
+      const missingTitles = proofImages.some(proof => !proof.title.trim());
+      if (missingTitles) {
+        toast({
+          title: "Error",
+          description: "Please provide a title for each proof image",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Simulate file upload (in a real app, you'd upload to a server/storage)
+      // For this example, we'll use the preview URLs as the "uploaded" image URLs
+      const proofs = proofImages.map(proof => ({
+        title: proof.title,
+        imgUrl: proof.preview // In a real app, this would be the URL returned from your server
+      }));
 
       // Submit the proof
-      const proofData = {
+      await submitProof({
         bookingId: selectedFinishBooking.id,
-        proofs: completionProof.proofs  // Array of { title, imgUrl }
-      };
+        title: proofs[0].title, // Using the first image title as the main title
+        imgUrl: proofs[0].preview // Using the first image URL
+      }).unwrap();
 
-      // TODO: API call to submit completion proof
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-      
+      toast({
+        title: "Success",
+        description: "Booking has been marked as completed",
+      });
+
       // Reset states after successful submission
       setFinishDialogOpen(false);
       setSelectedFinishBooking(null);
-      setCompletionProof({ proofs: [] });
+      setProofImages([]);
       
-      // TODO: Refresh booking list
+      // Refresh booking list
+      // The invalidatesTags in the mutation will handle this automatically
     } catch (error) {
       console.error('Error submitting completion proof:', error);
-    } finally {
-      setIsSubmitting(false);
+      toast({
+        title: "Error",
+        description: error.data?.messages?.Booking?.[0] || "Failed to submit proof",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const removeProofImage = (index) => {
+    const newProofImages = [...proofImages];
+    // Revoke the object URL to avoid memory leaks
+    URL.revokeObjectURL(newProofImages[index].preview);
+    newProofImages.splice(index, 1);
+    setProofImages(newProofImages);
+  };
+
+  // Format date and time from ISO string
+  const formatDateTime = (dateString, timeString) => {
+    try {
+      const date = parseISO(dateString);
+      return `${format(date, 'dd/MM/yyyy')} ${timeString}`;
+    } catch (e) {
+      // Handle the case where date might not be a valid ISO string
+      return `${dateString?.split('T')[0] || 'N/A'} ${timeString || ''}`;
     }
   };
 
   return (
     <div className="p-6 space-y-6">
-      <Card>
+      <Card className="shadow-sm hover:shadow-md transition-shadow">
         <CardHeader>
-          <CardTitle>Booking List</CardTitle>
+          <CardTitle>My Bookings</CardTitle>
         </CardHeader>
         <CardContent>
           {/* Filters */}
-          <div className="flex gap-4 mb-6">
-            <Select value={status} onValueChange={setStatus}>
+          <div className="flex flex-wrap gap-4 mb-6">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="confirmed">Confirmed</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
+                <SelectItem value="All">All Status</SelectItem>
+                <SelectItem value="ongoing">Ongoing</SelectItem>
                 <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="canceled">Canceled</SelectItem>
+                <SelectItem value="refunded">Refunded</SelectItem>
               </SelectContent>
             </Select>
 
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="outline">
+                  <CalendarIcon className="mr-2 h-4 w-4" />
                   {selectedDate ? format(selectedDate, 'PP') : 'Pick a date'}
                 </Button>
               </DialogTrigger>
@@ -276,109 +266,120 @@ function HouseKeeperBookingList() {
             )}
           </div>
 
-          {/* Replace the card grid content */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {mockBookings.data.map((booking) => (
-              <Card 
-                key={booking.id}
-                className="cursor-pointer hover:shadow-lg transition-shadow overflow-hidden relative"
-                onClick={() => setSelectedBookingId(booking.id)}
-              >
-                {/* Add an image at the top */}
-                <div className="relative h-40 bg-gray-100">
-                  <img
-                    src={booking.cleaningService.imageUrl || "/placeholder-service.jpg"}
-                    alt={booking.cleaningService.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    {/* Title and Status */}
-                    <div className="flex justify-between items-start gap-2">
-                      <h3 className="font-medium text-lg">{booking.cleaningService.name}</h3>
-                      <Badge 
-                        variant={getStatusVariant(booking.status)}
-                        className={`rounded-full ${
-                          booking.status === "cancelled" ? "bg-red-50 hover:bg-red-100 border-red-200" :
-                          booking.status === "completed" ? "bg-green-100 hover:bg-green-200 border-green-200" :
-                          "bg-purple-100 hover:bg-purple-200 border-purple-200"
-                        }`}
-                      >
-                        {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
-                      </Badge>
-                    </div>
-
-                    {/* Booking Details */}
-                    <div className="space-y-2">
-                      <div className="flex gap-2">
-                        <span className="text-gray-500 min-w-[120px]">Booking Date</span>
-                        <span className="text-gray-900">: {format(new Date(booking.preferDateStart), 'dd/MM/yyyy')}</span>
+          {/* Booking Cards Grid */}
+          {isBookingsLoading ? (
+            <div className="flex justify-center items-center min-h-[300px]">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : bookings.length === 0 ? (
+            <div className="flex flex-col items-center justify-center min-h-[300px] text-center p-6 border-2 border-dashed rounded-lg">
+              <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
+              <h3 className="text-lg font-medium">No bookings found</h3>
+              <p className="text-muted-foreground mt-2">Try changing your filters or check back later.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {bookings.map((booking) => (
+                <Card 
+                  key={booking.id}
+                  className="cursor-pointer hover:shadow-lg transition-shadow overflow-hidden relative"
+                  onClick={() => setSelectedBookingId(booking.id)}
+                >
+                  {/* Service Image */}
+                  <div className="relative h-40 bg-gray-100">
+                    <img
+                      src={booking.serviceImageUrl || "/placeholder-service.jpg"}
+                      alt={booking.serviceName}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.src = "/placeholder-service.jpg";
+                      }}
+                    />
+                  </div>
+                  <CardContent className="p-6">
+                    <div className="space-y-4">
+                      {/* Title and Status */}
+                      <div className="flex justify-between items-start gap-2">
+                        <h3 className="font-medium text-lg">{booking.serviceName}</h3>
+                        <Badge 
+                          variant={getStatusVariant(booking.status)}
+                          className="capitalize"
+                        >
+                          {booking.status === "OnGoing" ? "Ongoing" : booking.status}
+                        </Badge>
                       </div>
 
-                      <div className="flex gap-2">
-                        <span className="text-gray-500 min-w-[120px]">Amount</span>
-                        <div className="flex gap-2 items-center">
-                          <span className="text-gray-900">: ₹{booking.totalPrice}</span>
-                          <Badge variant="secondary" className="bg-pink-100 text-pink-700 hover:bg-pink-100">
-                            COD
-                          </Badge>
+                      {/* Booking Details */}
+                      <div className="space-y-2">
+                        <div className="flex gap-2">
+                          <span className="text-gray-500 min-w-[120px]">Booking Date</span>
+                          <span className="text-gray-900">: {formatDateTime(booking.preferDateStart, booking.timeStart)}</span>
                         </div>
-                      </div>
 
-                      <div className="flex gap-2">
-                        <span className="text-gray-500 min-w-[120px]">Location</span>
-                        <div className="flex-1 overflow-hidden">
-                          <span className="text-gray-900 inline-block">: </span>
-                          <div className="inline-block truncate max-w-[calc(100%-10px)]">
-                            <span className="text-gray-900">
-                              {booking.addressLine1}, {booking.district}, {booking.city}
-                            </span>
+                        <div className="flex gap-2">
+                          <span className="text-gray-500 min-w-[120px]">Amount</span>
+                          <div className="flex gap-2 items-center">
+                            <span className="text-gray-900">: ₹{booking.totalPrice}</span>
+                            <Badge variant="secondary" className="bg-pink-100 text-pink-700 hover:bg-pink-100">
+                              COD
+                            </Badge>
                           </div>
                         </div>
-                      </div>
 
-                      <div className="flex gap-2">
-                        <span className="text-gray-500 min-w-[120px]">User</span>
-                        <div className="flex flex-1 items-center gap-2">
-                          <span>:</span>
-                          <div className="flex items-center gap-2 min-w-0">
-                            <Avatar className="h-6 w-6 flex-shrink-0">
-                              <AvatarImage src={booking.customer.avatarUrl} />
-                              <AvatarFallback className="bg-primary/10">
-                                {booking.customer.fullName.charAt(0)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-sm font-medium text-gray-900 truncate">
-                                {booking.customer.fullName}
-                              </p>
-                              <p className="text-sm text-gray-500 truncate flex items-center gap-1">
-                                <PhoneIcon className="h-3 w-3 flex-shrink-0" />
-                                {booking.customer.phoneNumber}
-                              </p>
+                        <div className="flex gap-2">
+                          <span className="text-gray-500 min-w-[120px]">Location</span>
+                          <div className="flex-1 overflow-hidden">
+                            <span className="text-gray-900 inline-block">: </span>
+                            <div className="inline-block truncate max-w-[calc(100%-10px)]">
+                              <span className="text-gray-900">
+                                {booking.addressLine1}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2">
+                          <span className="text-gray-500 min-w-[120px]">User</span>
+                          <div className="flex flex-1 items-center gap-2">
+                            <span>:</span>
+                            <div className="flex items-center gap-2 min-w-0">
+                              <Avatar className="h-6 w-6 flex-shrink-0">
+                                <AvatarImage src={booking.customer.avatarUrl} />
+                                <AvatarFallback className="bg-primary/10">
+                                  {booking.customer.fullName.charAt(0)}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="min-w-0 flex-1">
+                                <p className="text-sm font-medium text-gray-900 truncate">
+                                  {booking.customer.fullName}
+                                </p>
+                                <p className="text-sm text-gray-500 truncate flex items-center gap-1">
+                                  <PhoneIcon className="h-3 w-3 flex-shrink-0" />
+                                  {booking.customer.phoneNumber}
+                                </p>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Add Finish Button for finishable bookings */}
-                    {booking.isFinishable && booking.status === "in progress" && (
-                      <div className="mt-4">
-                        <Button 
-                          className="w-full"
-                          onClick={(e) => handleFinishClick(e, booking)}
-                        >
-                          Complete Job
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                      {/* Add Finish Button for ongoing bookings that are finishable */}
+                      {booking.status === "OnGoing" && booking.isFinishable && (
+                        <div className="mt-4">
+                          <Button 
+                            className="w-full"
+                            onClick={(e) => handleFinishClick(e, booking)}
+                          >
+                            Complete Job
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
 
           {/* Booking Detail Dialog */}
           <Dialog open={selectedBookingId !== null} onOpenChange={(open) => !open && setSelectedBookingId(null)}>
@@ -387,30 +388,30 @@ function HouseKeeperBookingList() {
                 <DialogTitle>Booking Details</DialogTitle>
               </DialogHeader>
               <div className="space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto pr-6 -mr-6">
-                {mockBookingDetail.isLoading ? (
-                  <div className="flex justify-center">
+                {isDetailLoading ? (
+                  <div className="flex justify-center py-8">
                     <Loader2 className="h-6 w-6 animate-spin" />
                   </div>
-                ) : (
+                ) : bookingDetail ? (
                   <div className="space-y-6">
                     {/* Service Info Section */}
                     <div className="space-y-3">
                       <h3 className="font-medium border-b pb-2 sticky top-0 bg-white">Service Information</h3>
                       <div className="grid grid-cols-2 gap-2">
                         <div className="text-sm font-medium">Service:</div>
-                        <div className="text-sm">{mockBookingDetail.data.cleaningService.name}</div>
+                        <div className="text-sm">{bookingDetail.serviceName}</div>
                         
                         <div className="text-sm font-medium">Date:</div>
-                        <div className="text-sm">{format(new Date(mockBookingDetail.data.preferDateStart), 'dd/MM/yyyy')}</div>
+                        <div className="text-sm">{formatDateTime(bookingDetail.preferDateStart, "")}</div>
                         
                         <div className="text-sm font-medium">Time:</div>
-                        <div className="text-sm">{mockBookingDetail.data.timeStart} - {mockBookingDetail.data.timeEnd}</div>
+                        <div className="text-sm">{bookingDetail.timeStart} - {bookingDetail.timeEnd}</div>
                         
                         <div className="text-sm font-medium">Status:</div>
                         <div>
-                          <span className={`px-2 py-1 rounded-full text-xs ${getStatusBadgeColor(mockBookingDetail.data.status)}`}>
-                            {mockBookingDetail.data.status}
-                          </span>
+                          <Badge variant={getStatusVariant(bookingDetail.status)}>
+                            {bookingDetail.status === "OnGoing" ? "Ongoing" : bookingDetail.status}
+                          </Badge>
                         </div>
                       </div>
                     </div>
@@ -421,19 +422,19 @@ function HouseKeeperBookingList() {
                       <div className="space-y-2">
                         <div className="flex items-center gap-3">
                           <Avatar className="h-10 w-10">
-                            <AvatarImage src={mockBookingDetail.data.customer.avatarUrl} />
+                            <AvatarImage src={bookingDetail.customer?.avatarUrl} />
                             <AvatarFallback className="bg-primary/10">
-                              {mockBookingDetail.data.customer.fullName.charAt(0)}
+                              {bookingDetail.customer?.fullName.charAt(0)}
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <div className="font-medium">{mockBookingDetail.data.customer.fullName}</div>
-                            <div className="text-sm text-gray-500">{mockBookingDetail.data.customer.email}</div>
+                            <div className="font-medium">{bookingDetail.customer?.fullName}</div>
+                            <div className="text-sm text-gray-500">{bookingDetail.customer?.email}</div>
                           </div>
                         </div>
                         <div className="flex items-center gap-2 text-sm">
                           <PhoneIcon className="h-4 w-4 text-gray-500" />
-                          <span>{mockBookingDetail.data.customer.phoneNumber}</span>
+                          <span>{bookingDetail.customer?.phoneNumber}</span>
                         </div>
                       </div>
                     </div>
@@ -444,13 +445,13 @@ function HouseKeeperBookingList() {
                       <div className="space-y-2">
                         <div className="grid grid-cols-2 gap-2">
                           <div className="text-sm font-medium">Address:</div>
-                          <div className="text-sm">{mockBookingDetail.data.addressLine1}</div>
+                          <div className="text-sm">{bookingDetail.addressLine1}</div>
                           
                           <div className="text-sm font-medium">District:</div>
-                          <div className="text-sm">{mockBookingDetail.data.district}</div>
+                          <div className="text-sm">{bookingDetail.district}</div>
                           
                           <div className="text-sm font-medium">City:</div>
-                          <div className="text-sm">{mockBookingDetail.data.city}</div>
+                          <div className="text-sm">{bookingDetail.city}</div>
                         </div>
                       </div>
                     </div>
@@ -461,68 +462,61 @@ function HouseKeeperBookingList() {
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span>Service Price</span>
-                          <span>₹{mockBookingDetail.data.servicePrice}</span>
+                          <span>₹{bookingDetail.servicePrice}</span>
                         </div>
                         <div className="flex justify-between">
                           <span>Distance Price</span>
-                          <span>₹{mockBookingDetail.data.distancePrice}</span>
+                          <span>₹{bookingDetail.distancePrice}</span>
                         </div>
                         
                         {/* Additional Services */}
-                        {mockBookingDetail.data.bookingAdditionals?.length > 0 && (
-                          <>
-                            <div className="pt-2 border-t">
-                              <p className="font-medium mb-2">Additional Services:</p>
-                              {mockBookingDetail.data.bookingAdditionals.map((item, index) => (
-                                <div key={index} className="flex justify-between pl-2 text-gray-600">
-                                  <span>• {item.name}</span>
-                                  <span>₹{item.price}</span>
-                                </div>
-                              ))}
-                            </div>
-                            <div className="flex justify-between text-gray-600">
-                              <span>Additional Total</span>
-                              <span>₹{mockBookingDetail.data.additionalPrice}</span>
-                            </div>
-                          </>
+                        {bookingDetail.additionalPrice > 0 && (
+                          <div className="flex justify-between text-gray-600">
+                            <span>Additional Services</span>
+                            <span>₹{bookingDetail.additionalPrice}</span>
+                          </div>
                         )}
 
                         <div className="flex justify-between font-medium pt-2 border-t">
                           <span>Total Amount</span>
-                          <span>₹{mockBookingDetail.data.totalPrice}</span>
+                          <span>₹{bookingDetail.totalPrice}</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Notes Section */}
-                    {mockBookingDetail.data.note && (
+                    {bookingDetail.note && (
                       <div className="space-y-3">
                         <h3 className="font-medium border-b pb-2 sticky top-0 bg-white">Notes</h3>
                         <div className="text-sm bg-gray-50 p-3 rounded-md">
-                          {mockBookingDetail.data.note}
+                          {bookingDetail.note}
                         </div>
                       </div>
                     )}
 
                     {/* Feedback Section */}
-                    {mockBookingDetail.data.status === "completed" && (mockBookingDetail.data.rating || mockBookingDetail.data.feedback) && (
+                    {bookingDetail.status === "Completed" && (bookingDetail.rating || bookingDetail.feedback) && (
                       <div className="space-y-3">
                         <h3 className="font-medium border-b pb-2 sticky top-0 bg-white">Feedback</h3>
                         <div className="space-y-2">
-                          {mockBookingDetail.data.rating && (
+                          {bookingDetail.rating && (
                             <div className="flex items-center gap-2">
                               <StarIcon className="h-5 w-5 text-yellow-400" />
-                              <span className="text-sm">{mockBookingDetail.data.rating} / 5</span>
+                              <span className="text-sm">{bookingDetail.rating} / 5</span>
                             </div>
                           )}
-                          {mockBookingDetail.data.feedback && (
+                          {bookingDetail.feedback && (
                             <div className="text-sm bg-gray-50 p-3 rounded-md">
-                              {mockBookingDetail.data.feedback}
+                              {bookingDetail.feedback}
                             </div>
                           )}
                         </div>
                       </div>
                     )}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    Booking details not available
                   </div>
                 )}
               </div>
@@ -540,7 +534,7 @@ function HouseKeeperBookingList() {
                 <div className="space-y-2">
                   <Label>Proof Images</Label>
                   <div className="grid grid-cols-1 gap-4">
-                    {completionProof.proofs.map((proof, index) => (
+                    {proofImages.map((proof, index) => (
                       <div key={index} className="border rounded-lg p-4 space-y-3">
                         <div className="space-y-2">
                           <Label htmlFor={`title-${index}`}>Title for Image {index + 1}</Label>
@@ -548,17 +542,17 @@ function HouseKeeperBookingList() {
                             id={`title-${index}`}
                             value={proof.title}
                             onChange={(e) => {
-                              const newProofs = [...completionProof.proofs];
+                              const newProofs = [...proofImages];
                               newProofs[index].title = e.target.value;
-                              setCompletionProof(prev => ({ ...prev, proofs: newProofs }));
+                              setProofImages(newProofs);
                             }}
-                            placeholder="Enter proof title"
+                            placeholder="Enter a description for this image"
                             maxLength={255}
                           />
                         </div>
                         <div className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden">
                           <img
-                            src={proof.imgUrl}
+                            src={proof.preview}
                             alt={`Proof ${index + 1}`}
                             className="w-full h-full object-cover"
                           />
@@ -566,62 +560,57 @@ function HouseKeeperBookingList() {
                             variant="destructive"
                             size="icon"
                             className="absolute top-1 right-1 h-6 w-6"
-                            onClick={() => {
-                              const newProofs = [...completionProof.proofs];
-                              newProofs.splice(index, 1);
-                              setCompletionProof(prev => ({ ...prev, proofs: newProofs }));
-                            }}
+                            onClick={() => removeProofImage(index)}
                           >
                             ×
                           </Button>
                         </div>
                       </div>
                     ))}
-                    {completionProof.proofs.length < 4 && (
-                      <label className="cursor-pointer">
-                        <div className="aspect-video border-2 border-dashed rounded-lg flex items-center justify-center">
-                          <ImageIcon className="h-8 w-8 text-gray-400" />
+                    
+                    {proofImages.length < 1 && (
+                      <div className="space-y-6">
+                        <div 
+                          className="aspect-video border-2 border-dashed rounded-lg flex flex-col items-center justify-center p-6 cursor-pointer"
+                          onClick={() => fileInputRef.current?.click()}
+                        >
+                          <ImageIcon className="h-12 w-12 text-gray-400 mb-2" />
+                          <p className="text-sm text-gray-500 text-center">
+                            Click to upload an image of your completed work
+                          </p>
                         </div>
                         <input
+                          ref={fileInputRef}
                           type="file"
                           accept="image/*"
                           className="hidden"
-                          onChange={(e) => {
-                            if (e.target.files?.[0]) {
-                              // TODO: Handle image upload and get URL
-                              const file = e.target.files[0];
-                              // Temporary local URL for preview
-                              const localUrl = URL.createObjectURL(file);
-                              setCompletionProof(prev => ({
-                                ...prev,
-                                proofs: [...prev.proofs, { title: '', imgUrl: localUrl }]
-                              }));
-                            }
-                          }}
+                          onChange={handleImageUpload}
                         />
-                      </label>
+                      </div>
                     )}
                   </div>
-                  <p className="text-sm text-gray-500 mt-2">Upload up to 4 images as proof</p>
+                  <p className="text-sm text-gray-500 mt-2">
+                    Upload a clear image of your completed work as proof
+                  </p>
                 </div>
 
                 <div className="flex justify-end gap-2">
                   <Button
                     variant="outline"
                     onClick={() => setFinishDialogOpen(false)}
-                    disabled={isSubmitting}
+                    disabled={isSubmittingProof}
                   >
                     Cancel
                   </Button>
                   <Button
                     onClick={handleFinishSubmit}
                     disabled={
-                      isSubmitting || 
-                      completionProof.proofs.length === 0 || 
-                      completionProof.proofs.some(proof => !proof.title.trim())
+                      isSubmittingProof || 
+                      proofImages.length === 0 || 
+                      proofImages.some(proof => !proof.title.trim())
                     }
                   >
-                    {isSubmitting ? (
+                    {isSubmittingProof ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Submitting...
@@ -636,31 +625,33 @@ function HouseKeeperBookingList() {
           </Dialog>
 
           {/* Pagination */}
-          <div className="flex items-center justify-between mt-4">
-            <div className="text-sm text-gray-500">
-              Page {pageIndex} of {Math.ceil(mockBookings.totalCount / ITEMS_PER_PAGE)}
+          {!isBookingsLoading && bookings.length > 0 && (
+            <div className="flex items-center justify-between mt-6">
+              <div className="text-sm text-gray-500">
+                Page {pageIndex} of {totalPages}
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handlePreviousPage}
+                  disabled={pageIndex === 1 || isBookingsFetching}
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleNextPage}
+                  disabled={!bookingsResponse?.data?.hasNext || isBookingsFetching}
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </div>
             </div>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handlePreviousPage}
-                disabled={pageIndex === 1}
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleNextPage}
-                disabled={pageIndex === Math.ceil(mockBookings.totalCount / ITEMS_PER_PAGE)}
-              >
-                Next
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+          )}
         </CardContent>
       </Card>
     </div>
