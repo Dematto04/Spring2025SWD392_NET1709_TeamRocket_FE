@@ -6,12 +6,11 @@ import {
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-import { forwardRef } from "react";
+
 import { ThemeToggle } from "../ui/theme-toggle";
 import { useDispatch, useSelector } from "react-redux";
 import { isUserAuth, logout, selectUser } from "@/redux/features/authSlice";
@@ -19,6 +18,7 @@ import { Button } from "../ui/button";
 import { NavbarUser } from "./NavbarUser";
 import { CircleUserRound } from "lucide-react";
 import Logo from "../Logo";
+import { Card, CardContent, CardHeader } from "../ui/card";
 
 export default function Navbar({ services }) {
   const isAuth = useSelector(isUserAuth);
@@ -51,29 +51,31 @@ export default function Navbar({ services }) {
             <ul className="grid gap-3 p-4 md:w-screen grid-cols-8">
               {services ? (
                 services.map((service, idx) => (
-                  <li key={idx} className="col-span-2 xl:col-span-1">
-                    <Link
-                      className="group flex h-full w-full select-none flex-col justify-start rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                      to={`/services?category=${service.id}`}
-                    >
-                      <div className="overflow-hidden min-w-full flex-1">
-                        <img
-                          loading="lazy"
-
-                          src={service.imgUrl}
-
-                          className="duration-200 group-hover:scale-110 h-full w-full object-contain"
-
-                        />
-                      </div>
-                      <div className="mb-2 mt-4 text-lg font-medium">
-                        {service.name}
-                      </div>
-                      <p className="text-sm leading-tight text-muted-foreground">
-                        {service?.description}
-                      </p>
-                    </Link>
-                  </li>
+                  <Link
+                    key={idx}
+                    className="h-full w-full"
+                    to={`/services?category=${service.id}`}
+                  >
+                    <Card className="col-span-2 xl:col-span-1 flex flex-col h-full">
+                      <CardHeader className="p-0 overflow-hidden">
+                        <div className="w-full h-36">
+                          <img
+                            loading="lazy"
+                            src={service.imgUrl}
+                            className="w-full h-full object-cover aspect-square"
+                          />
+                        </div>
+                      </CardHeader>
+                      <CardContent className="flex flex-grow flex-col justify-start p-4">
+                        <div className="mb-2 mt-2 text-lg font-medium text-start">
+                          {service.name}
+                        </div>
+                        <p className="text-sm leading-tight text-muted-foreground line-clamp-3 overflow-hidden">
+                          {service?.description}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 ))
               ) : (
                 <li className="col-span-2 xl:col-span-1">

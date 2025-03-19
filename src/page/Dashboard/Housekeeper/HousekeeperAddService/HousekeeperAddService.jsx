@@ -32,6 +32,7 @@ import AddServiceDetail from "@/components/Housekeeper/AddService/AddServiceDeta
 import AddServicePrice from "@/components/Housekeeper/AddService/AddServicePrice";
 import AddServiceAvailability from "@/components/Housekeeper/AddService/AddServiceAvailability";
 import AddServiceAdditionalService from "@/components/Housekeeper/AddService/AddServiceAdditionalService";
+import { useNavigate } from "react-router-dom";
 const formSchema = z.object({
   service_name: z.string().min(1, { message: "Service name is required" }),
   category_id: z.string().min(1, { message: "Service name is required" }),
@@ -103,6 +104,7 @@ const formSchema = z.object({
 function HousekeeperAddService() {
   const [dateOfWeek, setDateOfWeek] = useState(serviceTimeSlots);
   const [files, setFiles] = useState([]);
+  const nav = useNavigate()
   //api cateogry
   const { data: categories, isLoading } = useGetCategoriesQuery();
   //api create service
@@ -201,7 +203,10 @@ function HousekeeperAddService() {
     }
     toast({
       title: "Create service sucessfully",
+      duration: 1000
     });
+    nav("/dashboard/housekeeper/my-service");
+
   };
   if (isLoading) return <LoadingScreen />;
 
@@ -299,7 +304,7 @@ function HousekeeperAddService() {
               </Accordion>
             </CardContent>
             <CardFooter className="justify-end">
-              <Button>Submit</Button>
+              <Button disable={isCreating}>Submit</Button>
             </CardFooter>
           </Card>
         </form>

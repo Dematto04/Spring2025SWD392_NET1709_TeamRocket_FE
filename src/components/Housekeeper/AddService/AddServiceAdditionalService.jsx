@@ -88,7 +88,7 @@ function AddServiceAdditionalService({
               name={`additionalServices.${idx}.duration`}
               render={({ field }) => (
                 <FormItem className="flex-grow">
-                  <FormLabel>Duration</FormLabel>
+                  <FormLabel>Duration (min)</FormLabel>
                   <FormControl>
                     <Input
                       {...field}

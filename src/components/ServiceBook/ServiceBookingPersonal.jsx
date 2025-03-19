@@ -1,10 +1,5 @@
 import React, { useEffect, useContext, useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { motion } from "framer-motion";
-
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -14,7 +9,6 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { containerVariants } from "@/lib/utils";
 
 import { ServiceBookContext } from "./ServiceBookContext";
@@ -23,6 +17,7 @@ import { useCustomerProfileQuery } from "@/redux/api/customerProfileApi";
 import LoadingScreen from "../Loading";
 import { useGetAddressesQuery } from "@/redux/api/addressApi";
 import AddressList from "./AddressList";
+import ServiceBookingAddAddress from "./ServiceBookingAddAddress";
 
 function ServiceBookingPersonal() {
   const { data, isLoading, isSuccess } = useCustomerProfileQuery();
@@ -50,18 +45,18 @@ function ServiceBookingPersonal() {
       const defaultValue = address.data.items.find(
         (address) => address.isDefault
       );
-      
+
       if (defaultValue) {
         setDefaultAddress({
-          defaultAddress: defaultValue?.address,
-          defaultAddressId: defaultValue?.placeId,
+          defaultAddress: defaultValue?.address_line,
+          defaultAddressId: defaultValue?.place_id,
         });
-        form.setValue("location", defaultValue.placeId);
+        form.setValue("location", defaultValue.place_id);
         form.setValue("city", defaultValue.city || "");
         form.setValue("district", defaultValue?.district || "");
         form.setValue("address_line", defaultValue.address || "");
-        form.setValue("place_id", defaultValue.placeId);
-        form.setValue("addressId", defaultValue.id)
+        form.setValue("place_id", defaultValue.place_id);
+        form.setValue("addressId", defaultValue.id);
       }
     }
   }, [isSuccess, data, isOk, form]);
@@ -70,8 +65,7 @@ function ServiceBookingPersonal() {
 
   return (
     isSuccess &&
-    isOk &&
-     (
+    isOk && (
       <motion.div
         variants={containerVariants}
         initial="hidden"
@@ -138,11 +132,13 @@ function ServiceBookingPersonal() {
                   defaultAddress={defaultAddress?.defaultAddress}
                   defaultAddressId={defaultAddress?.defaultAddressId}
                 />
-              <AddressList addressList={address.data.items} setDefaultAddress={setDefaultAddress}/>
-
+                <AddressList
+                  addressList={address.data.items}
+                  setDefaultAddress={setDefaultAddress}
+                />
+                <ServiceBookingAddAddress/>
               </div>
             </div>
-            
           </form>
         </Form>
       </motion.div>

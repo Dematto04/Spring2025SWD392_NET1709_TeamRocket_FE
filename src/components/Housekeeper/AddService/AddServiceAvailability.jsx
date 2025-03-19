@@ -18,7 +18,6 @@ import { useFieldArray } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
 
 function AddServiceAvailability({ form, dateOfWeek }) {
-
   const handleAppend = (append) => {
     const isFilledDuration = form.getValues("duration");
     if (!isFilledDuration) {
@@ -26,6 +25,7 @@ function AddServiceAvailability({ form, dateOfWeek }) {
         title: "Please fill duration first!",
         description: "Fill first so we can estimate end time 😊",
         variant: "warning",
+        duration: 2000,
       });
       form.trigger("duration");
       return;
@@ -40,6 +40,7 @@ function AddServiceAvailability({ form, dateOfWeek }) {
         title: "Invalid Duration",
         description: "Please enter a valid duration (in hours).",
         variant: "destructive",
+        duration: 2000,
       });
       return;
     }
@@ -71,6 +72,7 @@ function AddServiceAvailability({ form, dateOfWeek }) {
           title: "Invalid Time Slot",
           description: `Each slot must be at least ${duration} hours + 30 minutes apart.`,
           variant: "destructive",
+          duration: 2000,
         });
         form.setValue(`serviceTimeSlots.${dayIndex}.slots.${index}`, "");
         return;
