@@ -182,7 +182,7 @@ function HousekeeperDashboard() {
               <DollarSign className="h-6 w-6 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">$89.50</div>
+              <div className="text-2xl font-bold">{stats.averagePrice}</div>
               <p className="text-xs text-muted-foreground">
                 +3.2% from last month
               </p>
