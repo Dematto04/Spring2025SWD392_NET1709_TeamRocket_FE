@@ -23,53 +23,94 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { toast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
 import { useDebounce } from '@/hooks/useDebounce';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import {
+  Wallet as WalletIcon,
+  ArrowUpRight,
+  ArrowDownLeft,
+  Clock,
+  DollarSign,
+  Calendar,
+  CreditCard,
+  RefreshCw,
+  ChevronLeft,
+  ChevronRight,
+  Search,
+  Filter,
+  AlertCircle,
+  CheckCircle,
+  XCircle,
+  Loader2,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { motion, AnimatePresence } from "framer-motion";
+import WalletTransactionHistory from './WalletTransactionHistory';
 
 const TRANSACTION_TYPES = [
   { 
     value: 'WithdrawRequestUser', 
     label: 'Withdraw Requests',
-    description: 'Show withdraw requests by user'
+    description: 'Show withdraw requests by user',
+    icon: <Clock className="h-4 w-4" />
   },
   { 
     value: 'WithdrawUser', 
     label: 'Withdrawals',
-    description: 'Show withdrawals by user'
+    description: 'Show withdrawals by user',
+    icon: <ArrowUpRight className="h-4 w-4" />
   },
   { 
     value: 'WithdrawRejectUser', 
     label: 'Rejected Withdrawals',
-    description: 'Show rejected withdrawals by user'
+    description: 'Show rejected withdrawals by user',
+    icon: <XCircle className="h-4 w-4" />
   },
   { 
     value: 'ShowWithdrawHistoryUser', 
     label: 'Withdrawal History',
-    description: 'Show all withdrawal transactions (including deposit, done/pending/fail withdraw)'
+    description: 'Show all withdrawal transactions',
+    icon: <RefreshCw className="h-4 w-4" />
   },
   { 
     value: 'Deposit', 
     label: 'Deposits',
-    description: 'Show deposit transactions'
+    description: 'Show deposit transactions',
+    icon: <ArrowDownLeft className="h-4 w-4" />
   },
   { 
     value: 'ShowAllHistoryUser', 
     label: 'All Transactions',
-    description: 'Show all transaction history'
+    description: 'Show all transaction history',
+    icon: <DollarSign className="h-4 w-4" />
   }
 ];
 
 const Wallet = () => {
   // States
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
   const [depositAmount, setDepositAmount] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
-  const [transactionType, setTransactionType] = useState('ShowAllHistoryUser');
+  const [activeTab, setActiveTab] = useState("overview");
 
   // Debounced values
   const debouncedDepositAmount = useDebounce(depositAmount, 500);
@@ -77,13 +118,12 @@ const Wallet = () => {
 
   // API Hooks
   const { data: transactions, isLoading: isLoadingTransactions } = useGetWalletTransactionQuery({
-    pageIndex: page,
-    pageSize: pageSize,
-    transactionType: transactionType
+    pageIndex: 1,
+    pageSize: 5,
+    transactionType: 'ShowAllHistoryUser'
   });
-  const { data: balanceData } = useGetBalanceQuery();
-  const [createDepositPayment] = useCreateDepositPaymentMutation();
-  const [processDeposit] = useProcessDepositMutation();
+  const { data: balanceData, isLoading: isLoadingBalance } = useGetBalanceQuery();
+  const [createDepositPayment, { isLoading: isDepositLoading }] = useCreateDepositPaymentMutation();
   const [sendWithdrawRequest, { isLoading: isWithdrawLoading }] = useSendWithdrawRequestMutation();
 
   // Exchange queries
@@ -146,179 +186,313 @@ const Wallet = () => {
     }
   };
 
-  const handleTransactionTypeChange = (value) => {
-    setTransactionType(value);
-    setPage(1);
-  };
-
   const formatDate = (dateString) => {
-    return format(new Date(dateString), 'dd/MM/yyyy HH:mm:ss');
+    return format(new Date(dateString), 'MMM d, yyyy • HH:mm');
   };
 
   const formatAmount = (amount) => {
-    return new Intl.NumberFormat('USD', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD'
     }).format(amount);
   };
 
-  if (isLoadingTransactions) {
-    return <div>Loading...</div>;
-  }
+  // Calculate summary statistics
+  const calculateStats = () => {
+    if (!transactions?.data?.items) return { deposits: 0, withdrawals: 0, pending: 0 };
+    
+    return transactions.data.items.reduce((stats, transaction) => {
+      if (transaction.type === 'Deposit' && transaction.status === 'Done') {
+        stats.deposits += transaction.amount;
+      } else if (transaction.type === 'Withdraw' && transaction.status === 'Done') {
+        stats.withdrawals += transaction.amount;
+      } else if (transaction.status === 'Pending') {
+        stats.pending += transaction.amount;
+      }
+      return stats;
+    }, { deposits: 0, withdrawals: 0, pending: 0 });
+  };
+
+  const stats = calculateStats();
+
+  // Get status badge styling
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case 'Done':
+        return (
+          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1">
+            <CheckCircle className="h-3 w-3" />
+            <span>Completed</span>
+          </Badge>
+        );
+      case 'Pending':
+        return (
+          <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 flex items-center gap-1">
+            <Clock className="h-3 w-3" />
+            <span>Pending</span>
+          </Badge>
+        );
+      case 'Rejected':
+        return (
+          <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 flex items-center gap-1">
+            <XCircle className="h-3 w-3" />
+            <span>Rejected</span>
+          </Badge>
+        );
+      default:
+        return (
+          <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">
+            {status}
+          </Badge>
+        );
+    }
+  };
 
   return (
-    <div className="p-6 rounded-lg shadow-sm">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Wallet</h2>
-        <div className="text-2xl font-bold">
-          Balance: {formatAmount(balanceData?.data || 0)}
-        </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex gap-4 mb-6">
-        <Button onClick={() => setIsDepositModalOpen(true)}>
-          Deposit
-        </Button>
-        <Button onClick={() => setIsWithdrawModalOpen(true)} variant="outline">
-          Withdraw
-        </Button>
-      </div>
-
-      {/* Add Transaction Type Filter */}
-      <div className="mb-6">
-        <div className="flex items-center gap-4">
-          <div className="w-72">
-            <Select value={transactionType} onValueChange={handleTransactionTypeChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select transaction type" />
-              </SelectTrigger>
-              <SelectContent>
-                {TRANSACTION_TYPES.map((type) => (
-                  <SelectItem 
-                    key={type.value} 
-                    value={type.value}
-                  >
-                    <div className="flex flex-col">
-                      <span>{type.label}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {type.description}
-                      </span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+    <div className="space-y-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid grid-cols-2 mb-4">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="transactions">Transactions</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="overview" className="space-y-6">
+          {/* Balance Card */}
+          <Card className="overflow-hidden">
+            <div className="bg-gradient-to-r from-primary/90 to-primary p-6 text-primary-foreground">
+              <div className="flex items-center gap-2 mb-2">
+                <WalletIcon className="h-5 w-5" />
+                <h3 className="text-lg font-medium">Your Balance</h3>
+              </div>
+              
+              {isLoadingBalance ? (
+                <Skeleton className="h-10 w-40 bg-white/20" />
+              ) : (
+                <div className="text-3xl font-bold">
+                  {formatAmount(balanceData?.data || 0)}
+                </div>
+              )}
+            </div>
+            
+            <CardContent className="p-6">
+              <div className="flex flex-wrap gap-4 justify-between">
+                <Button 
+                  onClick={() => setIsDepositModalOpen(true)}
+                  className="flex-1 min-w-[120px]"
+                >
+                  <ArrowDownLeft className="mr-2 h-4 w-4" />
+                  Deposit
+                </Button>
+                <Button 
+                  onClick={() => setIsWithdrawModalOpen(true)} 
+                  variant="outline"
+                  className="flex-1 min-w-[120px]"
+                >
+                  <ArrowUpRight className="mr-2 h-4 w-4" />
+                  Withdraw
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Total Deposits</p>
+                    <p className="text-2xl font-bold text-green-600">{formatAmount(stats.deposits)}</p>
+                  </div>
+                  <div className="bg-green-100 p-2 rounded-full">
+                    <ArrowDownLeft className="h-5 w-5 text-green-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Total Withdrawals</p>
+                    <p className="text-2xl font-bold text-purple-600">{formatAmount(stats.withdrawals)}</p>
+                  </div>
+                  <div className="bg-purple-100 p-2 rounded-full">
+                    <ArrowUpRight className="h-5 w-5 text-purple-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Pending Transactions</p>
+                    <p className="text-2xl font-bold text-yellow-600">{formatAmount(stats.pending)}</p>
+                  </div>
+                  <div className="bg-yellow-100 p-2 rounded-full">
+                    <Clock className="h-5 w-5 text-yellow-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </div>
-      </div>
-
-      {/* Transactions Table */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full border border-border">
-          <thead>
-            <tr className="bg-muted">
-              <th className="px-4 py-3 text-left">Type</th>
-              <th className="px-4 py-3 text-left">Amount</th>
-              <th className="px-4 py-3 text-left">Status</th>
-              <th className="px-4 py-3 text-left">Date</th>
-              <th className="px-4 py-3 text-left">Reference ID</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transactions?.data?.items.map((transaction) => (
-              <tr key={transaction.id} className="border-b border-border hover:bg-muted/50">
-                <td className="px-4 py-3">
-                  <span className={`px-2 py-1 rounded-full text-sm ${
-                    transaction.type === 'Deposit' ? 'bg-blue-100 text-blue-800' :
-                    transaction.type === 'Withdraw' ? 'bg-purple-100 text-purple-800' :
-                    'bg-gray-100 text-gray-800'
-                  }`}>
-                    {transaction.type}
-                  </span>
-                </td>
-                <td className="px-4 py-3">
-                  <span className={transaction.type === 'Withdraw' ? 'text-red-600' : 'text-green-600'}>
-                    {transaction.type === 'Withdraw' ? '- ' : '+ '}
-                    {formatAmount(transaction.amount)}
-                  </span>
-                </td>
-                <td className="px-4 py-3">
-                  <span className={`px-2 py-1 rounded-full text-sm ${
-                    transaction.status === 'Done' ? 'bg-green-100 text-green-800' :
-                    transaction.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                    transaction.status === 'Rejected' ? 'bg-red-100 text-red-800' :
-                    'bg-gray-100 text-gray-800'
-                  }`}>
-                    {transaction.status}
-                  </span>
-                </td>
-                <td className="px-4 py-3">{formatDate(transaction.createdDate)}</td>
-                <td className="px-4 py-3">
-                  {transaction.referenceId || '-'}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination */}
-      {transactions?.data?.totalPages > 1 && (
-        <div className="flex justify-between items-center mt-4">
-          <Button 
-            onClick={() => setPage(prev => Math.max(1, prev - 1))}
-            disabled={!transactions.data.hasPrevious}
-          >
-            Previous
-          </Button>
-          <span>
-            Page {page} of {transactions.data.totalPages}
-          </span>
-          <Button 
-            onClick={() => setPage(prev => prev + 1)}
-            disabled={!transactions.data.hasNext}
-          >
-            Next
-          </Button>
-        </div>
-      )}
+          
+          {/* Recent Transactions */}
+          <Card>
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-center">
+                <CardTitle>Recent Transactions</CardTitle>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setActiveTab("transactions")}
+                  className="text-primary"
+                >
+                  View All
+                </Button>
+              </div>
+              <CardDescription>Your most recent financial activities</CardDescription>
+            </CardHeader>
+            <CardContent className="p-6">
+              {isLoadingTransactions ? (
+                <div className="space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="h-10 w-10 rounded-full" />
+                        <div className="space-y-2">
+                          <Skeleton className="h-4 w-[100px]" />
+                          <Skeleton className="h-3 w-[80px]" />
+                        </div>
+                      </div>
+                      <Skeleton className="h-5 w-[80px]" />
+                    </div>
+                  ))}
+                </div>
+              ) : transactions?.data?.items?.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <div className="flex justify-center mb-2">
+                    <AlertCircle className="h-8 w-8" />
+                  </div>
+                  <p>No transactions found</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {transactions?.data?.items.slice(0, 5).map((transaction) => (
+                    <div key={transaction.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-full ${
+                          transaction.type === 'Deposit' ? 'bg-blue-100' : 'bg-purple-100'
+                        }`}>
+                          {transaction.type === 'Deposit' ? (
+                            <ArrowDownLeft className={`h-5 w-5 text-blue-600`} />
+                          ) : (
+                            <ArrowUpRight className={`h-5 w-5 text-purple-600`} />
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-medium">{transaction.type}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {formatDate(transaction.createdDate)}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <span className={`font-semibold ${
+                          transaction.type === 'Withdraw' ? 'text-red-600' : 'text-green-600'
+                        }`}>
+                          {transaction.type === 'Withdraw' ? '- ' : '+ '}
+                          {formatAmount(transaction.amount)}
+                        </span>
+                        <div className="mt-1">
+                          {getStatusBadge(transaction.status)}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="transactions">
+          <WalletTransactionHistory formatAmount={formatAmount} formatDate={formatDate} />
+        </TabsContent>
+      </Tabs>
 
       {/* Deposit Modal */}
       <Dialog open={isDepositModalOpen} onOpenChange={setIsDepositModalOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Deposit to Wallet</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <ArrowDownLeft className="h-5 w-5 text-primary" />
+              Deposit to Wallet
+            </DialogTitle>
+            <DialogDescription>
+              Add funds to your wallet using VNPay
+            </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleDeposit}>
             <div className="grid gap-4 py-4">
               <div className="space-y-2">
                 <Label>Amount (USD)</Label>
                 <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    <DollarSign className="h-4 w-4" />
+                  </div>
                   <Input
                     type="number"
                     placeholder="0.00"
                     value={depositAmount}
                     onChange={(e) => setDepositAmount(e.target.value)}
-                    className="pr-16"
+                    className="pl-10 pr-16"
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
                     USD
                   </span>
                 </div>
                 {depositAmount && depositExchangeData?.data && (
-                  <span className="text-sm text-muted-foreground">
-                    ≈ {depositExchangeData.data.toLocaleString()} VND
-                  </span>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
+                    <RefreshCw className="h-3 w-3" />
+                    <span>≈ {depositExchangeData.data.toLocaleString()} VND</span>
+                  </div>
                 )}
+              </div>
+              
+              <div className="bg-blue-50 p-3 rounded-md border border-blue-100 text-sm text-blue-700 mt-2">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="h-4 w-4 mt-0.5" />
+                  <div>
+                    You will be redirected to VNPay to complete your deposit. The funds will be available in your wallet immediately after successful payment.
+                  </div>
+                </div>
               </div>
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsDepositModalOpen(false)}>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setIsDepositModalOpen(false)}
+                disabled={isDepositLoading}
+              >
                 Cancel
               </Button>
-              <Button type="submit">
-                Proceed to Payment
+              <Button 
+                type="submit"
+                disabled={isDepositLoading || !depositAmount || Number(depositAmount) <= 0}
+              >
+                {isDepositLoading ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Processing...
+                  </span>
+                ) : (
+                  "Proceed to Payment"
+                )}
               </Button>
             </DialogFooter>
           </form>
@@ -327,40 +501,67 @@ const Wallet = () => {
 
       {/* Withdraw Modal */}
       <Dialog open={isWithdrawModalOpen} onOpenChange={setIsWithdrawModalOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Withdraw from Wallet</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <ArrowUpRight className="h-5 w-5 text-primary" />
+              Withdraw from Wallet
+            </DialogTitle>
+            <DialogDescription>
+              Request to withdraw funds from your wallet
+            </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleWithdraw}>
             <div className="grid gap-4 py-4">
-              <div className="text-sm text-muted-foreground">
-                Current Balance: {formatAmount(balanceData?.data || 0)}
+              <div className="bg-muted p-3 rounded-md flex items-center justify-between">
+                <span className="text-sm">Current Balance:</span>
+                <span className="font-semibold">{formatAmount(balanceData?.data || 0)}</span>
               </div>
+              
               <div className="space-y-2">
                 <Label>Amount (USD)</Label>
                 <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    <DollarSign className="h-4 w-4" />
+                  </div>
                   <Input
                     type="number"
                     placeholder="0.00"
                     value={withdrawAmount}
                     onChange={(e) => setWithdrawAmount(e.target.value)}
-                    className="pr-16"
+                    className="pl-10 pr-16"
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
                     USD
                   </span>
                 </div>
                 {withdrawAmount && withdrawExchangeData?.data && (
-                  <span className="text-sm text-muted-foreground">
-                    ≈ {withdrawExchangeData.data.toLocaleString()} VND
-                  </span>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
+                    <RefreshCw className="h-3 w-3" />
+                    <span>≈ {withdrawExchangeData.data.toLocaleString()} VND</span>
+                  </div>
                 )}
               </div>
+              
               {Number(withdrawAmount) > (balanceData?.data || 0) && (
-                <p className="text-sm text-destructive">
-                  Amount cannot exceed your current balance
-                </p>
+                <div className="bg-red-50 p-3 rounded-md border border-red-100 text-sm text-red-700">
+                  <div className="flex items-start gap-2">
+                    <AlertCircle className="h-4 w-4 mt-0.5" />
+                    <div>
+                      Withdrawal amount cannot exceed your current balance.
+                    </div>
+                  </div>
+                </div>
               )}
+              
+              <div className="bg-amber-50 p-3 rounded-md border border-amber-100 text-sm text-amber-700">
+                <div className="flex items-start gap-2">
+                  <Clock className="h-4 w-4 mt-0.5" />
+                  <div>
+                    Withdrawal requests are typically processed within 1-3 business days. You will be notified once your request has been processed.
+                  </div>
+                </div>
+              </div>
             </div>
             <DialogFooter>
               <Button 
@@ -379,7 +580,14 @@ const Wallet = () => {
                   Number(withdrawAmount) <= 0
                 }
               >
-                {isWithdrawLoading ? "Processing..." : "Request Withdrawal"}
+                {isWithdrawLoading ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Processing...
+                  </span>
+                ) : (
+                  "Request Withdrawal"
+                )}
               </Button>
             </DialogFooter>
           </form>

@@ -133,7 +133,6 @@ export default function UserManagement() {
                   <TableHead>Contact</TableHead>
                   <TableHead>Birthday</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -171,11 +170,6 @@ export default function UserManagement() {
                       >
                         {user.status}
                       </span>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="outline" size="sm">
-                        View Details
-                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}

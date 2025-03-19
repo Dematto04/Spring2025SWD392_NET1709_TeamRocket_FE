@@ -56,7 +56,7 @@ export function AdminBookings() {
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl font-bold">
-            Booking History - {bookings[0]?.serviceName}
+            Booking History
           </CardTitle>
           
           <div className="flex gap-2 mt-4">
