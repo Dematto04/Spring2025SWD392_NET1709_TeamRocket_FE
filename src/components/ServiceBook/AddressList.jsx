@@ -27,17 +27,18 @@ export default function AddressList({ addressList = [], setDefaultAddress}) {
 
   const handleSave = async () => {
     if (!tempSelected) return;
-
+    console.log({tempSelected});
+    
     setSelectedAddress(tempSelected);
     setDefaultAddress({
-        defaultAddress: tempSelected.address,
-        defaultAddressId: tempSelected.placeId
+        defaultAddress: tempSelected.address_line,
+        defaultAddressId: tempSelected.place_id
     })
-    form.setValue("location", tempSelected?.placeId);
+    form.setValue("location", tempSelected?.place_id);
     form.setValue("city", tempSelected?.city || "");
     form.setValue("district", tempSelected?.district || "");
-    form.setValue("address_line", tempSelected.address || "");
-    form.setValue("place_id", tempSelected.placeId);
+    form.setValue("address_line", tempSelected.address_line || "");
+    form.setValue("place_id", tempSelected.place_id);
     form.setValue("addressId", tempSelected.id)
     if(setAsDefault){
         updateAddress({...tempSelected, isDefault: true})
@@ -64,7 +65,7 @@ export default function AddressList({ addressList = [], setDefaultAddress}) {
               <div>
                 <p className="font-medium">{defaultAddress.title}</p>
                 <p className="text-sm text-gray-500">
-                  {defaultAddress.address}
+                  {defaultAddress.address_line}
                 </p>
               </div>
               {defaultAddress.isDefault && <Badge>Default</Badge>}
@@ -89,7 +90,7 @@ export default function AddressList({ addressList = [], setDefaultAddress}) {
                   >
                     <div>
                       <p className="font-medium">{addr.title}</p>
-                      <p className="text-sm text-gray-500">{addr.address}</p>
+                      <p className="text-sm text-gray-500">{addr.address_line}</p>
                     </div>
                   </Card>
                 )
@@ -111,10 +112,10 @@ export default function AddressList({ addressList = [], setDefaultAddress}) {
 
           <DialogFooter className="flex justify-end gap-2 mt-4">
             <Button variant="outline" onClick={() => setIsOpen(false)}>
-              Hủy
+              Cancel
             </Button>
             <Button onClick={handleSave} disabled={!tempSelected}>
-              Lưu
+              Save
             </Button>
           </DialogFooter>
         </DialogContent>

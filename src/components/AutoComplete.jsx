@@ -126,7 +126,7 @@ function AutoComplete({ form, defaultAddress, defaultAddressId }) {
             </PopoverContent>
           </Popover>
           <FormDescription>
-            This is the address that will be shown in your service.
+            {/* This is the address that will be shown in your service. */}
           </FormDescription>
           <FormMessage />
         </FormItem>

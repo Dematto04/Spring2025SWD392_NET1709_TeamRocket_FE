@@ -26,7 +26,7 @@ function UpdateServiceAdditionalService({
   additionalFields,
 }) {
   return (
-    <AccordionItem value="item-6">
+    <AccordionItem value="item-8">
       <AccordionTrigger className="text-lg text-primary">
         Additional Service
       </AccordionTrigger>

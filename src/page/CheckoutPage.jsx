@@ -15,9 +15,10 @@ import {
 } from "@/redux/features/bookingSlice";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
+import { ArrowLeft } from "lucide-react";
 
 const CheckoutSkeleton = () => (
   <div className="w-full bg-background p-4 rounded-xl">
@@ -97,19 +98,20 @@ function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState([]);
 
   const timeSlot = useSelector(selectServiceBookingTimeSlot);
-  const [getCheckoutDetail, { data, isLoading, isError }] =
+  const [getCheckoutDetail, { data, isLoading, isError, isSuccess, error }] =
     useGetServiceCheckoutDetailMutation();
   const [placeOrder, { isLoading: isPlacing, data: order }] =
     usePlaceOrderServiceMutation();
   const [checkout, setCheckout] = useState();
- 
-  
+  const nav = useNavigate();
+
   useEffect(() => {
     const fn = async () => {
       if (!timeSlot?.id || !address?.addressId || !service?.serviceId) {
+        console.log({ timeSlot, address, service });
         
         return;
-      };
+      }
 
       const result = await getCheckoutDetail({
         timeslot_id: timeSlot?.id,
@@ -122,8 +124,11 @@ function CheckoutPage() {
       });
 
       if (result.error) {
+        console.log(result.error.data.messages.Error[0]);
+
         toast({
           title: "Cannot get checkout detail",
+          description: result.error.data.messages.Error[0],
           variant: "destructive",
         });
         return;
@@ -131,16 +136,14 @@ function CheckoutPage() {
       setCheckout(result.data.data);
     };
     fn();
-  }, [timeSlot?.id, address?.addressId, service?.id, additionalService]);
+  }, [timeSlot?.id, address?.addressId, service?.serviceId, additionalService]);
 
   const handlePlaceOrder = async () => {
-    const result = await placeOrder(
-      {
-        id: checkout?.checkout_id,
-        paymentMethod: paymentMethod,
-        amount: checkout?.total_price,
-      },
-    );
+    const result = await placeOrder({
+      id: checkout?.checkout_id,
+      paymentMethod: paymentMethod,
+      amount: checkout?.total_price,
+    });
     if (result.error) {
       toast({
         title: "Cannot place order",
@@ -164,20 +167,20 @@ function CheckoutPage() {
 
   return (
     <div className="w-full min-h-screen bg-secondary mb-48">
-      {checkout && checkout?.status !== "Pending" && <Navigate to={"/checkout"} />}
+      {checkout && checkout?.status !== "Pending" && (
+        <Navigate to={"/"} />
+      )}
       <div className="container mx-auto px-6 lg:px-16 h-full py-40">
-        {isLoading || !checkout ? (
+        {isLoading ? (
           <CheckoutSkeleton />
-        ) : (
+        ) : isSuccess ? (
           <div className="w-full bg-background p-4 rounded-xl">
             <h1 className="text-xl leading-none tracking-tight font-semibold">
               Checkout
             </h1>
             <div className="flex flex-col md:flex-row gap-6 md:p-6">
               <div className="md:w-2/3">
-                <CheckoutItems
-                 checkout={checkout && checkout}
-                />
+                <CheckoutItems checkout={checkout && checkout} />
               </div>
               <div className="md:w-1/3">
                 <CheckoutSummary
@@ -189,6 +192,19 @@ function CheckoutPage() {
                 />
               </div>
             </div>
+          </div>
+        ) : (
+          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-3 rounded-lg">
+            <p className="font-medium">
+              ⚠️ Cleaning Service Not Available for this Distance!
+            </p>
+            <button
+              onClick={() => nav(`/service/booking/${service?.serviceId}`)}
+              className="mt-3 flex items-center justify-center bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
+            >
+              <ArrowLeft />
+              <div>You may change the address or choose another service</div>
+            </button>
           </div>
         )}
       </div>

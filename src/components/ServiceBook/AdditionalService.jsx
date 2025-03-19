@@ -34,7 +34,7 @@ function AdditionalService() {
 
   const dispatch = useDispatch();
   const { data, isLoading } = useGetAdditionalServicesQuery({ serviceId: id });
-const checkedItem = useSelector(selectAdditional);
+  const checkedItem = useSelector(selectAdditional);
   const handleAdd = (additionalService) => {
     dispatch(toggleAdditional(additionalService));
   };
@@ -77,13 +77,18 @@ const checkedItem = useSelector(selectAdditional);
                 <div>
                   <h2 className="font-medium">{addition.name}</h2>
                   <p className="font-medium w-full text-sm text-gray-500">
-                    {/* Fixing faulty wiring, outlets, switches, and more to ensure. */}
+                    {addition.description}
                   </p>
                 </div>
                 <div className="flex justify-between w-full items-center">
-                  <span className="text-sm text-primary font-medium">
-                    ${addition.price}
-                  </span>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">
+                      Estimate: {addition.duration} mins
+                    </span>
+                    <span className="text-sm text-primary font-medium">
+                      ${addition.price}
+                    </span>
+                  </div>
                   <Button
                     onClick={() => handleAdd(addition)}
                     variant={

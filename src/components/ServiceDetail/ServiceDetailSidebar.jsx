@@ -31,7 +31,7 @@ function ServiceDetailSidebar({service, housekeeper}) {
         <Separator />
         <div>
           <Link
-            to={`/service/booking/${service.id}`}
+            to={`/service/booking/${service?.id}`}
             className="flex gap-2 items-center text-lg"
           >
             <Button className="mt-8 w-full py-6">
@@ -39,45 +39,30 @@ function ServiceDetailSidebar({service, housekeeper}) {
               <span>Book service</span>
             </Button>
           </Link>
-
-          <Button variant="outline" className="mt-4 w-full py-6">
-            <Link className="flex gap-2 items-center text-lg">
-              <Mail />
-              <span>Send Enquiry</span>
-            </Link>
-          </Button>
         </div>
         <div>
           <h1 className="text-3xl font-semibold mt-8">Housekeeper info</h1>
           {/* housekeeper personal info */}
           <div className="w-full mt-8 py-6 bg-secondary flex flex-col items-center justify-center rounded-lg">
             <div>
-              <img src={housekeeper.avatar} className="w-20 h-20 rounded-full" />
+              <img src={housekeeper?.avatar} className="w-20 h-20 rounded-full" />
             </div>
-            <div className="text-lg font-medium mt-4">{housekeeper.name}</div>
+            <div className="text-lg font-medium mt-4">{housekeeper?.name}</div>
             <div>
               <div className="flex gap-1 items-center">
                 <Star size={14} color="#ffc107" fill="#ffc107" />
-                <span className="text-sm font-normal">4.9 (255 reviews)</span>
+                <span className="text-sm font-normal">{housekeeper?.review}</span>
               </div>
             </div>
           </div>
           {/* housekeeper contact info */}
           <div className="mt-4 space-y-2">
-            <div className="flex justify-between">
-              <div className="flex items-center gap-2">
-                <User size={16} />
-                <span>Member since</span>
-              </div>
-              <div>{housekeeper.memberSince}</div>
-            </div>
-
-            <div className="flex justify-between">
+            <div className="flex justify-between items-start">
               <div className="flex items-center gap-2">
                 <MapPin size={16} />
                 <span>Address</span>
               </div>
-              <div>{housekeeper.address}</div>
+              <div className="w-48 text-end ">{housekeeper?.address}</div>
             </div>
 
             <div className="flex justify-between">
@@ -85,7 +70,7 @@ function ServiceDetailSidebar({service, housekeeper}) {
                 <MailIcon size={16} />
                 <span>Email</span>
               </div>
-              <div>{housekeeper.email}</div>
+              <div>{housekeeper?.email}</div>
             </div>
 
             <div className="flex justify-between">
@@ -93,7 +78,7 @@ function ServiceDetailSidebar({service, housekeeper}) {
                 <Phone size={16} />
                 <span>Phone</span>
               </div>
-              <div>+123 456 7890</div>
+              <div>{housekeeper?.mobile}</div>
             </div>
           </div>
         </div>
