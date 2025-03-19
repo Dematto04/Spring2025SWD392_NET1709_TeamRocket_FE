@@ -8,7 +8,6 @@ const defaultImages = [
 ];
 
 export default function ServiceDetailSteps({ data }) {
-    console.log(data);
     
   return (
     <div className="flex flex-wrap md:flex-nowrap gap-6 items-start">

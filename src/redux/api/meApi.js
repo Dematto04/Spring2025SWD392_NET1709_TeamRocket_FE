@@ -9,9 +9,15 @@ const meApi = apiSlice.injectEndpoints({
       }),
       providesTags: ["Services"],
     }),
+    getHousekeeperProfile: build.query({
+      query: () => ({
+        url: "/Housekeeper",
+      }),
+      providesTags: ["HousekeeperProfile"],
+    }),
   }),
 });
 
 export const {
- 
-} = serviceApi;
+  useGetHousekeeperProfileQuery,
+} = meApi;

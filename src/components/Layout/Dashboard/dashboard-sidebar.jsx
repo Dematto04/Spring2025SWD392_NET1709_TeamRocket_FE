@@ -22,6 +22,9 @@ export function DashboardSidebar({ ...props }) {
   const [clickedItem, setClickedItem] = React.useState(localStorage.getItem("dashboard-item") || "Dashboard");
   const user = useSelector(selectUser);
   let navItem;
+  if(!user){
+    return null;
+  }
   switch(user.role){
     case "Housekeeper":
       navItem = data.navHousekeeper;

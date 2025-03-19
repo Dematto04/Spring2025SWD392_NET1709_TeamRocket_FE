@@ -9,7 +9,6 @@ export const authApi = apiSlice.injectEndpoints({
         body: data,
       }),
       transformResponse: (res) => {
-        console.log(res);
         return res.data;
       },
       invalidateTags: ["Auth"],
@@ -58,6 +57,22 @@ export const authApi = apiSlice.injectEndpoints({
         body,
       }),
     }),
+    housekeeperRegister: build.mutation({
+      query: (body) => ({
+        url: "/Authentication/register/housekeeper",
+        method: "POST",
+        body,
+      }),
+    }),
+    checkEmail: build.mutation({
+      query: (email) => ({
+        url: "/Authentication/email-check",
+        method: "POST",
+        params: {
+          email,
+        },
+      }),
+    }),
   }),
 });
 
@@ -68,5 +83,7 @@ export const {
   useRefreshTokenMutation,
   useResendEmailMutation,
   useForgotPasswordMutation,
-  useResetPasswordMutation
+  useResetPasswordMutation,
+  useHousekeeperRegisterMutation,
+  useCheckEmailMutation,
 } = authApi;

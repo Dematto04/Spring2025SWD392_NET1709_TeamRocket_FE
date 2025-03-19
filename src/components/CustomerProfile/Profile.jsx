@@ -100,13 +100,11 @@ const Profile = ({ profileInfo }) => {
           phone: formattedPhoneNumber,
           gender: formattedGender,
           birth_date: formattedBirthdate 
-          // If the API expects the file itself (or a base64 string), you'll need to handle that conversion.
       };
   
-      console.log("Sending Data:", payload); // Debug: log the payload
+     
   
       const response = await updateProfile(payload).unwrap();
-      console.log("Response:", response);
   
       toast({
         title: "Profile Updated Successfully!",

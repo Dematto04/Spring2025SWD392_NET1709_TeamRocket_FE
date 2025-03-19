@@ -32,6 +32,10 @@ const housekeeperRegisterProfileSlice = createSlice({
     registerCV: (state, action) => {
       state.cv = action.payload;
     },
+    resetRegisterProfile: (state) => {
+      state.profile = null;
+      state.cv = null;
+    },
   },
 });
 export const selectUser = (state) => {
@@ -43,8 +47,11 @@ export const selectUser = (state) => {
 export const selectRegisterProfile = (state) => {
   return state.housekeeperRegisterProfile.profile;
 };
+export const selectEmail = (state) => {
+  return state.housekeeperRegister.email;
+};
 export const { housekeeperRegister } = housekeeperRegisterSlice.actions;
-export const { registerCV, registerProfile } =
+export const { registerCV, registerProfile, resetRegisterProfile } =
   housekeeperRegisterProfileSlice.actions;
 export const housekeeperRegisterProfileReducer =
   housekeeperRegisterProfileSlice.reducer;
