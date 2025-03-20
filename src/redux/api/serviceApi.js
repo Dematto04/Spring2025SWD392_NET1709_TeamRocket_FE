@@ -112,16 +112,6 @@ const serviceApi = apiSlice.injectEndpoints({
         }
       }),
     }),
-    getBookingCalendar: build.query({
-      query: ({referenceDate, navigationMode, viewMode}) => ({
-        url: '/Booking/BookingListCalendar',
-        params: {
-          referenceDate,
-          navigationMode,
-          viewMode,
-        }
-      }),
-    }),
   }),
 });
 
@@ -140,5 +130,5 @@ export const {
   useGetMyServicesDetailQuery,
   useGetFilterOptionsQuery,
   useGetTopServicesQuery,
-  useGetBookingCalendarQuery,
+  
 } = serviceApi;

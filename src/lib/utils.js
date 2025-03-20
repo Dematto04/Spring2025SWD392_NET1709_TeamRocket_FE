@@ -61,5 +61,35 @@ export const formatSchedule = (date) => {
     hour12: true,
   };
   const formattedDate = date1.toLocaleString("en-US", options);
-  return formattedDate
+  return formattedDate;
+};
+
+export const getStatusColor = (status) => {
+  switch (status.toLowerCase()) {
+    case "completed":
+      return "bg-green-500";
+    case "pending":
+      return "bg-pink-500";
+    case "cancelled":
+      return "bg-red-500";
+    case "in_progress":
+      return "bg-blue-500";
+    default:
+      return "bg-gray-500";
+  }
+};
+
+export const getStatusBadgeVariant = (status) => {
+  switch (status.toLowerCase()) {
+    case "completed":
+      return "success";
+    case "pending":
+      return "secondary";
+    case "cancelled":
+      return "destructive";
+    case "in_progress":
+      return "default";
+    default:
+      return "secondary";
+  }
 };
