@@ -41,6 +41,7 @@ import RefundRequestPage from "@/page/Dashboard/Staff/refundRequestPage";
 import RefundRequestDetail from "@/page/Dashboard/Staff/refundRequestDetail";
 import RegisterApprovePage from "@/page/Dashboard/Staff/RegisterApprovePage";
 import RegisterApproveDetail from "@/page/Dashboard/Staff/RegisterApproveDetail";
+import HousekeeperProfile from "@/page/Dashboard/Housekeeper/HousekeeperProfile";
 
 
 const routes = [
@@ -177,6 +178,12 @@ const routes = [
         component: HousekeeperEarning,
         allowedRoles: ["Housekeeper"]
       },
+      {
+        path: "/dashboard/housekeeper/me",
+        component: HousekeeperProfile,
+        allowedRoles: ["Housekeeper"]
+      },
+      
       //Staff routes
       {
         path: "/dashboard/staff",
