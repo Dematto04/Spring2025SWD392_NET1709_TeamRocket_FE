@@ -35,17 +35,17 @@ import {
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { format, parseISO } from 'date-fns';
-import { Loader2, ChevronLeft, ChevronRight, ImageIcon, AlertCircle } from 'lucide-react';
-import { CalendarIcon, UserIcon, MapPinIcon, StarIcon } from 'lucide-react';
+import { Loader2, ChevronLeft, ChevronRight, ImageIcon, AlertCircle, Clock, CalendarDays, CreditCard, MapPin, FileText, Info } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { PhoneIcon } from 'lucide-react';
+import { PhoneIcon, Mail } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from '@/hooks/use-toast';
+import { Separator } from '@/components/ui/separator';
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 12;
 const PLACEHOLDER_IMAGE = "/placeholder-service.jpg";
 
 function HouseKeeperBookingList() {
@@ -72,7 +72,7 @@ function HouseKeeperBookingList() {
   } = useGetHousekeeperBookingsQuery({
     page: pageIndex,
     pageSize: ITEMS_PER_PAGE,
-    status: statusFilter || undefined
+    status: statusFilter === "All" ? undefined : statusFilter
   });
 
   const {
@@ -105,7 +105,7 @@ function HouseKeeperBookingList() {
 
   // Status badge color mapping
   const getStatusVariant = (status) => {
-    switch (status.toLowerCase()) {
+    switch (status?.toLowerCase()) {
       case "completed":
         return "success";
       case "canceled":
@@ -115,6 +115,20 @@ function HouseKeeperBookingList() {
         return "purple";
       case "refunded":
         return "blue";
+      default:
+        return "secondary";
+    }
+  };
+
+  // Payment status badge color mapping
+  const getPaymentStatusVariant = (status) => {
+    switch (status?.toLowerCase()) {
+      case "succeed":
+        return "success";
+      case "failed":
+        return "destructive";
+      case "pending":
+        return "warning";
       default:
         return "secondary";
     }
@@ -201,10 +215,21 @@ function HouseKeeperBookingList() {
   const formatDateTime = (dateString, timeString) => {
     try {
       const date = parseISO(dateString);
-      return `${format(date, 'dd/MM/yyyy')} ${timeString}`;
+      return `${format(date, 'dd/MM/yyyy')} ${timeString || ''}`;
     } catch (e) {
       // Handle the case where date might not be a valid ISO string
       return `${dateString?.split('T')[0] || 'N/A'} ${timeString || ''}`;
+    }
+  };
+
+  // Format payment date
+  const formatPaymentDate = (dateString) => {
+    if (!dateString) return "N/A";
+    try {
+      const date = parseISO(dateString);
+      return format(date, 'dd/MM/yyyy HH:mm');
+    } catch (e) {
+      return dateString;
     }
   };
 
@@ -244,34 +269,6 @@ function HouseKeeperBookingList() {
                 <SelectItem value="refunded">Refunded</SelectItem>
               </SelectContent>
             </Select>
-
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline">
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {selectedDate ? format(selectedDate, 'PP') : 'Pick a date'}
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Select Date</DialogTitle>
-                </DialogHeader>
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={setSelectedDate}
-                />
-              </DialogContent>
-            </Dialog>
-
-            {selectedDate && (
-              <Button
-                variant="ghost"
-                onClick={() => setSelectedDate(null)}
-              >
-                Clear date
-              </Button>
-            )}
           </div>
 
           {/* Booking Cards Grid with improved image handling */}
@@ -332,10 +329,7 @@ function HouseKeeperBookingList() {
                         <div className="flex gap-2">
                           <span className="text-gray-500 min-w-[120px]">Amount</span>
                           <div className="flex gap-2 items-center">
-                            <span className="text-gray-900">: ₹{booking.totalPrice}</span>
-                            <Badge variant="secondary" className="bg-pink-100 text-pink-700 hover:bg-pink-100">
-                              COD
-                            </Badge>
+                            <span className="text-gray-900">: ${booking.totalPrice}</span>
                           </div>
                         </div>
 
@@ -394,7 +388,7 @@ function HouseKeeperBookingList() {
             </div>
           )}
 
-          {/* Booking Detail Dialog */}
+          {/* Updated Booking Detail Dialog */}
           <Dialog open={selectedBookingId !== null} onOpenChange={(open) => !open && setSelectedBookingId(null)}>
             <DialogContent className="max-w-md">
               <DialogHeader>
@@ -408,123 +402,95 @@ function HouseKeeperBookingList() {
                 ) : bookingDetail ? (
                   <div className="space-y-6">
                     {/* Service Info Section */}
-                    <div className="space-y-3">
-                      <h3 className="font-medium border-b pb-2 sticky top-0 bg-white">Service Information</h3>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="text-sm font-medium">Service:</div>
-                        <div className="text-sm">{bookingDetail.serviceName}</div>
-                        
-                        <div className="text-sm font-medium">Date:</div>
-                        <div className="text-sm">{formatDateTime(bookingDetail.preferDateStart, "")}</div>
-                        
-                        <div className="text-sm font-medium">Time:</div>
-                        <div className="text-sm">{bookingDetail.timeStart} - {bookingDetail.timeEnd}</div>
-                        
-                        <div className="text-sm font-medium">Status:</div>
-                        <div>
-                          <Badge variant={getStatusVariant(bookingDetail.status)}>
-                            {bookingDetail.status === "OnGoing" ? "Ongoing" : bookingDetail.status}
-                          </Badge>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-medium text-lg">{bookingDetail.serviceName}</h3>
+                        <Badge 
+                          variant={getStatusVariant(bookingDetail.status)}
+                          className="capitalize"
+                        >
+                          {bookingDetail.status === "OnGoing" ? "Ongoing" : bookingDetail.status}
+                        </Badge>
+                      </div>
+                      
+                      <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+                        <div className="flex items-center gap-2">
+                          <CalendarDays className="h-4 w-4 text-gray-500" />
+                          <span className="text-sm font-medium">
+                            {formatDateTime(bookingDetail.preferDateStart, '')}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="h-4 w-4 text-gray-500" />
+                          <span className="text-sm">
+                            {bookingDetail.timeStart} - {bookingDetail.timeEnd} 
+                            ({bookingDetail.cleaningServiceDuration} {bookingDetail.cleaningServiceDuration > 1 ? 'hours' : 'hour'})
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <MapPin className="h-4 w-4 text-gray-500" />
+                          <span className="text-sm">{bookingDetail.location}</span>
                         </div>
                       </div>
                     </div>
+
+                    <Separator />
+
+                    {/* Payment Info Section */}
+                    <div className="space-y-3">
+                      <h3 className="font-medium">Payment Information</h3>
+                      <div className="grid grid-cols-2 gap-y-2">
+                        <div className="text-sm text-gray-500">Payment Method:</div>
+                        <div className="text-sm font-medium flex items-center gap-1">
+                          <CreditCard className="h-3.5 w-3.5" />
+                          {bookingDetail.paymentMethod}
+                        </div>
+                        
+                        <div className="text-sm text-gray-500">Payment Status:</div>
+                        <Badge variant={getPaymentStatusVariant(bookingDetail.paymentStatus)} className="w-fit capitalize">
+                          {bookingDetail.paymentStatus}
+                        </Badge>
+                        
+                        <div className="text-sm text-gray-500">Payment Date:</div>
+                        <div className="text-sm">
+                          {formatPaymentDate(bookingDetail.paymentDate)}
+                        </div>
+                        
+                        <div className="text-sm text-gray-500">Total Amount:</div>
+                        <div className="text-sm font-semibold">${bookingDetail.totalPrice}</div>
+                      </div>
+                    </div>
+
+                    <Separator />
 
                     {/* Customer Info Section */}
                     <div className="space-y-3">
-                      <h3 className="font-medium border-b pb-2 sticky top-0 bg-white">Customer Information</h3>
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-10 w-10">
-                            <AvatarImage src={bookingDetail.customer?.avatarUrl} />
-                            <AvatarFallback className="bg-primary/10">
-                              {bookingDetail.customer?.fullName.charAt(0)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <div className="font-medium">{bookingDetail.customer?.fullName}</div>
-                            <div className="text-sm text-gray-500">{bookingDetail.customer?.email}</div>
-                          </div>
+                      <h3 className="font-medium">Customer Information</h3>
+                      <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                        <div className="font-medium">{bookingDetail.customerName}</div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Mail className="h-4 w-4 text-gray-500" />
+                          <span>{bookingDetail.customerMail}</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm">
                           <PhoneIcon className="h-4 w-4 text-gray-500" />
-                          <span>{bookingDetail.customer?.phoneNumber}</span>
+                          <span>{bookingDetail.customerPhoneNumber}</span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Location Section */}
-                    <div className="space-y-3">
-                      <h3 className="font-medium border-b pb-2 sticky top-0 bg-white">Location Details</h3>
-                      <div className="space-y-2">
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="text-sm font-medium">Address:</div>
-                          <div className="text-sm">{bookingDetail.addressLine1}</div>
-                          
-                          <div className="text-sm font-medium">District:</div>
-                          <div className="text-sm">{bookingDetail.district}</div>
-                          
-                          <div className="text-sm font-medium">City:</div>
-                          <div className="text-sm">{bookingDetail.city}</div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Price Breakdown Section */}
-                    <div className="space-y-3">
-                      <h3 className="font-medium border-b pb-2 sticky top-0 bg-white">Price Details</h3>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span>Service Price</span>
-                          <span>₹{bookingDetail.servicePrice}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Distance Price</span>
-                          <span>₹{bookingDetail.distancePrice}</span>
-                        </div>
-                        
-                        {/* Additional Services */}
-                        {bookingDetail.additionalPrice > 0 && (
-                          <div className="flex justify-between text-gray-600">
-                            <span>Additional Services</span>
-                            <span>₹{bookingDetail.additionalPrice}</span>
-                          </div>
-                        )}
-
-                        <div className="flex justify-between font-medium pt-2 border-t">
-                          <span>Total Amount</span>
-                          <span>₹{bookingDetail.totalPrice}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Notes Section */}
+                    {/* Notes Section - Only show if notes exist */}
                     {bookingDetail.note && (
-                      <div className="space-y-3">
-                        <h3 className="font-medium border-b pb-2 sticky top-0 bg-white">Notes</h3>
-                        <div className="text-sm bg-gray-50 p-3 rounded-md">
-                          {bookingDetail.note}
+                      <>
+                        <Separator />
+                        <div className="space-y-3">
+                          <h3 className="font-medium">Notes</h3>
+                          <div className="flex gap-2 bg-yellow-50 p-3 rounded-md">
+                            <FileText className="h-5 w-5 text-yellow-500 flex-shrink-0 mt-0.5" />
+                            <p className="text-sm">{bookingDetail.note}</p>
+                          </div>
                         </div>
-                      </div>
-                    )}
-
-                    {/* Feedback Section */}
-                    {bookingDetail.status === "Completed" && (bookingDetail.rating || bookingDetail.feedback) && (
-                      <div className="space-y-3">
-                        <h3 className="font-medium border-b pb-2 sticky top-0 bg-white">Feedback</h3>
-                        <div className="space-y-2">
-                          {bookingDetail.rating && (
-                            <div className="flex items-center gap-2">
-                              <StarIcon className="h-5 w-5 text-yellow-400" />
-                              <span className="text-sm">{bookingDetail.rating} / 5</span>
-                            </div>
-                          )}
-                          {bookingDetail.feedback && (
-                            <div className="text-sm bg-gray-50 p-3 rounded-md">
-                              {bookingDetail.feedback}
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                      </>
                     )}
                   </div>
                 ) : (

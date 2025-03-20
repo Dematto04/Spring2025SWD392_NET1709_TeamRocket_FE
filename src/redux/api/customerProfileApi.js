@@ -17,7 +17,15 @@ export const customerProfileApi = apiSlice.injectEndpoints({
       }),
       providesTags: ["Customer"]
     }),
+    updateProfileAvatar: build.mutation({
+      query: (avatarUrl) => ({
+        url: `/Customer/ProfileAvatar`,
+        method: "PUT",
+        params: { avatar: avatarUrl },
+      }),
+      invalidatesTags: ["Customer"],
+    }),
   }),
 });
 
-export const {useCustomerProfileQuery, useUpdateCustomerProfileMutation} = customerProfileApi;
+export const {useCustomerProfileQuery, useUpdateCustomerProfileMutation, useUpdateProfileAvatarMutation} = customerProfileApi;

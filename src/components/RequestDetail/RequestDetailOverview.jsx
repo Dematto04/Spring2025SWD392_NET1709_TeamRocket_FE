@@ -54,7 +54,7 @@ function RequestDetailOverview({ overview, additionalServices, duration, service
                     <div className="h-full flex gap-4 flex-wrap md:flex-nowrap">
                       <div className="md:shrink-0">
                         <img
-                          src={item.image || "/home-cleaning.webp"}
+                          src={item.url || "/home-cleaning.webp"}
                           className="h-full object-contain rounded-lg"
                           alt={item.additional_service_name}
                         />
@@ -67,6 +67,7 @@ function RequestDetailOverview({ overview, additionalServices, duration, service
                           {item.description && (
                             <p className="text-sm text-gray-600">{item.description}</p>
                           )}
+                          Duration: {item.duration} hours
                         </div>
                         <div className="flex flex-col items-end justify-end">
                           <span className="text-lg text-primary font-medium">
