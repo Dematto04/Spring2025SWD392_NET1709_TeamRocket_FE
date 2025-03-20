@@ -2,13 +2,6 @@ import React, { useState } from 'react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { format } from 'date-fns';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { 
   useGetWalletTransactionQuery, 
   useSendWithdrawRequestMutation,
@@ -48,13 +41,7 @@ import {
   ArrowDownLeft,
   Clock,
   DollarSign,
-  Calendar,
-  CreditCard,
   RefreshCw,
-  ChevronLeft,
-  ChevronRight,
-  Search,
-  Filter,
   AlertCircle,
   CheckCircle,
   XCircle,
@@ -62,7 +49,6 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { motion, AnimatePresence } from "framer-motion";
 import WalletTransactionHistory from './WalletTransactionHistory';
 
 const TRANSACTION_TYPES = [
@@ -198,22 +184,22 @@ const Wallet = () => {
   };
 
   // Calculate summary statistics
-  const calculateStats = () => {
-    if (!transactions?.data?.items) return { deposits: 0, withdrawals: 0, pending: 0 };
+  // const calculateStats = () => {
+  //   if (!transactions?.data?.items) return { deposits: 0, withdrawals: 0, pending: 0 };
     
-    return transactions.data.items.reduce((stats, transaction) => {
-      if (transaction.type === 'Deposit' && transaction.status === 'Done') {
-        stats.deposits += transaction.amount;
-      } else if (transaction.type === 'Withdraw' && transaction.status === 'Done') {
-        stats.withdrawals += transaction.amount;
-      } else if (transaction.status === 'Pending') {
-        stats.pending += transaction.amount;
-      }
-      return stats;
-    }, { deposits: 0, withdrawals: 0, pending: 0 });
-  };
+  //   return transactions.data.items.reduce((stats, transaction) => {
+  //     if (transaction.type === 'Deposit' && transaction.status === 'Done') {
+  //       stats.deposits += transaction.amount;
+  //     } else if (transaction.type === 'Withdraw' && transaction.status === 'Done') {
+  //       stats.withdrawals += transaction.amount;
+  //     } else if (transaction.status === 'Pending') {
+  //       stats.pending += transaction.amount;
+  //     }
+  //     return stats;
+  //   }, { deposits: 0, withdrawals: 0, pending: 0 });
+  // };
 
-  const stats = calculateStats();
+  // const stats = calculateStats();
 
   // Get status badge styling
   const getStatusBadge = (status) => {
@@ -296,7 +282,7 @@ const Wallet = () => {
           </Card>
           
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card>
               <CardContent className="p-6">
                 <div className="flex justify-between items-start">
@@ -338,7 +324,7 @@ const Wallet = () => {
                 </div>
               </CardContent>
             </Card>
-          </div>
+          </div> */}
           
           {/* Recent Transactions */}
           <Card>

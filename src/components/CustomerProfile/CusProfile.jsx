@@ -10,13 +10,23 @@ const CusProfile = ({ selectedMenu, setSelectedMenu, profileInfo}) => {
     <Card className="w-full relative z-[0] ">
       <CardHeader>
         <div className="flex items-center space-x-4">
-          <Avatar>
-            <AvatarImage src="/path/to/avatar.png" />
-            <AvatarFallback>DU</AvatarFallback>
+        <Avatar className="h-16 w-16 border-2 border-primary/10">
+            {profileInfo?.data?.avatar ? (
+              <AvatarImage 
+                src={profileInfo.data.avatar} 
+                alt={profileInfo.data.full_name || "User"}
+                onError={(e) => {
+                  e.target.onError = null;
+                  e.target.src = "https://villagesonmacarthur.com/wp-content/uploads/2020/12/Blank-Avatar.png";
+                }}
+              />
+            ) : null}
+            <AvatarFallback className="bg-primary/10">
+              {profileInfo?.data?.full_name} 
+            </AvatarFallback>
           </Avatar>
           <div>
             <CardTitle>{profileInfo.data.full_name}</CardTitle>
-            <CardDescription>Member Since Dec 2024</CardDescription>
           </div>
         </div>
       </CardHeader>
