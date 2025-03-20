@@ -109,7 +109,7 @@ function CheckoutPage() {
     const fn = async () => {
       if (!timeSlot?.id || !address?.addressId || !service?.serviceId) {
         console.log({ timeSlot, address, service });
-        
+
         return;
       }
 
@@ -148,6 +148,12 @@ function CheckoutPage() {
       });
       return;
     }
+    console.log({
+      id: checkout?.checkout_id,
+      paymentMethod: paymentMethod,
+      amount: checkout?.total_price,
+    });
+
     const result = await placeOrder({
       id: checkout?.checkout_id,
       paymentMethod: paymentMethod,
@@ -162,8 +168,9 @@ function CheckoutPage() {
       });
       return;
     }
-    
-    window.open(result.data.url);
+
+    window.location.replace(result.data.url);
+ 
   };
 
   if (isError) {
@@ -176,9 +183,7 @@ function CheckoutPage() {
 
   return (
     <div className="w-full min-h-screen bg-secondary mb-48">
-      {checkout && checkout?.status !== "Pending" && (
-        <Navigate to={"/"} />
-      )}
+      {checkout && checkout?.status !== "Pending" && <Navigate to={"/"} />}
       <div className="container mx-auto px-6 lg:px-16 h-full py-40">
         {isLoading ? (
           <CheckoutSkeleton />
