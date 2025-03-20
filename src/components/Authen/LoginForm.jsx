@@ -197,7 +197,7 @@ export function LoginForm() {
             {isLoading && <LoaderCircle className="animate-spin" />} Login
           </Button>
 
-          <div className="relative text-center text-sm">
+          {/* <div className="relative text-center text-sm">
             <span className="relative z-10 bg-background px-2 text-muted-foreground">
               Or continue with
             </span>
@@ -213,7 +213,7 @@ export function LoginForm() {
           >
             <GoogleIcon />
             <span className="ml-2">Login with Google</span>
-          </Button>
+          </Button> */}
         </div>
 
         <div className="text-center text-sm">
