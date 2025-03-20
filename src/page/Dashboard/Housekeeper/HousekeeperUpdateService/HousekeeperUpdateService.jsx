@@ -41,7 +41,7 @@ const formSchema = z.object({
   description: z
     .string()
     .min(1, { message: "Service description is required" })
-    .max(225, { message: "Max characters is 225" }),
+    .max(2000, { message: "Max characters is 2000" }),
   duration: z.string().min(1, { message: "Service duration is required" }),
   price: z.string().min(1, { message: "Service price is required" }),
   serviceSteps: z.array(
