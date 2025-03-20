@@ -149,43 +149,12 @@ function HousekeeperDashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                Total Customers
-              </CardTitle>
-              <Users className="h-6 w-6 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">10,124</div>
-              <p className="text-xs text-muted-foreground">
-                +12% from last month
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Pending Orders
-              </CardTitle>
-              <Clock className="h-6 w-6 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">321</div>
-              <p className="text-xs text-muted-foreground">
-                +5% from last month
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
                 Average Order Value
               </CardTitle>
               <DollarSign className="h-6 w-6 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.averagePrice}</div>
-              <p className="text-xs text-muted-foreground">
-                +3.2% from last month
-              </p>
+              <div className="text-2xl font-bold">{Math.ceil(stats.averagePrice)}</div>
             </CardContent>
           </Card>
         </div>
@@ -200,69 +169,6 @@ function HousekeeperDashboard() {
 
       {/* Revenue Chart */}
       <RevenueChart />
-
-      {/* Recent Booking */}
-      <Card className="bg-background">
-        <CardHeader>
-          <CardTitle>Recent Booking</CardTitle>
-        </CardHeader>
-        {Array(1)
-          .fill(1)
-          .map((item, idx) => (
-            <>
-              <CardContent key={item} className=" min-h-40 md:h-52 rounded-lg ">
-                <div className="border p-4 h-full rounded-md flex gap-4 flex-wrap md:flex-nowrap">
-                  <div className="md:shrink-0">
-                    <img
-                      src="/home-cleaning.webp"
-                      className="h-full object-contain rounded-lg"
-                    />
-                  </div>
-                  <div className="flex flex-col justify-between flex-grow">
-                    <h2 className="text-xl font-semibold">Home Cleaning</h2>
-                    <div className="text-sm text-muted-foreground space-y-1">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-primary" />
-                        <span className="text-primary font-semibold">
-                          Booking Date:{" "}
-                        </span>
-                        <span>November 23, 2024, 3:45 pm - 4:15 pm</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="h-4 w-4 text-primary" />
-                        <span className="text-primary font-semibold">
-                          Amount:{" "}
-                        </span>
-                        <span>$100.00</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4 text-primary" />
-                        <span className="text-primary font-semibold">
-                          Location:{" "}
-                        </span>
-                        <span>Not Provided</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <User className="h-4 w-4 text-primary" />
-                        <span className="text-primary font-semibold">
-                          Customer:{" "}
-                        </span>
-                        <span>Demo</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Mail className="h-4 w-4 text-primary" />
-                        <span className="text-primary font-semibold">
-                          Email:{" "}
-                        </span>
-                        <span>customerdemo@example.com</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </>
-          ))}
-      </Card>
     </div>
   );
 }

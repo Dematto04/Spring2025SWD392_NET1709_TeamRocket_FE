@@ -32,7 +32,6 @@ import {
 import { cn } from "@/lib/utils";
 
 export function RevenueChart() {
-  const [timeRange, setTimeRange] = useState("weekly");
   const [chartConfig, setChartConfig] = useState({
     type: "year",
     yearStart: new Date().getFullYear(),
@@ -71,10 +70,20 @@ export function RevenueChart() {
       }));
     };
   
-    const handleYearChange = (value) => {
+    const handleYearStartChange = (value) => {
+      const yearValue = parseInt(value);
       setChartConfig(prev => ({
         ...prev,
-        yearStart: parseInt(value)
+        yearStart: yearValue,
+        // If end year is less than start year, set end year to start year
+        yearEnd: prev.yearEnd < yearValue ? yearValue : prev.yearEnd
+      }));
+    };
+  
+    const handleYearEndChange = (value) => {
+      setChartConfig(prev => ({
+        ...prev,
+        yearEnd: parseInt(value)
       }));
     };
 
@@ -104,7 +113,6 @@ export function RevenueChart() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="day">Daily View</SelectItem>
-                      <SelectItem value="week">Weekly View</SelectItem>
                       <SelectItem value="year">Yearly View</SelectItem>
                       <SelectItem value="years">Multi-Year View</SelectItem>
                     </SelectContent>
@@ -112,91 +120,138 @@ export function RevenueChart() {
                 </div>
 
                 {chartConfig.type === "day" ? (
-                  // Date Range Pickers for Daily View
-                  <>
-                    <div className="flex items-center gap-2">
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className={cn(
-                              "w-[200px] justify-start text-left font-normal",
-                              !startDate && "text-muted-foreground"
-                            )}
-                          >
-                            <Calendar1Icon className="mr-2 h-4 w-4" />
-                            {startDate ? format(startDate, "PPP") : <span>Start date</span>}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={startDate}
-                            onSelect={(date) => {
-                              setStartDate(date || new Date());
-                              if (date && date > endDate) {
-                                setEndDate(date);
-                              }
-                            }}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-
-                      <span className="text-muted-foreground">to</span>
-
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className={cn(
-                              "w-[200px] justify-start text-left font-normal",
-                              !endDate && "text-muted-foreground"
-                            )}
-                          >
-                            <Calendar1Icon className="mr-2 h-4 w-4" />
-                            {endDate ? format(endDate, "PPP") : <span>End date</span>}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={endDate}
-                            onSelect={(date) => setEndDate(date || new Date())}
-                            disabled={(date) =>
-                              date < startDate || date > new Date()
-                            }
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                  </>
-                ) : (
-                  // Year Selector for other views
-                  ["week", "year"].includes(chartConfig.type) && (
-                    <div className="w-[150px]">
-                      <Select
-                        value={chartConfig.yearStart.toString()}
-                        onValueChange={handleYearChange}
+              // Date Range Pickers for Daily View
+              <>
+                <div className="flex items-center gap-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-[200px] justify-start text-left font-normal",
+                          !startDate && "text-muted-foreground"
+                        )}
                       >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select year" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Array.from(
-                            { length: 5 },
-                            (_, i) => new Date().getFullYear() - i
-                          ).map(year => (
-                            <SelectItem key={year} value={year.toString()}>
-                              {year}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )
-                )}
+                        <Calendar1Icon className="mr-2 h-4 w-4" />
+                        {startDate ? format(startDate, "PPP") : <span>Start date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={startDate}
+                        onSelect={(date) => {
+                          setStartDate(date || new Date());
+                          if (date && date > endDate) {
+                            setEndDate(date);
+                          }
+                        }}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+
+                  <span className="text-muted-foreground">to</span>
+
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-[200px] justify-start text-left font-normal",
+                          !endDate && "text-muted-foreground"
+                        )}
+                      >
+                        <Calendar1Icon className="mr-2 h-4 w-4" />
+                        {endDate ? format(endDate, "PPP") : <span>End date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={endDate}
+                        onSelect={(date) => setEndDate(date || new Date())}
+                        disabled={(date) =>
+                          date < startDate || date > new Date()
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </>
+            ) : chartConfig.type === "years" ? (
+              // Year range selectors for Multi-Year View
+              <div className="flex items-center gap-2">
+                <div className="w-[150px]">
+                  <Select
+                    value={chartConfig.yearStart.toString()}
+                    onValueChange={handleYearStartChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="From year" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Array.from(
+                        { length: 10 },
+                        (_, i) => new Date().getFullYear() - i
+                      ).map(year => (
+                        <SelectItem key={year} value={year.toString()}>
+                          {year}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <span className="text-muted-foreground">to</span>
+
+                <div className="w-[150px]">
+                  <Select
+                    value={chartConfig.yearEnd.toString()}
+                    onValueChange={handleYearEndChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="To year" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Array.from(
+                        { length: 10 },
+                        (_, i) => new Date().getFullYear() - i
+                      )
+                      .filter(year => year >= chartConfig.yearStart) // Only show years >= startYear
+                      .map(year => (
+                        <SelectItem key={year} value={year.toString()}>
+                          {year}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            ) : (
+              // Year Selector for Yearly view
+              <div className="w-[150px]">
+                <Select
+                  value={chartConfig.yearStart.toString()}
+                  onValueChange={handleYearStartChange}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select year" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from(
+                      { length: 5 },
+                      (_, i) => new Date().getFullYear() - i
+                    ).map(year => (
+                      <SelectItem key={year} value={year.toString()}>
+                        {year}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
               </div>
             </div>
           </CardHeader>
