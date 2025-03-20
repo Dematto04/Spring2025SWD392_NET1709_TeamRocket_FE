@@ -95,7 +95,7 @@ function CheckoutPage() {
   const address = useSelector(selectAddress);
   const additionalService = useSelector(selectAdditional);
   const service = useSelector(selectServiceBooking);
-  const [paymentMethod, setPaymentMethod] = useState([]);
+  const [paymentMethod, setPaymentMethod] = useState(null);
 
   const timeSlot = useSelector(selectServiceBookingTimeSlot);
   const [getCheckoutDetail, { data, isLoading, isError, isSuccess, error }] =
@@ -139,6 +139,15 @@ function CheckoutPage() {
   }, [timeSlot?.id, address?.addressId, service?.serviceId, additionalService]);
 
   const handlePlaceOrder = async () => {
+    if (!paymentMethod) {
+      toast({
+        title: "Error",
+        description: "Please select a payment method",
+        variant: "destructive",
+        duration: 1000,
+      });
+      return;
+    }
     const result = await placeOrder({
       id: checkout?.checkout_id,
       paymentMethod: paymentMethod,
