@@ -14,10 +14,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-function AddServicePrice({form}) {
+function AddServicePrice({ form }) {
   return (
     <AccordionItem value="item-3">
-      <AccordionTrigger className="text-lg text-primary">Pricing</AccordionTrigger>
+      <AccordionTrigger className="text-lg text-primary">
+        Pricing
+      </AccordionTrigger>
       <AccordionContent className="block lg:flex lg:gap-3">
         <FormField
           control={form.control}
@@ -30,6 +32,17 @@ function AddServicePrice({form}) {
                   min={1}
                   type="number"
                   {...field}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    form.setValue("duration", e.target.value);
+                    // Reset all time slots in the serviceTimeSlots array
+                    const timeSlots = form.getValues("serviceTimeSlots");
+                    if (timeSlots && timeSlots.length > 0) {
+                      timeSlots.forEach((_, index) => {
+                        form.setValue(`serviceTimeSlots.${index}.slots`, []);
+                      });
+                    }
+                  }}
                   className="focus-visible:ring-0"
                 />
               </FormControl>

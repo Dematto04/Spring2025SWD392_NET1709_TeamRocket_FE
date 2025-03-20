@@ -34,7 +34,7 @@ const serviceApi = apiSlice.injectEndpoints({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["Services"],
+      invalidatesTags: ["Services", "ServiceDetail"],
     }),
     getAdditionalServices: build.query({
       query: (params) => ({
@@ -70,7 +70,7 @@ const serviceApi = apiSlice.injectEndpoints({
         method: "PUT",
         body,
       }),
-      invalidatesTags: ["Services"],
+      invalidatesTags: ["Services", "ServiceDetail"],
     }),
     getMyServices: build.query({
       query: ({status, pageIndex, pageSize}) => ({
@@ -81,11 +81,13 @@ const serviceApi = apiSlice.injectEndpoints({
           pageSize,
         },
       }),
+      providesTags: ["Services"],
     }),
     getMyServicesDetail: build.query({
       query: (id) => ({
         url: `/Service/detail/${id}`,
       }),
+      providesTags: ["ServiceDetail"],
     }),
     getFilterOptions: build.query({
       query: () => ({
@@ -111,6 +113,7 @@ const serviceApi = apiSlice.injectEndpoints({
           topservice: params.topservice,
         }
       }),
+      providesTags: ["Services"],
     }),
   }),
 });
