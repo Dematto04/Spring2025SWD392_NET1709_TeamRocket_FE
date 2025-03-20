@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   useGetHousekeeperBookingsQuery, 
   useGetBookingDetailQuery, 
@@ -46,11 +46,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from '@/hooks/use-toast';
 
 const ITEMS_PER_PAGE = 10;
+const PLACEHOLDER_IMAGE = "/placeholder-service.jpg";
 
 function HouseKeeperBookingList() {
   // Hooks
   const { toast } = useToast();
   const fileInputRef = useRef(null);
+  const loadedImages = useRef(new Set());
 
   // State management
   const [pageIndex, setPageIndex] = useState(1);
@@ -59,7 +61,8 @@ function HouseKeeperBookingList() {
   const [selectedBookingId, setSelectedBookingId] = useState(null);
   const [finishDialogOpen, setFinishDialogOpen] = useState(false);
   const [selectedFinishBooking, setSelectedFinishBooking] = useState(null);
-  const [proofImages, setProofImages] = useState([]);
+  const [proofImage, setProofImage] = useState(null);
+  const [proofTitle, setProofTitle] = useState('');
 
   // API queries
   const { 
@@ -120,58 +123,48 @@ function HouseKeeperBookingList() {
   const handleFinishClick = (e, booking) => {
     e.stopPropagation(); // Prevent card click
     setSelectedFinishBooking(booking);
-    setProofImages([]);
+    setProofImage(null);
+    setProofTitle('');
     setFinishDialogOpen(true);
   };
 
   const handleImageUpload = (event) => {
-    const files = Array.from(event.target.files);
-    if (files.length === 0) return;
+    const file = event.target.files[0];
+    if (!file) return;
 
-    // Add preview URLs for the images
-    const newProofImages = files.map(file => ({
+    // Create a preview URL for the image
+    const preview = URL.createObjectURL(file);
+    setProofImage({
       file,
-      title: '',
-      preview: URL.createObjectURL(file)
-    }));
-
-    setProofImages(prevImages => [...prevImages, ...newProofImages]);
+      preview
+    });
   };
 
   const handleFinishSubmit = async () => {
     try {
-      if (proofImages.length === 0) {
+      if (!proofImage) {
         toast({
           title: "Error",
-          description: "Please upload at least one proof image",
+          description: "Please upload a proof image",
           variant: "destructive"
         });
         return;
       }
 
-      // Check if all proof images have titles
-      const missingTitles = proofImages.some(proof => !proof.title.trim());
-      if (missingTitles) {
+      if (!proofTitle.trim()) {
         toast({
           title: "Error",
-          description: "Please provide a title for each proof image",
+          description: "Please provide a title for your proof",
           variant: "destructive"
         });
         return;
       }
-
-      // Simulate file upload (in a real app, you'd upload to a server/storage)
-      // For this example, we'll use the preview URLs as the "uploaded" image URLs
-      const proofs = proofImages.map(proof => ({
-        title: proof.title,
-        imgUrl: proof.preview // In a real app, this would be the URL returned from your server
-      }));
 
       // Submit the proof
       await submitProof({
         bookingId: selectedFinishBooking.id,
-        title: proofs[0].title, // Using the first image title as the main title
-        imgUrl: proofs[0].preview // Using the first image URL
+        title: proofTitle,
+        imgUrl: proofImage.preview // In a real app, this would be the URL from server upload
       }).unwrap();
 
       toast({
@@ -182,10 +175,10 @@ function HouseKeeperBookingList() {
       // Reset states after successful submission
       setFinishDialogOpen(false);
       setSelectedFinishBooking(null);
-      setProofImages([]);
+      setProofImage(null);
+      setProofTitle('');
       
-      // Refresh booking list
-      // The invalidatesTags in the mutation will handle this automatically
+      // Refresh booking list happens automatically via invalidatesTags
     } catch (error) {
       console.error('Error submitting completion proof:', error);
       toast({
@@ -196,12 +189,12 @@ function HouseKeeperBookingList() {
     }
   };
 
-  const removeProofImage = (index) => {
-    const newProofImages = [...proofImages];
-    // Revoke the object URL to avoid memory leaks
-    URL.revokeObjectURL(newProofImages[index].preview);
-    newProofImages.splice(index, 1);
-    setProofImages(newProofImages);
+  const removeProofImage = () => {
+    if (proofImage) {
+      // Revoke the object URL to avoid memory leaks
+      URL.revokeObjectURL(proofImage.preview);
+      setProofImage(null);
+    }
   };
 
   // Format date and time from ISO string
@@ -214,6 +207,21 @@ function HouseKeeperBookingList() {
       return `${dateString?.split('T')[0] || 'N/A'} ${timeString || ''}`;
     }
   };
+
+  // Helper function to handle image loading/errors
+  const handleImageError = (e, id) => {
+    if (!loadedImages.current.has(id)) {
+      e.target.src = PLACEHOLDER_IMAGE;
+      loadedImages.current.add(id);
+    }
+  };
+
+  // When component unmounts, clear the set
+  useEffect(() => {
+    return () => {
+      loadedImages.current.clear();
+    };
+  }, []);
 
   return (
     <div className="p-6 space-y-6">
@@ -266,7 +274,7 @@ function HouseKeeperBookingList() {
             )}
           </div>
 
-          {/* Booking Cards Grid */}
+          {/* Booking Cards Grid with improved image handling */}
           {isBookingsLoading ? (
             <div className="flex justify-center items-center min-h-[300px]">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -285,16 +293,21 @@ function HouseKeeperBookingList() {
                   className="cursor-pointer hover:shadow-lg transition-shadow overflow-hidden relative"
                   onClick={() => setSelectedBookingId(booking.id)}
                 >
-                  {/* Service Image */}
+                  {/* Service Image with improved handling */}
                   <div className="relative h-40 bg-gray-100">
-                    <img
-                      src={booking.serviceImageUrl || "/placeholder-service.jpg"}
-                      alt={booking.serviceName}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.src = "/placeholder-service.jpg";
-                      }}
-                    />
+                    {booking.serviceImageUrl ? (
+                      <img
+                        src={booking.serviceImageUrl}
+                        alt={booking.serviceName}
+                        className="w-full h-full object-cover"
+                        onError={(e) => handleImageError(e, booking.id)}
+                        loading="lazy" // Add lazy loading
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                        <ImageIcon className="h-10 w-10 text-gray-400" />
+                      </div>
+                    )}
                   </div>
                   <CardContent className="p-6">
                     <div className="space-y-4">
@@ -523,7 +536,7 @@ function HouseKeeperBookingList() {
             </DialogContent>
           </Dialog>
 
-          {/* Finish Booking Dialog */}
+          {/* Modified Finish Booking Dialog */}
           <Dialog open={finishDialogOpen} onOpenChange={(open) => !open && setFinishDialogOpen(false)}>
             <DialogContent className="max-w-md">
               <DialogHeader>
@@ -532,69 +545,65 @@ function HouseKeeperBookingList() {
               
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label>Proof Images</Label>
-                  <div className="grid grid-cols-1 gap-4">
-                    {proofImages.map((proof, index) => (
-                      <div key={index} className="border rounded-lg p-4 space-y-3">
-                        <div className="space-y-2">
-                          <Label htmlFor={`title-${index}`}>Title for Image {index + 1}</Label>
-                          <Input
-                            id={`title-${index}`}
-                            value={proof.title}
-                            onChange={(e) => {
-                              const newProofs = [...proofImages];
-                              newProofs[index].title = e.target.value;
-                              setProofImages(newProofs);
-                            }}
-                            placeholder="Enter a description for this image"
-                            maxLength={255}
-                          />
-                        </div>
-                        <div className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden">
-                          <img
-                            src={proof.preview}
-                            alt={`Proof ${index + 1}`}
-                            className="w-full h-full object-cover"
-                          />
-                          <Button
-                            variant="destructive"
-                            size="icon"
-                            className="absolute top-1 right-1 h-6 w-6"
-                            onClick={() => removeProofImage(index)}
-                          >
-                            ×
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                    
-                    {proofImages.length < 1 && (
-                      <div className="space-y-6">
-                        <div 
-                          className="aspect-video border-2 border-dashed rounded-lg flex flex-col items-center justify-center p-6 cursor-pointer"
-                          onClick={() => fileInputRef.current?.click()}
-                        >
-                          <ImageIcon className="h-12 w-12 text-gray-400 mb-2" />
-                          <p className="text-sm text-gray-500 text-center">
-                            Click to upload an image of your completed work
-                          </p>
-                        </div>
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={handleImageUpload}
+                  <Label htmlFor="proof-title">Proof Title</Label>
+                  <Input
+                    id="proof-title"
+                    value={proofTitle}
+                    onChange={(e) => setProofTitle(e.target.value)}
+                    placeholder="Enter a descriptive title for your proof"
+                    maxLength={255}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Proof Image</Label>
+                  
+                  {proofImage ? (
+                    <div className="relative border rounded-lg overflow-hidden">
+                      <div className="aspect-video bg-gray-100">
+                        <img
+                          src={proofImage.preview}
+                          alt="Completion proof"
+                          className="w-full h-full object-contain"
                         />
                       </div>
-                    )}
-                  </div>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="absolute top-2 right-2"
+                        onClick={removeProofImage}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  ) : (
+                    <div 
+                      className="aspect-video border-2 border-dashed rounded-lg flex flex-col items-center justify-center p-6 cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <ImageIcon className="h-12 w-12 text-gray-400 mb-2" />
+                      <p className="text-sm text-gray-500 text-center font-medium">
+                        Click to upload an image
+                      </p>
+                      <p className="text-xs text-gray-400 text-center mt-1">
+                        Upload a clear photo of your completed work
+                      </p>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleImageUpload}
+                      />
+                    </div>
+                  )}
+                  
                   <p className="text-sm text-gray-500 mt-2">
-                    Upload a clear image of your completed work as proof
+                    The image will be reviewed to verify the completion of your work
                   </p>
                 </div>
 
-                <div className="flex justify-end gap-2">
+                <div className="flex justify-end gap-2 pt-2">
                   <Button
                     variant="outline"
                     onClick={() => setFinishDialogOpen(false)}
@@ -604,11 +613,7 @@ function HouseKeeperBookingList() {
                   </Button>
                   <Button
                     onClick={handleFinishSubmit}
-                    disabled={
-                      isSubmittingProof || 
-                      proofImages.length === 0 || 
-                      proofImages.some(proof => !proof.title.trim())
-                    }
+                    disabled={isSubmittingProof || !proofImage || !proofTitle.trim()}
                   >
                     {isSubmittingProof ? (
                       <>
