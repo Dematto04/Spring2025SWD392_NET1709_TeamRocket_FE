@@ -53,6 +53,17 @@ export const UserDropDown = ({ role }) => {
           </Link>
         </>
       );
+    case "Admin":
+      return (
+        <>
+          <Link to="/dashboard/admin">
+            <DropdownMenuItem>
+              <LayoutDashboard className="mr-2 h-4 w-4" />
+              <span>Dashboard</span>
+            </DropdownMenuItem>
+          </Link>
+        </>
+      );
     default:
       break;
   }
