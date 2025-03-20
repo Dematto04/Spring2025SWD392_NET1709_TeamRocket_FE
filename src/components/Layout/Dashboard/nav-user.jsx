@@ -17,16 +17,16 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { logout } from "@/redux/features/authSlice";
 export function NavUser({ user }) {
   const { isMobile } = useSidebar();
-  const dispatch = useDispatch()
-  const nav = useNavigate()
-  const handleLogout = ()=> {
-    dispatch(logout())
-    nav('/login')
-  }
+  const dispatch = useDispatch();
+  const nav = useNavigate();
+  const handleLogout = () => {
+    dispatch(logout());
+    nav("/login");
+  };
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -38,7 +38,9 @@ export function NavUser({ user }) {
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user?.avatar} alt={user?.email} />
-                <AvatarFallback className="rounded-lg">{user?.email.slice(0, 2)}</AvatarFallback>
+                <AvatarFallback className="rounded-lg">
+                  {user?.email.slice(0, 2)}
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{user?.email}</span>
@@ -73,12 +75,14 @@ export function NavUser({ user }) {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
+            <Link to={"/dashboard/housekeeper/me"}>
+              <DropdownMenuGroup>
+                <DropdownMenuItem>
+                  <BadgeCheck />
+                  Account
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </Link>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
