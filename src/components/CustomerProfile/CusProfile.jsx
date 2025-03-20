@@ -58,7 +58,7 @@ const CusProfile = ({ selectedMenu, setSelectedMenu, profileInfo}) => {
                 Wallet
               </NavigationMenuLink>
             </NavigationMenuItem>
-            <NavigationMenuItem>
+            {/* <NavigationMenuItem>
               <NavigationMenuLink
                 href="#transactions"
                 onClick={() => setSelectedMenu('transactions')}
@@ -69,7 +69,7 @@ const CusProfile = ({ selectedMenu, setSelectedMenu, profileInfo}) => {
                 <BadgeDollarSign />
                 Transactions
               </NavigationMenuLink>
-            </NavigationMenuItem>
+            </NavigationMenuItem> */}
             <NavigationMenuItem>
               <NavigationMenuLink
                 href="#address"

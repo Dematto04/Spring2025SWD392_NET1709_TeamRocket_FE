@@ -103,11 +103,11 @@ export default function Navbar({ services }) {
           </NavigationMenuContent>
         </NavigationMenuItem>
 
-        <Link to="/blogs">
+        {/* <Link to="/blogs">
           <NavigationMenuItem className={navigationMenuTriggerStyle()}>
             Blogs
           </NavigationMenuItem>
-        </Link>
+        </Link> */}
       </NavigationMenuList>
       <NavigationMenuList>
         <NavigationMenuItem>
