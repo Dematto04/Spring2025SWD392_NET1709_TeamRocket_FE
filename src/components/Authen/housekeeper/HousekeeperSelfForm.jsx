@@ -9,13 +9,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
+
 import { Checkbox } from "@/components/ui/checkbox";
 import AutoComplete from "@/components/AutoComplete";
 import { useGetCategoriesQuery } from "@/redux/api/serviceApi";
@@ -90,9 +84,9 @@ export default function HousekeeperSelfForm({ form }) {
               render={() => (
                 <FormItem>
                   <div className="mb-4">
-                    <FormLabel className="text-base">Services</FormLabel>
+                    <FormLabel className="text-base">Categories</FormLabel>
                     <FormDescription>
-                      Select the services you want to apply.
+                      Select the categories you want to apply.
                     </FormDescription>
                   </div>
                   <div className="grid grid-cols-4 gap-y-6">

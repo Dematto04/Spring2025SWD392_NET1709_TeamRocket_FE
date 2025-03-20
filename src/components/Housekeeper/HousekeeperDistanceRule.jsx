@@ -61,7 +61,12 @@ export default function HousekeeperDistanceRule({
                 <FormItem className="flex-grow">
                   <FormLabel>Min Distance (km)</FormLabel>
                   <FormControl>
-                    <Input type="number" readOnly={index > 0} {...field} />
+                    <Input
+                      type="number"
+                      min="1"
+                      readOnly={index > 0}
+                      {...field}
+                    />
                   </FormControl>
                   <FormDescription />
                   <FormMessage />
