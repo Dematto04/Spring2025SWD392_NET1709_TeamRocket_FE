@@ -30,6 +30,17 @@ function UpdateServicePrice({form}) {
                   min={1}
                   type="number"
                   {...field}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    form.setValue("duration", e.target.value);
+                    // Reset all time slots in the serviceTimeSlots array
+                    const timeSlots = form.getValues("serviceTimeSlots");
+                    if (timeSlots && timeSlots.length > 0) {
+                      timeSlots.forEach((_, index) => {
+                        form.setValue(`serviceTimeSlots.${index}.slots`, []);
+                      });
+                    }
+                  }}
                   className="focus-visible:ring-0"
                 />
               </FormControl>
