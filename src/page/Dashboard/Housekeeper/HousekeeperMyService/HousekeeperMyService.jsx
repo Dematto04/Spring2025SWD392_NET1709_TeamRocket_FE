@@ -37,7 +37,6 @@ function HousekeeperMyService() {
   const {
     data: services,
     isLoading,
-    error,
     isFetching,
     isSuccess,
   } = useGetMyServicesQuery({

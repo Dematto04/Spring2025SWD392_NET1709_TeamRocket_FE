@@ -25,7 +25,6 @@ import {
   useUpdateServiceMutation,
 } from "@/redux/api/serviceApi";
 import { toast } from "@/hooks/use-toast";
-import AutoComplete from "@/components/AutoComplete";
 import HousekeeperDistanceRule from "@/components/Housekeeper/HousekeeperDistanceRule";
 import BasisInformation from "@/components/Housekeeper/UpdateService/BasisInformation";
 import LoadingScreen from "@/components/Loading";
@@ -33,7 +32,7 @@ import UpdateServiceDetail from "@/components/Housekeeper/UpdateService/UpdateSe
 import UpdateServicePrice from "@/components/Housekeeper/UpdateService/UpdateServicePrice";
 import UpdateServiceAvailability from "@/components/Housekeeper/UpdateService/UpdateServiceAvailability";
 import UpdateServiceAdditionalService from "@/components/Housekeeper/UpdateService/UpdateServiceAdditionalService";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 
 const formSchema = z.object({
   service_name: z.string().min(1, { message: "Service name is required" }),
@@ -42,12 +41,14 @@ const formSchema = z.object({
     .string()
     .min(1, { message: "Service description is required" })
     .max(2000, { message: "Max characters is 2000" }),
-  duration: z.string().min(1, { message: "Service duration is required" }),
   price: z.string().min(1, { message: "Service price is required" }),
   serviceSteps: z.array(
     z.object({
       step_order: z.number(),
       step_description: z.string().min(1, "Description is required"),
+      step_duration: z
+        .number()
+        .gt(0, { message: "Duration must be greater than 0" }),
     })
   ),
   additionalServices: z.array(
@@ -59,7 +60,7 @@ const formSchema = z.object({
         .string()
         .min(1, { message: "Additional service price is required" }),
       duration: z
-        .string()
+        .number()
         .min(1, { message: "Additional service duration is required" }),
       url: z
         .string()
@@ -69,11 +70,6 @@ const formSchema = z.object({
         .min(1, { message: "Additional service description is required" }),
     })
   ),
-  city: z.string().min(1, { message: "City is required" }),
-  district: z.string().min(1, { message: "District is required" }),
-  address_line: z.string().min(1, { message: "Address is required" }),
-  place_id: z.string(),
-  location: z.string().min(1, { message: "Location is required" }),
   serviceDistanceRule: z.array(
     z
       .object({
@@ -106,12 +102,20 @@ function HousekeeperUpdateService() {
   const [dateOfWeek, setDateOfWeek] = useState(serviceTimeSlots);
   const [files, setFiles] = useState([]);
   //api cateogry
+  const location = useLocation();
+
+
   const { id } = useParams();
   const { data: categories, isLoading } = useGetCategoriesQuery();
   const [updateService, { isSuccess, isLoading: isUpdating }] =
     useUpdateServiceMutation();
-  const { data: myService, isLoading: isGettingMyService, isSuccess: isOk } =
-  useGetMyServicesDetailQuery(id);
+
+  const {
+    data: myService,
+    isLoading: isGettingMyService,
+    isSuccess: isOk,
+    refetch: refetchServiceDetail,
+  } = useGetMyServicesDetailQuery(id);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -121,45 +125,63 @@ function HousekeeperUpdateService() {
       description: "",
       duration: "",
       price: "",
-      serviceSteps: [{ step_order: 1, step_description: "" }],
+      serviceSteps: [{ step_order: 1, step_description: "", step_duration: 0 }],
       additionalServices: [],
-      city: "",
-      district: "",
-      address_line: "",
-      place_id: "",
-      location: "",
       serviceDistanceRule: [],
-      serviceTimeSlots: [],
+      serviceTimeSlots: {},
     },
   });
-  useEffect(()=> {
-    if(myService && isOk){
+  useEffect(() => {
+    refetchServiceDetail();
+  }, [location.pathname, refetchServiceDetail]);
+  useEffect(() => {
+    console.log("HousekeeperUpdateService mounted");
+    return () => {
+      console.log("HousekeeperUpdateService unmounted");
+    };
+  }, []);
+  
+  useEffect(() => {
+    if (myService && isOk) {
       const service = myService.data;
       form.setValue("service_name", service?.service_name);
       form.setValue("category_id", service?.category_id);
       form.setValue("description", service?.description);
-      form.setValue("duration", String(service?.duration)); 
+      form.setValue("duration", service?.duration * 60);
       form.setValue("price", String(service?.price));
-      form.setValue("serviceSteps", service?.serviceSteps);
-      form.setValue("city", service?.city);
-      form.setValue("district", service?.district);
-      form.setValue("address_line", service?.address_line);
-      form.setValue("place_id", service?.place_id);
-      form.setValue("location", service?.place_id);
+      form.setValue(
+        "serviceSteps",
+        service?.serviceSteps?.map((step) => ({
+          ...step,
+          step_duration: Number(step.step_duration),
+        })) || []
+      );
       form.setValue("serviceDistanceRule", service?.serviceDistanceRule);
-      setFiles(service?.serviceImages.map((image) => image.link));
-      form.setValue("additionalServices", service?.additionalServices);
+      setFiles(service?.serviceImages?.map((image) => image.link) || []);
+      form.setValue(
+        "additionalServices",
+        (service?.additionalServices || []).map((item) => ({
+          ...item,
+          duration: Number(item.duration),
+        }))
+      );
+    }
+  }, [myService, isOk, isGettingMyService]);
+  useEffect(() => {
+    if (myService && isOk) {
+      const service = myService.data;
 
       dateOfWeek.forEach((day, index) => {
         const timeSlots = service?.serviceTimeSlots.filter(
           (slot) => slot.day_of_week === day.dateOfWeek
         );
-        form.setValue(`serviceTimeSlots.${index}.slots`, timeSlots.map((slot) => slot.start_time));
+        form.setValue(
+          `serviceTimeSlots.${index}.slots`,
+          timeSlots.map((slot) => slot.start_time)
+        );
       });
-      
-
     }
-  }, [myService, isOk, isGettingMyService])
+  }, [form.getValues("duration")]);
 
   const { control } = form;
   const { fields, append, remove } = useFieldArray({
@@ -205,12 +227,12 @@ function HousekeeperUpdateService() {
         });
       });
     });
-    if(data.serviceDistanceRule.length === 0){
+    if (data.serviceDistanceRule.length === 0) {
       toast({
         title: "Please add distance rule",
         variant: "destructive",
       });
-      return
+      return;
     }
     const body = {
       ...data,
@@ -221,8 +243,9 @@ function HousekeeperUpdateService() {
       })),
       serviceTimeSlots: temp,
     };
-    
-    const result = await updateService({id, body});
+    console.log({ body });
+
+    const result = await updateService({ id, body });
     if (result.error) {
       toast({
         title: "UpdateUpdate service fail",
@@ -260,7 +283,7 @@ function HousekeeperUpdateService() {
                   "item-5",
                   "item-6",
                   "item-7",
-                  "item-8"
+                  "item-8",
                 ]}
               >
                 {/* Basic Info */}
@@ -286,17 +309,6 @@ function HousekeeperUpdateService() {
                   dateOfWeek={dateOfWeek}
                   setDateOfWeek={setDateOfWeek}
                 />
-                {/* Location  */}
-                <AccordionItem value="item-5">
-                  <AccordionTrigger className="text-lg text-primary">
-                    Location
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="flex flex-wrap w-full gap-6 p-2">
-                      <AutoComplete form={form} defaultAddress={myService?.data?.address_line}/>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
                 {/* Gallery  */}
                 <AccordionItem value="item-6">
                   <AccordionTrigger className="text-lg text-primary">
@@ -330,7 +342,9 @@ function HousekeeperUpdateService() {
               </Accordion>
             </CardContent>
             <CardFooter className="justify-end">
-              <Button disabled={isUpdating} type="submit">Submit</Button>
+              <Button disabled={isUpdating} type="submit">
+                Submit
+              </Button>
             </CardFooter>
           </Card>
         </form>

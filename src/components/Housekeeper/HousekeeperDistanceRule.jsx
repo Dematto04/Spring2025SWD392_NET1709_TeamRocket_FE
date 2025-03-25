@@ -83,6 +83,7 @@ export default function HousekeeperDistanceRule({
                     <Input
                       type="number"
                       {...field}
+                      min={1}
                       onChange={(e) => {
                         const value = e.target.value || 0;
                         field.onChange(value);

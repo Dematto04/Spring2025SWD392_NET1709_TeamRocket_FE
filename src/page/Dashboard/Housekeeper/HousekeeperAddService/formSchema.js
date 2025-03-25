@@ -27,7 +27,7 @@ export const formSchema = z.object({
           .string()
           .min(1, { message: "Additional service price is required" }),
         duration: z
-          .string()
+          .number()
           .min(1, { message: "Additional service duration is required" }),
         url: z
           .string()
@@ -37,11 +37,11 @@ export const formSchema = z.object({
           .min(1, { message: "Additional service description is required" }),
       })
     ),
-    city: z.string().min(1, { message: "City is required" }),
-    district: z.string().min(1, { message: "District is required" }),
-    address_line: z.string().min(1, { message: "Address is required" }),
-    place_id: z.string(),
-    location: z.string().min(1, { message: "Location is required" }),
+    // city: z.string().min(1, { message: "City is required" }),
+    // district: z.string().min(1, { message: "District is required" }),
+    // address_line: z.string().min(1, { message: "Address is required" }),
+    // place_id: z.string(),
+    // location: z.string().min(1, { message: "Location is required" }),
     serviceDistanceRule: z.array(
       z
         .object({
