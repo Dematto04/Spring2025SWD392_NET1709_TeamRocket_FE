@@ -64,14 +64,6 @@ const serviceApi = apiSlice.injectEndpoints({
         body,
       }),
     }),
-    updateService: build.mutation({
-      query: ({ id, body }) => ({
-        url: `/Service/${id}`,
-        method: "PUT",
-        body,
-      }),
-      invalidatesTags: ["Services", "ServiceDetail"],
-    }),
     getMyServices: build.query({
       query: ({ status, pageIndex, pageSize }) => ({
         url: "/Service/user/filter",
@@ -81,13 +73,26 @@ const serviceApi = apiSlice.injectEndpoints({
           pageSize,
         },
       }),
-      providesTags: ["Services"],
+      providesTags: ["HousekeeperService"],
     }),
+    updateService: build.mutation({
+      query: ({ id, body }) => ({
+        url: `/Service/${id}`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["HousekeeperService"],
+    }),
+
     getMyServicesDetail: build.query({
       query: (id) => ({
         url: `/Service/detail/${id}`,
       }),
-      providesTags: ["ServiceDetail"],
+      providesTags: ["HousekeeperService"],
+      refetchOnMountOrArgChange: true,
+      refetchOnFocus: true,
+      refetchOnReconnect: true,
+      keepUnusedDataFor: 0
     }),
     getFilterOptions: build.query({
       query: () => ({
@@ -119,10 +124,12 @@ const serviceApi = apiSlice.injectEndpoints({
       query: () => ({
         url: "/Service/housekeeper/skill",
       }),
-      providesTags: ["HousekeeperSkills"], 
+      providesTags: ["HousekeeperSkills"],
       refetchOnMountOrArgChange: true,
       refetchOnFocus: true,
-      refetchOnReconnect: true
+      refetchOnReconnect: true,
+      keepUnusedDataFor: 0
+
     }),
   }),
 });
@@ -142,5 +149,5 @@ export const {
   useGetMyServicesDetailQuery,
   useGetFilterOptionsQuery,
   useGetTopServicesQuery,
-  useGetHousekeeperSkillsQuery
+  useGetHousekeeperSkillsQuery,
 } = serviceApi;

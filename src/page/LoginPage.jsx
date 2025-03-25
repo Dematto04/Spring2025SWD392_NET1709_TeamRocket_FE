@@ -4,8 +4,7 @@ import Logo from "@/components/Logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default function LoginPage() {
-  
-  
+
   return (
     <div className="grid max-h-svh h-full lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">

@@ -18,6 +18,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useUploadFilesMutation } from "@/redux/api/uploadFileApi";
 import { toast } from "@/hooks/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const minuteHandle = (min) => {
+  if (min < 60) {
+    return min + " min";
+  }
+  const hour = Math.floor(min / 60);
+  const remainMin = min % 60 ? `${min % 60}min` : "";
+  return `${hour}h ${remainMin}`;
+};
 
 function UpdateServiceAdditionalService({
   form,
@@ -55,7 +71,7 @@ function UpdateServiceAdditionalService({
                 </FormItem>
               )}
             />
-            <FormField  
+            <FormField
               control={form.control}
               name={`additionalServices.${idx}.additional_service_name`}
               render={({ field }) => (
@@ -76,7 +92,12 @@ function UpdateServiceAdditionalService({
                 <FormItem className="flex-grow">
                   <FormLabel>Price</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Additional service price" />
+                    <Input
+                      {...field}
+                      type="number"
+                      min="1"
+                      placeholder="Additional service price"
+                    />
                   </FormControl>
                   <FormDescription />
                   <FormMessage />
@@ -86,19 +107,36 @@ function UpdateServiceAdditionalService({
             <FormField
               control={form.control}
               name={`additionalServices.${idx}.duration`}
-              render={({ field }) => (
-                <FormItem className="flex-grow">
-                  <FormLabel>Duration</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Additional service duration"
-                    />
-                  </FormControl>
-                  <FormDescription />
-                  <FormMessage />
-                </FormItem>
-              )}
+              render={({ field }) => {
+                console.log(field.value);
+                
+                return (
+                  <FormItem className="flex-grow">
+                    <FormLabel>Duration (minutes)</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={(value) => {
+                          field.onChange(Number(value));
+                        }}
+                        defaultValue={field.value?.toString()}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select duration" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {[15, 30, 45, 60, 75, 90, 105, 120].map((value) => (
+                            <SelectItem key={value} value={value.toString()}>
+                              {minuteHandle(value)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormDescription />
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
             />
             <FormField
               control={form.control}
@@ -148,8 +186,7 @@ function UpdateServiceAdditionalService({
 }
 
 function ImageUpload({ onChange, value, maxFiles = 10, index, form }) {
-  const defaultValue = form.getValues(`additionalServices.${index}.url`);
-  const [previewUrl, setPreviewUrl] = useState(defaultValue || null);
+  const [previewUrl, setPreviewUrl] = useState(value || null);
   const [upload, { isLoading }] = useUploadFilesMutation();
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
@@ -166,16 +203,15 @@ function ImageUpload({ onChange, value, maxFiles = 10, index, form }) {
           duration: 2000,
         });
       }
-     
+
       const formData = new FormData();
       acceptedFiles.forEach((file) => formData.append("files", file));
       const response = await upload(formData);
-      const imgUrl = response?.data?.data?.map((url) => url)[0]
+      const imgUrl = response?.data?.data?.map((url) => url)[0];
       setPreviewUrl(imgUrl);
-      form.setValue(`additionalServices.${index}.url`, imgUrl)
+      form.setValue(`additionalServices.${index}.url`, imgUrl);
     },
   });
-
 
   return (
     <div

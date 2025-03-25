@@ -31,7 +31,11 @@ const MyServiceCard = ({ service }) => {
       <CardHeader>
         <div className="flex justify-between items-start">
           <div>
-            <CardTitle className="text-xl">{service.service_name}</CardTitle>
+            <Link
+              to={`/dashboard/housekeeper/my-service/${service.service_id}`}
+            >
+              <CardTitle className="text-xl">{service.service_name}</CardTitle>
+            </Link>
             <CardDescription>{service.description}</CardDescription>
           </div>
           <Badge variant={getStatusColor(service.service_status)}>
@@ -45,7 +49,10 @@ const MyServiceCard = ({ service }) => {
           {service.images.length > 0 ? (
             <div className="grid grid-cols-2 gap-2 h-48">
               {service.images.slice(0, 2).map((image, index) => (
-                <div key={image.id} className="relative h-full w-full overflow-hidden rounded-lg">
+                <div
+                  key={image.id}
+                  className="relative h-full w-full overflow-hidden rounded-lg"
+                >
                   <img
                     src={image.url}
                     alt={`Service ${index + 1}`}
@@ -55,7 +62,9 @@ const MyServiceCard = ({ service }) => {
               ))}
               {service.images.length > 2 && (
                 <div className="absolute bottom-2 right-2">
-                  <Badge variant="secondary">+{service.images.length - 2} more</Badge>
+                  <Badge variant="secondary">
+                    +{service.images.length - 2} more
+                  </Badge>
                 </div>
               )}
             </div>
@@ -97,7 +106,9 @@ const MyServiceCard = ({ service }) => {
       </CardContent>
       <CardFooter className="flex justify-end gap-2">
         <Button variant="outline" size="sm" asChild>
-          <Link to={`/dashboard/housekeeper/update-service/${service.service_id}`}>
+          <Link
+            to={`/dashboard/housekeeper/update-service/${service.service_id}`}
+          >
             <Edit className="w-4 h-4 mr-2" />
             Edit
           </Link>
