@@ -42,10 +42,10 @@ function BasisInformation({form, categories }) {
                     </FormControl>
                     <SelectContent>
                       {categories &&
-                        categories.data &&
-                        categories.data.map((category) => (
-                          <SelectItem key={category.id} value={category.id}>
-                            {category.name}
+                        categories?.data &&
+                        categories?.data.map((category) => (
+                          <SelectItem key={category.category_id} value={category.category_id}>
+                            {category.category_name}
                           </SelectItem>
                         ))}
                     </SelectContent>
