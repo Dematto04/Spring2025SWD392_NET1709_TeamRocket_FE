@@ -63,11 +63,11 @@ function HousekeeperAddService() {
       price: 0,
       serviceSteps: [{ step_order: 1, step_description: "", step_duration: null }],
       additionalServices: [],
-      city: "",
-      province: "",
-      address_line: "",
-      place_id: "",
-      location: "",
+      // city: "",
+      // province: "",
+      // address_line: "",
+      // place_id: "",
+      // location: "",
       serviceDistanceRule: [],
       serviceTimeSlots: [],
     },
@@ -126,6 +126,8 @@ function HousekeeperAddService() {
       })),
       serviceTimeSlots: temp,
     };
+    console.log({body});
+    
 
     if (data.serviceDistanceRule.length === 0) {
       toast({
@@ -200,7 +202,7 @@ function HousekeeperAddService() {
                   setDateOfWeek={setDateOfWeek}
                 />
                 {/* Location  */}
-                <AccordionItem value="item-5">
+                {/* <AccordionItem value="item-5">
                   <AccordionTrigger className="text-lg text-primary">
                     Location
                   </AccordionTrigger>
@@ -209,7 +211,7 @@ function HousekeeperAddService() {
                       <AutoComplete form={form} />
                     </div>
                   </AccordionContent>
-                </AccordionItem>
+                </AccordionItem> */}
                 {/* Gallery  */}
                 <AccordionItem value="item-6">
                   <AccordionTrigger className="text-lg text-primary">

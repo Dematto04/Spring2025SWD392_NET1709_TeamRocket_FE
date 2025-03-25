@@ -18,14 +18,16 @@ import { useFieldArray } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
 
 function UpdateServiceAvailability({ form, dateOfWeek }) {
-
   const handleAppend = (append) => {
-    const isFilledDuration = form.getValues("duration");
-    if (!isFilledDuration) {
+    const isFilledDuration = parseFloat(form.watch("duration"));
+    console.log({ isFilledDuration });
+
+    if (!isFilledDuration || isFilledDuration === "0") {
       toast({
         title: "Please fill duration first!",
         description: "Fill first so we can estimate end time 😊",
         variant: "warning",
+        duration: 2000,
       });
       form.trigger("duration");
       return;
@@ -35,42 +37,74 @@ function UpdateServiceAvailability({ form, dateOfWeek }) {
 
   const handleTimeChange = (value, index, dayIndex) => {
     let duration = parseFloat(form.getValues("duration"));
-    if (isNaN(duration) || duration <= 0) {
+    if (isNaN(duration) || duration <= 0 || !duration || duration === "0") {
       toast({
         title: "Invalid Duration",
-        description: "Please enter a valid duration (in hours).",
+        description: "Please enter a valid duration (in minutes).",
         variant: "destructive",
+        duration: 2000,
       });
       return;
     }
-    // Chuyển duration sang phút và cộng thêm 30 phút
-    const minGap = duration * 60 + 30;
+    // Duration is already in minutes, add 30 minutes gap
+    const minGap = duration + 30;
     const timeSlots =
       form.getValues(`serviceTimeSlots.${dayIndex}.slots`) || [];
 
-    // Chuyển đổi giờ sang phút
+    // Convert time to minutes
     const convertToMinutes = (time) => {
       const [hours, minutes] = time.split(":").map(Number);
       return hours * 60 + minutes;
     };
 
-    // Cập nhật giá trị mới vào form
+    // Update form value
     form.setValue(`serviceTimeSlots.${dayIndex}.slots.${index}`, value);
 
-    // Lấy danh sách thời gian đã nhập và sắp xếp tăng dần
+    // Check if time slot is less than previous slot
+    if (
+      timeSlots.length > 1 &&
+      convertToMinutes(timeSlots[timeSlots.length - 1]) <
+        convertToMinutes(timeSlots[timeSlots.length - 2])
+    ) {
+      toast({
+        title: "Invalid Time Slot",
+        description: `Time slot must be in increasing order.`,
+        variant: "destructive",
+        duration: 2000,
+      });
+      form.setValue(`serviceTimeSlots.${dayIndex}.slots.${index}`, "");
+      return;
+    }
+
+    // Get sorted times and check gaps
     const sortedTimes = [...timeSlots];
     sortedTimes[index] = value;
     sortedTimes.sort((a, b) => convertToMinutes(a) - convertToMinutes(b));
-    
-    // Kiểm tra khoảng cách giữa các slot
+
+    // Check gaps between slots
     for (let i = 1; i < sortedTimes.length; i++) {
       const prevTime = convertToMinutes(sortedTimes[i - 1]);
       const currTime = convertToMinutes(sortedTimes[i]);
       if (currTime - prevTime < minGap) {
+        // Calculate the valid next time slot
+        const validNextMinutes = prevTime + minGap;
+        const validNextHours = Math.floor(validNextMinutes / 60);
+        const validNextMins = validNextMinutes % 60;
+        const validTimeString = `${validNextHours
+          .toString()
+          .padStart(2, "0")}:${validNextMins.toString().padStart(2, "0")}`;
+
         toast({
           title: "Invalid Time Slot",
-          description: `Each slot must be at least ${duration} hours + 30 minutes apart.`,
+          description: `Each slot must be at least ${
+            Math.floor(duration / 60) > 0
+              ? Math.floor(duration / 60) + " hours "
+              : ""
+          }${
+            duration % 60 > 0 ? (duration % 60) + " minutes " : ""
+          } + 30 minutes apart. Next available slot should be ${validTimeString} or later.`,
           variant: "destructive",
+          duration: 2000,
         });
         form.setValue(`serviceTimeSlots.${dayIndex}.slots.${index}`, "");
         return;
@@ -86,7 +120,7 @@ function UpdateServiceAvailability({ form, dateOfWeek }) {
       <AccordionContent>
         <div className="text-primary mb-4">
           In order to ensure service quality, each time slot should be at least{" "}
-          <strong>duration (hours) + 30 minutes</strong> apart.
+          <strong>duration (minutes) + 30 minutes</strong> apart.
         </div>
         {dateOfWeek.map((day, dayIndex) => {
           const { fields, append, remove } = useFieldArray({

@@ -30,6 +30,7 @@ export const apiSlice = createApi({
     "RefundRequest",
     "HousekeeperProfile",
     "HousekeeperSkills",
+    "HousekeeperService",
   ],
   endpoints: () => ({}),
 });
