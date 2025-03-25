@@ -9,12 +9,35 @@ export const requestApi = apiSlice.injectEndpoints({
       }),
       providesTags: ["Request"],
     }),
+    getPendingRequestPaging: build.query({
+      query: (params) => ({
+        url: "Request/service-pending-request-paging",
+        method: "GET",
+        params: {
+          pageIndex: params.pageIndex,
+          pageSize: params.pageSize,
+        },
+      }),
+      providesTags: ["Request"],
+    }),
     getStaffApprovedRequest: build.query({
       query: () => ({
         url: "Staff/staff-requests-approved",
         method: "GET",
       }),
       providesTags: ["Request"],
+    }),
+    getStaffApprovedRequestPaging: build.query({
+      query: ({pageIndex, pageSize, status, searchByName}) => ({
+        url: "/Staff/staff-requests-approved-paging",
+        method: "GET",
+        params: {
+          pageIndex,
+          pageSize,
+          status,
+          searchByName,
+        },  
+      }),
     }),
     getPendingRequestDetail: build.query({
       query: (id) => ({
@@ -108,4 +131,6 @@ export const {
   useGetRegisterRequestQuery,
   useGetRegisterRequestDetailQuery,
   useApproveRegisterRequestMutation,
+  useGetPendingRequestPagingQuery,
+  useGetStaffApprovedRequestPagingQuery
 } = requestApi;
