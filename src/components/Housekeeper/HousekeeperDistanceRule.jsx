@@ -105,9 +105,9 @@ export default function HousekeeperDistanceRule({
               name={`serviceDistanceRule.${index}.base_fee`}
               render={({ field }) => (
                 <FormItem className="flex-grow">
-                  <FormLabel>Fee</FormLabel>
+                  <FormLabel>Fee ($USD)</FormLabel>
                   <FormControl>
-                    <Input type="number" {...field} />
+                    <Input min={1} type="number" {...field} />
                   </FormControl>
                   <FormDescription />
                   <FormMessage />

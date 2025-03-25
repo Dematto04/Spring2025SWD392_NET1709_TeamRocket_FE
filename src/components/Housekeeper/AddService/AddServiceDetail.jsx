@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   AccordionContent,
   AccordionItem,
@@ -17,10 +17,50 @@ import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-function AddServiceDetail({form, fields, remove, append}) {
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const minuteHandle = (min) => {
+  if (min < 60) {
+    return min + " min";
+  }
+  const hour = Math.floor(min / 60);
+  const remainMin = min % 60 ? `${min % 60}min` : "";
+  return `${hour}h ${remainMin}`;
+};
+function AddServiceDetail({ form, fields, remove, append }) {
+  // Calculate total duration whenever serviceSteps change
+  const totalDuration = form.watch("serviceSteps", [])
+    .reduce((acc, item) => acc + (item.step_duration || 0), 0);
+  
+  // Update duration field and reset timeslots when steps change
+  useEffect(() => {
+    const currentDuration = form.getValues("duration");
+    
+    // Only update when duration changes to avoid unnecessary rerenders
+    if (totalDuration.toString() !== currentDuration) {
+      form.setValue("duration", totalDuration.toString());
+      
+      // Reset all time slots when duration changes
+      const timeSlots = form.getValues("serviceTimeSlots");
+      if (timeSlots && timeSlots.length > 0) {
+        timeSlots.forEach((_, index) => {
+          form.setValue(`serviceTimeSlots.${index}.slots`, []);
+        });
+      }
+    }
+  }, [totalDuration, form]);
+
   return (
     <AccordionItem value="item-2">
-      <AccordionTrigger className="text-lg text-primary">Detail</AccordionTrigger>
+      <AccordionTrigger className="text-lg text-primary">
+        Detail
+      </AccordionTrigger>
       {/* Service Step  */}
       <AccordionContent className="">
         <FormLabel>Service Steps</FormLabel>
@@ -60,6 +100,36 @@ function AddServiceDetail({form, fields, remove, append}) {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name={`serviceSteps.${index}.step_duration`}
+                  render={({ field }) => (
+                    <FormItem className="flex-grow">
+                      <FormLabel>Duration (minutes)</FormLabel>
+                      <FormControl>
+                        <Select
+                          onValueChange={(value) => {
+                            field.onChange(Number(value));
+                          }}
+                          defaultValue={field.value?.toString()}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select duration" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {[15, 30, 45, 60, 75, 90, 105, 120].map((value) => (
+                              <SelectItem key={value} value={value.toString()}>
+                                {minuteHandle(value)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormDescription />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 {/* Xóa step */}
                 <Button
                   type="button"
@@ -75,19 +145,28 @@ function AddServiceDetail({form, fields, remove, append}) {
         })}
         <div></div>
         {/* add step */}
-        <Button
-          type="button"
-          variant="outline"
-          className="my-3"
-          onClick={() =>
-            append({
-              step_order: fields.length === 0 ? 1 : fields.length + 1,
-              step_description: "",
-            })
-          }
-        >
-          <Plus size={16} /> Add Step
-        </Button>
+        <div className="flex items-center">
+          <Button
+            type="button"
+            variant="outline"
+            className="my-3"
+            onClick={() =>
+              append({
+                step_order: fields.length === 0 ? 1 : fields.length + 1,
+                step_description: "",
+                step_duration: 0,
+              })
+            }
+          >
+            <Plus size={16} /> Add Step
+          </Button>
+          {/* Duration Display Card */}
+          <div className="w-full  rounded-2xl text-end">
+            <div className="p-4 font-medium">
+              Total Duration: {minuteHandle(totalDuration)}
+            </div>
+          </div>
+        </div>
 
         <FormField
           control={form.control}
