@@ -13,8 +13,8 @@ const CusProfile = ({ selectedMenu, setSelectedMenu, profileInfo}) => {
         <Avatar className="h-16 w-16 border-2 border-primary/10">
             {profileInfo?.data?.avatar ? (
               <AvatarImage 
-                src={profileInfo.data.avatar} 
-                alt={profileInfo.data.full_name || "User"}
+                src={profileInfo?.data.avatar} 
+                alt={profileInfo?.data.full_name || "User"}
                 onError={(e) => {
                   e.target.onError = null;
                   e.target.src = "https://villagesonmacarthur.com/wp-content/uploads/2020/12/Blank-Avatar.png";
@@ -26,7 +26,7 @@ const CusProfile = ({ selectedMenu, setSelectedMenu, profileInfo}) => {
             </AvatarFallback>
           </Avatar>
           <div>
-            <CardTitle>{profileInfo.data.full_name}</CardTitle>
+            <CardTitle>{profileInfo?.data.full_name}</CardTitle>
           </div>
         </div>
       </CardHeader>

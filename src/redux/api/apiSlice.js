@@ -29,6 +29,7 @@ export const apiSlice = createApi({
     "Wallet",
     "RefundRequest",
     "HousekeeperProfile",
+    "HousekeeperSkills",
   ],
   endpoints: () => ({}),
 });

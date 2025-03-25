@@ -22,6 +22,7 @@ import DragAndDropUpload from "@/components/DragAndDropUpload";
 import {
   useCreateServiceMutation,
   useGetCategoriesQuery,
+  useGetHousekeeperSkillsQuery,
 } from "@/redux/api/serviceApi";
 import { toast } from "@/hooks/use-toast";
 import AutoComplete from "@/components/AutoComplete";
@@ -33,80 +34,20 @@ import AddServicePrice from "@/components/Housekeeper/AddService/AddServicePrice
 import AddServiceAvailability from "@/components/Housekeeper/AddService/AddServiceAvailability";
 import AddServiceAdditionalService from "@/components/Housekeeper/AddService/AddServiceAdditionalService";
 import { useNavigate } from "react-router-dom";
-const formSchema = z.object({
-  service_name: z.string().min(1, { message: "Service name is required" }),
-  category_id: z.string().min(1, { message: "Service name is required" }),
-  description: z
-    .string()
-    .min(1, { message: "Service description is required" })
-    .max(2000, { message: "Max characters is 2000" }),
-  duration: z.string().min(1, { message: "Service duration is required" }),
-  price: z.string().min(1, { message: "Service price is required" }),
-  serviceSteps: z.array(
-    z.object({
-      step_order: z.number(),
-      step_description: z.string().min(1, "Description is required"),
-    })
-  ),
-  additionalServices: z.array(
-    z.object({
-      additional_service_name: z
-        .string()
-        .min(1, { message: "Additional service name is required" }),
-      amount: z
-        .string()
-        .min(1, { message: "Additional service price is required" }),
-      duration: z
-        .string()
-        .min(1, { message: "Additional service duration is required" }),
-      url: z
-        .string()
-        .min(1, { message: "Additional service image is required" }),
-      description: z
-        .string()
-        .min(1, { message: "Additional service description is required" }),
-    })
-  ),
-  city: z.string().min(1, { message: "City is required" }),
-  district: z.string().min(1, { message: "District is required" }),
-  address_line: z.string().min(1, { message: "Address is required" }),
-  place_id: z.string(),
-  location: z.string().min(1, { message: "Location is required" }),
-  serviceDistanceRule: z.array(
-    z
-      .object({
-        min_distance: z
-          .string({ message: "Please input" })
-          .min(1, { message: "Please input min distance" }),
-        max_distance: z
-          .string({ message: "Please input" })
-          .min(1, { message: "Please input max distance" }),
-        base_fee: z
-          .string({ message: "Please input" })
-          .min(1, { message: "Please input base fee" }),
-      })
-      .refine(
-        (data) => parseFloat(data.max_distance) > parseFloat(data.min_distance),
-        {
-          message: "Max distance must be greater than min distance",
-          path: ["max_distance"],
-        }
-      )
-  ),
-  serviceTimeSlots: z.array(
-    z.object({
-      slots: z.array(z.string().min(1, { message: "Time slot is required" })),
-    })
-  ),
-});
+import { formSchema } from "./formSchema";
+
 
 // thiếu field image
 function HousekeeperAddService() {
   const [dateOfWeek, setDateOfWeek] = useState(serviceTimeSlots);
   const [files, setFiles] = useState([]);
-  const nav = useNavigate()
+  const nav = useNavigate();
   //api cateogry
-  const { data: categories, isLoading } = useGetCategoriesQuery();
+  const { data: categories, isLoading } = useGetHousekeeperSkillsQuery({
+    refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
+    refetchOnReconnect: true
+  });
   //api create service
 
   const [createService, { isSuccess, isLoading: isCreating }] =
@@ -118,16 +59,15 @@ function HousekeeperAddService() {
       service_name: "",
       category_id: "",
       description: "",
-      duration: 0,
+      duration: "",
       price: 0,
-      serviceSteps: [{ step_order: 1, step_description: "" }],
+      serviceSteps: [{ step_order: 1, step_description: "", step_duration: null }],
       additionalServices: [],
       city: "",
       province: "",
       address_line: "",
       place_id: "",
       location: "",
-
       serviceDistanceRule: [],
       serviceTimeSlots: [],
     },
@@ -186,7 +126,7 @@ function HousekeeperAddService() {
       })),
       serviceTimeSlots: temp,
     };
-   
+
     if (data.serviceDistanceRule.length === 0) {
       toast({
         title: "Please add distance rule",
@@ -203,10 +143,9 @@ function HousekeeperAddService() {
     }
     toast({
       title: "Create service sucessfully",
-      duration: 1000
+      duration: 1000,
     });
     nav("/dashboard/housekeeper/my-service");
-
   };
   if (isLoading) return <LoadingScreen />;
 
@@ -304,7 +243,7 @@ function HousekeeperAddService() {
               </Accordion>
             </CardContent>
             <CardFooter className="justify-end">
-              <Button disable={isCreating}>Submit</Button>
+              <Button disabled={isCreating}>Submit</Button>
             </CardFooter>
           </Card>
         </form>

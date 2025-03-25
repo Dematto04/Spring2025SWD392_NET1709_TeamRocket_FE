@@ -11,7 +11,21 @@ export const authApi = apiSlice.injectEndpoints({
       transformResponse: (res) => {
         return res.data;
       },
-      invalidateTags: ["Auth"],
+      invalidateTags: [
+        "Auth",
+        "Customer",
+        "Services",
+        "ServiceDetail",
+        "Booking",
+        "Addresses",
+        "Categories",
+        "Request",
+        "AdditionalServices",
+        "Wallet",
+        "RefundRequest",
+        "HousekeeperProfile",
+        "HousekeeperSkills",
+      ],
     }),
     customerRegister: build.mutation({
       query: (data) => ({

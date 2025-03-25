@@ -19,8 +19,10 @@ import { toast } from "@/hooks/use-toast";
 
 function AddServiceAvailability({ form, dateOfWeek }) {
   const handleAppend = (append) => {
-    const isFilledDuration = form.getValues("duration");
-    if (!isFilledDuration) {
+    const isFilledDuration = parseFloat(form.watch("duration"));
+    console.log({ isFilledDuration });
+
+    if (!isFilledDuration || isFilledDuration === "0") {
       toast({
         title: "Please fill duration first!",
         description: "Fill first so we can estimate end time 😊",
@@ -35,17 +37,17 @@ function AddServiceAvailability({ form, dateOfWeek }) {
 
   const handleTimeChange = (value, index, dayIndex) => {
     let duration = parseFloat(form.getValues("duration"));
-    if (isNaN(duration) || duration <= 0) {
+    if (isNaN(duration) || duration <= 0 || !duration || duration === "0") {
       toast({
         title: "Invalid Duration",
-        description: "Please enter a valid duration (in hours).",
+        description: "Please enter a valid duration (in minutes).",
         variant: "destructive",
         duration: 2000,
       });
       return;
     }
-    // Chuyển duration sang phút và cộng thêm 30 phút
-    const minGap = duration * 60 + 30;
+    // Duration is already in minutes, add 30 minutes gap
+    const minGap = duration + 30;
     const timeSlots =
       form.getValues(`serviceTimeSlots.${dayIndex}.slots`) || [];
 
@@ -57,7 +59,22 @@ function AddServiceAvailability({ form, dateOfWeek }) {
 
     // Cập nhật giá trị mới vào form
     form.setValue(`serviceTimeSlots.${dayIndex}.slots.${index}`, value);
-
+    console.log(convertToMinutes(timeSlots[timeSlots.length - 1]));
+    // Nếu time slot cuối cùng nhỏ hơn time slot trước đó , kiểm tra xem có phù hợp với thời gian của slot trước đó không
+    if (
+      timeSlots.length > 1 &&
+      convertToMinutes(timeSlots[timeSlots.length - 1]) <
+        convertToMinutes(timeSlots[timeSlots.length - 2])
+    ) {
+      toast({
+        title: "Invalid Time Slot",
+        description: `Time slot must be in increasing order.`,
+        variant: "destructive",
+        duration: 2000,
+      });
+      form.setValue(`serviceTimeSlots.${dayIndex}.slots.${index}`, "");
+      return;
+    }
     // Lấy danh sách thời gian đã nhập và sắp xếp tăng dần
     const sortedTimes = [...timeSlots];
     sortedTimes[index] = value;
@@ -68,9 +85,23 @@ function AddServiceAvailability({ form, dateOfWeek }) {
       const prevTime = convertToMinutes(sortedTimes[i - 1]);
       const currTime = convertToMinutes(sortedTimes[i]);
       if (currTime - prevTime < minGap) {
+        // Calculate the valid next time slot
+        const validNextMinutes = prevTime + minGap;
+        const validNextHours = Math.floor(validNextMinutes / 60);
+        const validNextMins = validNextMinutes % 60;
+        const validTimeString = `${validNextHours
+          .toString()
+          .padStart(2, "0")}:${validNextMins.toString().padStart(2, "0")}`;
+
         toast({
           title: "Invalid Time Slot",
-          description: `Each slot must be at least ${duration} hours + 30 minutes apart.`,
+          description: `Each slot must be at least ${
+            Math.floor(duration / 60) > 0
+              ? Math.floor(duration / 60) + " hours "
+              : ""
+          }${
+            duration % 60 > 0 ? (duration % 60) + " minutes " : ""
+          } + 30 minutes apart. Next available slot should be ${validTimeString} or later.`,
           variant: "destructive",
           duration: 2000,
         });
@@ -88,7 +119,7 @@ function AddServiceAvailability({ form, dateOfWeek }) {
       <AccordionContent>
         <div className="text-primary mb-4">
           In order to ensure service quality, each time slot should be at least{" "}
-          <strong>duration (hours) + 30 minutes</strong> apart.
+          <strong>duration (minutes) + 30 minutes</strong> apart.
         </div>
         {dateOfWeek.map((day, dayIndex) => {
           const { fields, append, remove } = useFieldArray({
