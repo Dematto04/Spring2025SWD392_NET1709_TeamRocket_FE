@@ -37,6 +37,12 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const TRANSACTION_TYPES = [
   {
+    value: "ShowAllHistoryUser",
+    label: "All Transactions",
+    description: "Show all transaction history",
+    icon: <DollarSign className="h-4 w-4" />,
+  },
+  {
     value: "WithdrawRequestUser",
     label: "Withdraw Requests",
     description: "Show withdraw requests by user",
@@ -67,9 +73,21 @@ const TRANSACTION_TYPES = [
     icon: <ArrowDownLeft className="h-4 w-4" />,
   },
   {
-    value: "ShowAllHistoryUser",
-    label: "All Transactions",
-    description: "Show all transaction history",
+    value: "WalletPurchase",
+    label: "Wallet Purchase",
+    description: "Show all booking transactions by wallet ",
+    icon: <DollarSign className="h-4 w-4" />,
+  },
+  {
+    value: "VNPayPurchase",
+    label: "VNPay Purchase",
+    description: "Show all booking transactions by VNPay",
+    icon: <DollarSign className="h-4 w-4" />,
+  },
+  {
+    value: "BookingCanceledPayback",
+    label: "Payback transactions by cancel",
+    description: "Show all cancel transaction ",
     icon: <DollarSign className="h-4 w-4" />,
   },
 ];
@@ -161,6 +179,36 @@ const WalletTransactionHistory = ({ formatAmount, formatDate }) => {
             <span>Withdraw</span>
           </Badge>
         );
+      case "WalletPurchase":
+        return (
+          <Badge
+            variant="outline"
+            className="bg-red-50 text-red-700 border-red-200 flex items-center gap-1"
+          >
+            <DollarSign className="h-3 w-3" />
+            <span>Wallet Purchase</span>
+          </Badge>
+        );
+      case "VNPayPurchase":
+        return (
+          <Badge
+            variant="outline"
+            className="bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1"
+          >
+            <DollarSign className="h-3 w-3" />
+            <span>VNPay Purchase</span>
+          </Badge>
+        );
+      case "BookingCanceledPayback":
+        return (
+          <Badge
+            variant="outline"
+            className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1"
+          >
+            <DollarSign className="h-3 w-3" />
+            <span>Payback</span>
+          </Badge>
+        );
       default:
         return (
           <Badge
@@ -170,6 +218,24 @@ const WalletTransactionHistory = ({ formatAmount, formatDate }) => {
             {type}
           </Badge>
         );
+    }
+  };
+
+  // Get amount styling based on transaction type
+  const getAmountStyling = (type) => {
+    switch (type) {
+      case "WalletPurchase":
+        return { color: "text-red-600", prefix: "-" };
+      case "VNPayPurchase":
+        return { color: "text-blue-600", prefix: "" };
+      case "BookingCanceledPayback":
+        return { color: "text-green-600", prefix: "+" };
+      case "Withdraw":
+        return { color: "text-red-600", prefix: "-" };
+      case "Deposit":
+        return { color: "text-green-600", prefix: "+" };
+      default:
+        return { color: "text-gray-600", prefix: "" };
     }
   };
 
@@ -243,69 +309,76 @@ const WalletTransactionHistory = ({ formatAmount, formatDate }) => {
         ) : (
           <div className="space-y-4">
             <AnimatePresence>
-              {transactions?.data?.items.map((transaction, index) => (
-                <motion.div
-                  key={transaction.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.2, delay: index * 0.05 }}
-                >
-                  <Card className="overflow-hidden hover:shadow-md transition-shadow">
-                    <CardContent className="p-0">
-                      <div className="flex flex-col md:flex-row md:items-center justify-between p-4">
-                        <div className="flex items-start md:items-center gap-3 mb-3 md:mb-0">
-                          <div
-                            className={`p-2 rounded-full ${
-                              transaction.type === "Deposit"
-                                ? "bg-blue-100"
-                                : "bg-purple-100"
-                            }`}
-                          >
-                            {transaction.type === "Deposit" ? (
-                              <ArrowDownLeft
-                                className={`h-5 w-5 text-blue-600`}
-                              />
-                            ) : (
-                              <ArrowUpRight
-                                className={`h-5 w-5 text-purple-600`}
-                              />
-                            )}
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2 mb-1">
-                              {getTypeBadge(transaction.type)}
-                              {getStatusBadge(transaction.status)}
+              {transactions?.data?.items.map((transaction, index) => {
+                const { color, prefix } = getAmountStyling(transaction.type);
+                return (
+                  <motion.div
+                    key={transaction.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.2, delay: index * 0.05 }}
+                  >
+                    <Card className="overflow-hidden hover:shadow-md transition-shadow">
+                      <CardContent className="p-0">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between p-4">
+                          <div className="flex items-start md:items-center gap-3 mb-3 md:mb-0">
+                            <div
+                              className={`p-2 rounded-full ${
+                                transaction.type === "Deposit"
+                                  ? "bg-blue-100"
+                                  : transaction.type === "Withdraw"
+                                  ? "bg-purple-100"
+                                  : transaction.type === "WalletPurchase"
+                                  ? "bg-red-100"
+                                  : transaction.type === "VNPayPurchase"
+                                  ? "bg-blue-100"
+                                  : transaction.type === "BookingCanceledPayback"
+                                  ? "bg-green-100"
+                                  : "bg-gray-100"
+                              }`}
+                            >
+                              {transaction.type === "Deposit" ? (
+                                <ArrowDownLeft className="h-5 w-5 text-blue-600" />
+                              ) : transaction.type === "Withdraw" ? (
+                                <ArrowUpRight className="h-5 w-5 text-purple-600" />
+                              ) : (
+                                <DollarSign className="h-5 w-5 text-gray-600" />
+                              )}
                             </div>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                              <Calendar className="h-3 w-3" />
-                              <span>{formatDate(transaction.createdDate)}</span>
-                            </div>
-                            {transaction.referenceId && (
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                                <CreditCard className="h-3 w-3" />
-                                <span>Ref: {transaction.referenceId}</span>
+                            <div>
+                              <div className="flex items-center gap-2 mb-1">
+                                {getTypeBadge(transaction.type)}
+                                {getStatusBadge(transaction.status)}
                               </div>
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <Calendar className="h-3 w-3" />
+                                <span>{formatDate(transaction.createdDate)}</span>
+                              </div>
+                              {transaction.referenceId && (
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                                  <CreditCard className="h-3 w-3" />
+                                  <span>Ref: {transaction.referenceId}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex flex-col items-end gap-1">
+                            <span className={`text-xl font-bold ${color}`}>
+                              {prefix} {formatAmount(transaction.amount)}
+                            </span>
+                            {(transaction.currentAmount !== undefined && transaction.afterAmount !== undefined) && (
+                              <span className="text-sm text-muted-foreground">
+                                Before: {formatAmount(transaction.currentAmount)} - After: {formatAmount(transaction.afterAmount)}
+                              </span>
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center">
-                          <span
-                            className={`text-xl font-bold ${
-                              transaction.type === "Withdraw"
-                                ? "text-red-600"
-                                : "text-green-600"
-                            }`}
-                          >
-                            {transaction.type === "Withdraw" ? "- " : "+ "}
-                            {formatAmount(transaction.amount)}
-                          </span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                );
+              })}
             </AnimatePresence>
           </div>
         )}
