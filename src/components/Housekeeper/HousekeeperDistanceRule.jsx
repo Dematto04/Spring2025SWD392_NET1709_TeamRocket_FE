@@ -63,7 +63,7 @@ export default function HousekeeperDistanceRule({
                   <FormControl>
                     <Input
                       type="number"
-                      min="1"
+                      min="0"
                       readOnly={index > 0}
                       {...field}
                     />
