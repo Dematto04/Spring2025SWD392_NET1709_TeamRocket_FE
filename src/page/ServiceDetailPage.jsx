@@ -10,6 +10,7 @@ import { useGetServicesDetailQuery } from "@/redux/api/serviceApi";
 import { useParams } from "react-router-dom";
 import LoadingScreen from "@/components/Loading";
 import ServiceDetailSteps from "@/components/ServiceDetail/ServiceDetailSteps";
+import ServiceDistanceRule from "@/components/ServiceDetail/ServiceDistanceRule";
 function ServiceDetailPage() {
   const { id } = useParams();
   const { data, isLoading, isError, isSuccess } = useGetServicesDetailQuery(id);
@@ -38,7 +39,9 @@ function ServiceDetailPage() {
                 additionalServices={data?.data.additionalServices}
               />
               <ServiceDetailSteps data={data} />
+              <ServiceDistanceRule data={data}/>
               <ServiceDetailRating serviceId={id} />
+              
             </div>
             <div className="hidden lg:block lg:col-span-4 mt-20 ml-8">
               {/* service sidebar */}

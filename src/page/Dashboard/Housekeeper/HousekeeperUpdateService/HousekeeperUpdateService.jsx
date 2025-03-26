@@ -128,7 +128,7 @@ function HousekeeperUpdateService() {
       serviceSteps: [{ step_order: 1, step_description: "", step_duration: 0 }],
       additionalServices: [],
       serviceDistanceRule: [],
-      serviceTimeSlots: {},
+      serviceTimeSlots: [],
     },
   });
   useEffect(() => {
