@@ -1,6 +1,6 @@
 import { useGetServicesDetailQuery } from '@/redux/api/serviceApi'
 import React from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, data } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Clock, MapPin, DollarSign, ListChecks, Calendar, Star, User, Edit2, Phone, Mail } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { minuteHandle } from '@/lib/utils'
 
 function ServiceDetailSkeleton() {
   return (
@@ -83,6 +84,8 @@ function ServiceDetailSkeleton() {
 function HousekeeperMyServiceDetail() {
   const { id } = useParams()
   const { data: service, isLoading } = useGetServicesDetailQuery(id)
+  console.log({service});
+  
 
   if (isLoading) {
     return <ServiceDetailSkeleton />
@@ -224,19 +227,87 @@ function HousekeeperMyServiceDetail() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {serviceData.steps?.slice(0, 5).map((step, index) => (
+            {serviceData.steps?.map((step, index) => (
               <div key={index} className="flex gap-4">
                 <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
                   {index + 1}
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium">{step}</p>
+                  <p className="font-medium">{step.name}</p>
+                  <p className="text-sm text-muted-foreground">{minuteHandle(step.duration)}</p>
                 </div>
               </div>
             ))}
           </div>
         </CardContent>
       </Card>
+
+      {/* Additional Services */}
+      {serviceData.additionalServices && serviceData.additionalServices.length > 0 && (
+        <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ListChecks className="w-5 h-5 text-primary" />
+              Additional Services
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {serviceData.additionalServices.map((service, index) => (
+                <div key={index} className="p-4 rounded-lg border bg-card">
+                  <div className="flex gap-4">
+                    <img
+                      src={service.url}
+                      alt={service.name}
+                      className="w-24 h-24 object-cover rounded-lg"
+                    />
+                    <div className="flex-1">
+                      <h3 className="font-semibold">{service.name}</h3>
+                      <p className="text-sm text-muted-foreground">{service.description}</p>
+                      <div className="mt-2 flex items-center gap-4">
+                        <span className="text-primary font-medium">${service.price}</span>
+                        <span className="text-sm text-muted-foreground">{minuteHandle(service.duration)}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Service Rules */}
+      {serviceData.rules && serviceData.rules.length > 0 && (
+        <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MapPin className="w-5 h-5 text-primary" />
+              Distance Rules
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {serviceData.rules.map((rule, index) => (
+                <div key={index} className="p-4 rounded-lg bg-muted/30">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium text-muted-foreground">Distance Range</p>
+                      <p className="text-sm font-medium text-primary">${rule.fee}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-muted-foreground" />
+                      <p className="text-sm">
+                        {rule.min} - {rule.max} km
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Service Images */}
       {serviceData.images && serviceData.images.length > 0 && (

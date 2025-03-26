@@ -93,3 +93,12 @@ export const getStatusBadgeVariant = (status) => {
       return "secondary";
   }
 };
+
+export const minuteHandle = (min) => {
+  if (min < 60) {
+    return min + " min";
+  }
+  const hour = Math.floor(min / 60);
+  const remainMin = min % 60 ? `${min % 60}min` : "";
+  return `${hour}h ${remainMin}`;
+};

@@ -38,7 +38,7 @@ function ServiceDetailOverview({ overview, additionalServices }) {
                       <div className="flex flex-col justify-between flex-grow">
                         <div>
                           <h2 className="text-xl font-medium">{item?.name}</h2>
-                          <div className="text-sm font-medium text-slate-500">1{item?.description}</div>
+                          <div className="text-sm font-medium text-slate-500">{item?.description}</div>
                         </div>
                         <div className="flex flex-col items-end justify-end">
                           <span className="text-lg text-primary font-medium">

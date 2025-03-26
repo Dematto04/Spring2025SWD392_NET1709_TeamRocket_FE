@@ -2,11 +2,13 @@ import React, { useState } from "react";
 import { Badge } from "../ui/badge";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
-import { Calendar, CheckCheck, CircleX, MapPin, User } from "lucide-react";
+import { Calendar, CheckCheck, CircleX, MapPin, User, DollarSign, Clock } from "lucide-react";
 import { useAprroveNewRequestMutation } from "@/redux/api/requestApi";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { Input } from "../ui/input"; // Assuming you're using shadcn/ui Input component
+import { Input } from "../ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
 function RequestDetailSidebar({ service, housekeeper }) {
   const [approveNewRequest, { isLoading }] = useAprroveNewRequestMutation();
@@ -15,11 +17,24 @@ function RequestDetailSidebar({ service, housekeeper }) {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isApproveAction, setIsApproveAction] = useState(true);
-  const [reason, setReason] = useState(""); // State to store rejection reason
+  const [reason, setReason] = useState("");
+
+  const getStatusBadgeClasses = (status) => {
+    switch (status) {
+      case "Pending":
+        return "bg-gray-100 text-gray-800 hover:bg-gray-200";
+      case "Active":
+        return "bg-green-100 text-green-800 hover:bg-green-200";
+      case "Rejected":
+        return "bg-red-100 text-red-800 hover:bg-red-200";
+      default:
+        return "bg-gray-100 text-gray-800 hover:bg-gray-200";
+    }
+  };
 
   const handleApprovalClick = (isApprove) => {
     setIsApproveAction(isApprove);
-    setReason(""); // Reset reason when opening the modal
+    setReason("");
     setIsModalOpen(true);
   };
 
@@ -30,7 +45,6 @@ function RequestDetailSidebar({ service, housekeeper }) {
         is_approve: isApproveAction,
       };
 
-      // Include reason in payload only for rejection
       if (!isApproveAction) {
         if (!reason.trim()) {
           toast({
@@ -64,125 +78,147 @@ function RequestDetailSidebar({ service, housekeeper }) {
   };
 
   return (
-    <div className="">
-      <div>Price</div>
-      <div className="flex items-end justify-between mb-8">
-        <div className="flex items-end gap-1">
-          <h1 className="text-4xl font-bold">${service.service_price}</h1>
-        </div>
-        <Badge variant={service.service_status === "Pending" ? "secondary" : "success"}>
-          {service.service_status}
-        </Badge>
-      </div>
-      <Separator />
-      <div>
-        {/* Approve Button */}
-        <Button
-          variant="success"
-          className="mt-8 w-full py-6 bg-green-500 hover:bg-green-600"
-          disabled={isLoading || service.service_status !== "Pending"}
-          onClick={() => handleApprovalClick(true)}
-        >
-          <CheckCheck />
-          <span>Approve</span>
-        </Button>
+    <div className="space-y-6">
+      {/* Price Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <DollarSign size={20} />
+            Service Price
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-end justify-between">
+            <div className="flex items-end gap-1">
+              <span className="text-2xl font-bold">${service.service_price}</span>
+            </div>
+            <Badge 
+              className={`text-sm ${getStatusBadgeClasses(service.service_status)}`}
+            >
+              {service.service_status}
+            </Badge>
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Reject Button */}
-        <Button
-          variant="destructive"
-          className="mt-4 w-full py-6"
-          disabled={isLoading || service.service_status !== "Pending"}
-          onClick={() => handleApprovalClick(false)}
-        >
-          <CircleX />
-          <span>Reject</span>
-        </Button>
-      </div>
-
-      {/* Custom Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
-            <h2 className="text-xl font-semibold mb-4">
-              Confirm {isApproveAction ? "Approval" : "Rejection"}
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Are you sure you want to {isApproveAction ? "approve" : "reject"}{" "}
-              this service request? This action cannot be undone.
-            </p>
-
-            {/* Reason Input for Rejection */}
-            {!isApproveAction && (
-              <div className="mb-6">
-                <label htmlFor="reason" className="block text-sm font-medium text-gray-700 mb-2">
-                  Reason for Rejection (required)
-                </label>
-                <Input
-                  id="reason"
-                  type="text"
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value)}
-                  placeholder="Enter reason for rejection"
-                  className="w-full"
-                  required
-                />
-              </div>
-            )}
-
-            <div className="flex justify-end gap-4">
+      {/* Action Buttons */}
+      {service.service_status === "Pending" && (
+        <Card>
+          <CardContent className="pt-6">
+            <div className="space-y-4">
               <Button
-                variant="outline"
-                onClick={() => setIsModalOpen(false)}
+                variant="success"
+                className="w-full py-6 bg-green-500 hover:bg-green-600"
                 disabled={isLoading}
+                onClick={() => handleApprovalClick(true)}
               >
-                Cancel
+                <CheckCheck className="mr-2" />
+                <span>Approve Service</span>
               </Button>
+
               <Button
-                variant={isApproveAction ? "success" : "destructive"}
-                onClick={handleApproval}
+                variant="destructive"
+                className="w-full py-6"
                 disabled={isLoading}
-                className={isApproveAction ? "bg-green-500 hover:bg-green-600" : ""}
+                onClick={() => handleApprovalClick(false)}
               >
-                {isLoading ? "Processing..." : isApproveAction ? "Approve" : "Reject"}
+                <CircleX className="mr-2" />
+                <span>Reject Service</span>
               </Button>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       )}
 
-      <div>
-        <h1 className="text-3xl font-semibold mt-8">Provider Info</h1>
-        <div className="w-full mt-8 py-6 bg-secondary flex flex-col items-center justify-center rounded-lg">
-          <div>
-            <img
-              src="https://via.placeholder.com/150"
-              className="w-20 h-20 rounded-full"
-              alt={`${housekeeper.name}'s profile`}
-            />
-          </div>
-          <div className="text-lg font-medium mt-4">{housekeeper.name}</div>
-          {/* <Badge variant="outline" className="mt-2">
-            {service.category_name}
-          </Badge> */}
-        </div>
-        <div className="mt-4 space-y-2">
-          <div className="flex justify-between">
-            <div className="flex items-center gap-2">
-              <User size={16} />
-              <span>Created</span>
+      {/* Provider Info */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <User size={20} />
+            Provider Information
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center">
+            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xl font-semibold">
+              {housekeeper.name.charAt(0).toUpperCase()}
             </div>
-            <div>{new Date(service.created_time).toLocaleDateString()}</div>
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <MapPin size={16} />
-              <span>Address</span>
+            <div className="mt-4 text-center">
+              <div className="font-medium">{housekeeper.name}</div>
+              <div className="text-sm text-muted-foreground">Service Provider</div>
             </div>
-            <div className="ml-6">{service.service_address}, {service.service_city}, {service.service_district}</div>
           </div>
-        </div>
-      </div>
-      <Separator className="my-4" />
+
+          <div className="mt-6 space-y-4">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Calendar size={16} />
+                <span className="text-sm">Created</span>
+              </div>
+              <div className="text-sm">
+                {new Date(service.created_time).toLocaleDateString()}
+              </div>
+            </div>
+            <div>
+              <div className="flex items-center gap-2 text-muted-foreground mb-2">
+                <MapPin size={16} />
+                <span className="text-sm">Service Location</span>
+              </div>
+              <div className="text-sm ml-6">
+                {service.service_address}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Approval/Rejection Modal */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              Confirm {isApproveAction ? "Approval" : "Rejection"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-muted-foreground">
+              Are you sure you want to {isApproveAction ? "approve" : "reject"} this service request? 
+              This action cannot be undone.
+            </p>
+          </div>
+          {!isApproveAction && (
+            <div className="space-y-2">
+              <label htmlFor="reason" className="text-sm font-medium">
+                Reason for Rejection
+              </label>
+              <Input
+                id="reason"
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="Enter reason for rejection"
+                required
+              />
+            </div>
+          )}
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsModalOpen(false)}
+              disabled={isLoading}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant={isApproveAction ? "success" : "destructive"}
+              onClick={handleApproval}
+              disabled={isLoading}
+              className={isApproveAction ? "bg-green-500 hover:bg-green-600" : ""}
+            >
+              {isLoading ? "Processing..." : isApproveAction ? "Approve" : "Reject"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
