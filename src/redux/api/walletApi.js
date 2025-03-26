@@ -125,6 +125,19 @@ const walletApi = apiSlice.injectEndpoints({
         }
       }),
     }),
+    getHousekeeperEarnings: build.query({
+      query: ({ pageIndex, pageSize, day, month, year }) => ({
+        url: '/Housekeeper/earnings',
+        method: 'GET',
+        params: {
+          pageIndex,
+          pageSize,
+          day,
+          month,
+          year
+        }
+      }),
+    }),
   }), 
 });
 
@@ -135,4 +148,5 @@ export const { useGetWalletTransactionQuery,
    useProcessDepositMutation,
    useProcessWithdrawMutation,
    useGetMoneyExchangeQuery,
-   useGetRevenueHousekeeperChartDataQuery } = walletApi;
+   useGetRevenueHousekeeperChartDataQuery,
+  useGetHousekeeperEarningsQuery } = walletApi;
