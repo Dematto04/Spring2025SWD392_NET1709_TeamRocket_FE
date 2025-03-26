@@ -119,7 +119,7 @@ function RequestPendingService({ onCountUpdate }) {
           >
             {i}
           </PaginationLink>
-        </PaginationItem>
+      </PaginationItem>
       );
     }
 
