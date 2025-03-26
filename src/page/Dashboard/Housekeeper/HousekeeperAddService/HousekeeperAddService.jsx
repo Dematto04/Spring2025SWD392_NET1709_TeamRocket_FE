@@ -68,7 +68,13 @@ function HousekeeperAddService() {
       // address_line: "",
       // place_id: "",
       // location: "",
-      serviceDistanceRule: [],
+      serviceDistanceRule: [{
+        min_distance: "0",
+        max_distance: "0",
+        base_fee: "0"
+
+
+      }],
       serviceTimeSlots: [],
     },
   });
