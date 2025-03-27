@@ -104,7 +104,6 @@ function HousekeeperUpdateService() {
   //api cateogry
   const location = useLocation();
 
-
   const { id } = useParams();
   const { data: categories, isLoading } = useGetCategoriesQuery();
   const [updateService, { isSuccess, isLoading: isUpdating }] =
@@ -140,7 +139,7 @@ function HousekeeperUpdateService() {
       console.log("HousekeeperUpdateService unmounted");
     };
   }, []);
-  
+
   useEffect(() => {
     if (myService && isOk) {
       const service = myService.data;
@@ -205,6 +204,13 @@ function HousekeeperUpdateService() {
     name: "serviceDistanceRule",
   });
   const handleSubmit = async (data) => {
+    if (data.serviceTimeSlots.every((slot) => slot.slots.length === 0)) {
+      toast({
+        title: "Please add time slot",
+        variant: "destructive",
+      });
+      return;
+    }
     let temp = [];
     const timeSlotField = form.watch("serviceTimeSlots");
     timeSlotField.forEach((field, index) => {
