@@ -576,7 +576,7 @@ function HouseKeeperBookingList() {
 
                     <Separator />
                     <div className="space-y-3">
-                      <h3 className="font-medium">Completed Proof</h3>
+                      <h3 className="font-medium">Proof</h3>
                       <div className="grid grid-cols-2 gap-y-2">
                         <div className="text-sm text-gray-500">
                           Proof image:
