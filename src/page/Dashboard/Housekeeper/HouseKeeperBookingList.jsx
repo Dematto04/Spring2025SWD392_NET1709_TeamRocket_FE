@@ -475,41 +475,48 @@ function HouseKeeperBookingList() {
                       </div>
                     </div>
                     <div className="space-y-3">
-  <h3 className="font-medium">Additional Services</h3>
-  <div className="bg-gray-50 p-4 rounded-lg space-y-3">
-    {bookingDetail.bookings && bookingDetail.bookings.length > 0 ? (
-      bookingDetail.bookings.map((additional, index) => (
-        <div 
-          key={additional.additionalId} 
-          className={`flex items-center justify-between ${
-            index !== bookingDetail.bookings.length - 1 ? 'pb-3 border-b border-gray-200' : ''
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded overflow-hidden">
-              <img 
-                src={additional.url} 
-                alt={additional.name} 
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <div>
-              <p className="text-sm font-medium">{additional.name}</p>
-              <p className="text-xs text-gray-500">
-                {additional.duration} minutes
-              </p>
-            </div>
-          </div>
-          <div className="text-sm font-semibold">
-            ${additional.price.toFixed(2)}
-          </div>
-        </div>
-      ))
-    ) : (
-      <p className="text-sm text-gray-500">No additional services booked</p>
-    )}
-  </div>
-</div>
+                      <h3 className="font-medium">Additional Services</h3>
+                      <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+                        {bookingDetail.bookings &&
+                        bookingDetail.bookings.length > 0 ? (
+                          bookingDetail.bookings.map((additional, index) => (
+                            <div
+                              key={additional.additionalId}
+                              className={`flex items-center justify-between ${
+                                index !== bookingDetail.bookings.length - 1
+                                  ? "pb-3 border-b border-gray-200"
+                                  : ""
+                              }`}
+                            >
+                              <div className="flex items-center gap-2">
+                                <div className="h-8 w-8 rounded overflow-hidden">
+                                  <img
+                                    src={additional.url}
+                                    alt={additional.name}
+                                    className="h-full w-full object-cover"
+                                  />
+                                </div>
+                                <div>
+                                  <p className="text-sm font-medium">
+                                    {additional.name}
+                                  </p>
+                                  <p className="text-xs text-gray-500">
+                                    {additional.duration} minutes
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="text-sm font-semibold">
+                                ${additional.price.toFixed(2)}
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-sm text-gray-500">
+                            No additional services booked
+                          </p>
+                        )}
+                      </div>
+                    </div>
 
                     <Separator />
 
@@ -561,9 +568,28 @@ function HouseKeeperBookingList() {
                           Commision Fee:
                         </div>
                         <div className="text-sm font-medium flex items-center gap-1">
-                          {/* <CreditCard className="h-3.5 w-3.5" /> */}
-                          ${bookingDetail?.fee}
+                          {/* <CreditCard className="h-3.5 w-3.5" /> */}$
+                          {bookingDetail?.fee}
                         </div>
+                      </div>
+                    </div>
+
+                    <Separator />
+                    <div className="space-y-3">
+                      <h3 className="font-medium">Commission</h3>
+                      <div className="grid grid-cols-2 gap-y-2">
+                        <div className="text-sm text-gray-500">
+                          Proof image:
+                        </div>
+                        {bookingDetail?.proof ? (
+                          <div className="text-sm font-medium flex items-center gap-1">
+                            <img src={bookingDetail?.proof} alt="" />
+                          </div>
+                        ) : (
+                          <div className="text-sm font-medium flex items-center gap-1">
+                            No proof uploaded!
+                          </div>
+                        )}
                       </div>
                     </div>
                     <Separator />
