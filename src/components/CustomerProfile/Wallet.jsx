@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { format } from 'date-fns';
-import { 
-  useGetWalletTransactionQuery, 
+import React, { useState } from "react";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { format } from "date-fns";
+import {
+  useGetWalletTransactionQuery,
   useSendWithdrawRequestMutation,
   useGetBalanceQuery,
   useCreateDepositPaymentMutation,
   useProcessDepositMutation,
-  useGetMoneyExchangeQuery
-} from '@/redux/api/walletApi';
+  useGetMoneyExchangeQuery,
+} from "@/redux/api/walletApi";
 import {
   Dialog,
   DialogContent,
@@ -18,9 +18,9 @@ import {
   DialogFooter,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { toast } from '@/hooks/use-toast';
-import { Label } from '@/components/ui/label';
-import { useDebounce } from '@/hooks/useDebounce';
+import { toast } from "@/hooks/use-toast";
+import { Label } from "@/components/ui/label";
+import { useDebounce } from "@/hooks/useDebounce";
 import {
   Card,
   CardContent,
@@ -29,12 +29,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Wallet as WalletIcon,
   ArrowUpRight,
@@ -49,51 +44,51 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import WalletTransactionHistory from './WalletTransactionHistory';
+import WalletTransactionHistory from "./WalletTransactionHistory";
 
 const TRANSACTION_TYPES = [
-  { 
-    value: 'WithdrawRequestUser', 
-    label: 'Withdraw Requests',
-    description: 'Show withdraw requests by user',
-    icon: <Clock className="h-4 w-4" />
+  {
+    value: "WithdrawRequestUser",
+    label: "Withdraw Requests",
+    description: "Show withdraw requests by user",
+    icon: <Clock className="h-4 w-4" />,
   },
-  { 
-    value: 'WithdrawUser', 
-    label: 'Withdrawals',
-    description: 'Show withdrawals by user',
-    icon: <ArrowUpRight className="h-4 w-4" />
+  {
+    value: "WithdrawUser",
+    label: "Withdrawals",
+    description: "Show withdrawals by user",
+    icon: <ArrowUpRight className="h-4 w-4" />,
   },
-  { 
-    value: 'WithdrawRejectUser', 
-    label: 'Rejected Withdrawals',
-    description: 'Show rejected withdrawals by user',
-    icon: <XCircle className="h-4 w-4" />
+  {
+    value: "WithdrawRejectUser",
+    label: "Rejected Withdrawals",
+    description: "Show rejected withdrawals by user",
+    icon: <XCircle className="h-4 w-4" />,
   },
-  { 
-    value: 'ShowWithdrawHistoryUser', 
-    label: 'Withdrawal History',
-    description: 'Show all withdrawal transactions',
-    icon: <RefreshCw className="h-4 w-4" />
+  {
+    value: "ShowWithdrawHistoryUser",
+    label: "Withdrawal History",
+    description: "Show all withdrawal transactions",
+    icon: <RefreshCw className="h-4 w-4" />,
   },
-  { 
-    value: 'Deposit', 
-    label: 'Deposits',
-    description: 'Show deposit transactions',
-    icon: <ArrowDownLeft className="h-4 w-4" />
+  {
+    value: "Deposit",
+    label: "Deposits",
+    description: "Show deposit transactions",
+    icon: <ArrowDownLeft className="h-4 w-4" />,
   },
-  { 
-    value: 'ShowAllHistoryUser', 
-    label: 'All Transactions',
-    description: 'Show all transaction history',
-    icon: <DollarSign className="h-4 w-4" />
-  }
+  {
+    value: "ShowAllHistoryUser",
+    label: "All Transactions",
+    description: "Show all transaction history",
+    icon: <DollarSign className="h-4 w-4" />,
+  },
 ];
 
 const Wallet = () => {
   // States
-  const [depositAmount, setDepositAmount] = useState('');
-  const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [depositAmount, setDepositAmount] = useState("");
+  const [withdrawAmount, setWithdrawAmount] = useState("");
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
@@ -103,23 +98,33 @@ const Wallet = () => {
   const debouncedWithdrawAmount = useDebounce(withdrawAmount, 500);
 
   // API Hooks
-  const { data: transactions, isLoading: isLoadingTransactions } = useGetWalletTransactionQuery({
-    pageIndex: 1,
-    pageSize: 5,
-    transactionType: 'ShowAllHistoryUser'
-  });
-  const { data: balanceData, isLoading: isLoadingBalance } = useGetBalanceQuery();
-  const [createDepositPayment, { isLoading: isDepositLoading }] = useCreateDepositPaymentMutation();
-  const [sendWithdrawRequest, { isLoading: isWithdrawLoading }] = useSendWithdrawRequestMutation();
+  const { data: transactions, isLoading: isLoadingTransactions } =
+    useGetWalletTransactionQuery({
+      pageIndex: 1,
+      pageSize: 5,
+      transactionType: "ShowAllHistoryUser",
+    });
+  const { data: balanceData, isLoading: isLoadingBalance } =
+    useGetBalanceQuery();
+  const [createDepositPayment, { isLoading: isDepositLoading }] =
+    useCreateDepositPaymentMutation();
+  const [sendWithdrawRequest, { isLoading: isWithdrawLoading }] =
+    useSendWithdrawRequestMutation();
 
   // Exchange queries
-  const { data: depositExchangeData } = useGetMoneyExchangeQuery(debouncedDepositAmount || 0, {
-    skip: !debouncedDepositAmount
-  });
+  const { data: depositExchangeData } = useGetMoneyExchangeQuery(
+    debouncedDepositAmount || 0,
+    {
+      skip: !debouncedDepositAmount,
+    }
+  );
 
-  const { data: withdrawExchangeData } = useGetMoneyExchangeQuery(debouncedWithdrawAmount || 0, {
-    skip: !debouncedWithdrawAmount
-  });
+  const { data: withdrawExchangeData } = useGetMoneyExchangeQuery(
+    debouncedWithdrawAmount || 0,
+    {
+      skip: !debouncedWithdrawAmount,
+    }
+  );
 
   // Handlers
   const handleDeposit = async (e) => {
@@ -127,19 +132,19 @@ const Wallet = () => {
     try {
       const result = await createDepositPayment({
         amount: Number(depositAmount),
-        paymentMethod: 'Vnpay'
+        paymentMethod: "Vnpay",
       }).unwrap();
-      
+
       if (result.url) {
         window.location.href = result.url;
         setIsDepositModalOpen(false);
-        setDepositAmount('');
+        setDepositAmount("");
       }
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to create deposit payment",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
@@ -148,45 +153,46 @@ const Wallet = () => {
     e.preventDefault();
     try {
       const result = await sendWithdrawRequest({
-        amount: Number(withdrawAmount)
+        amount: Number(withdrawAmount),
       }).unwrap();
-      
+
       toast({
         title: "Success",
         description: "Withdrawal request sent successfully",
       });
       setIsWithdrawModalOpen(false);
-      setWithdrawAmount('');
+      setWithdrawAmount("");
     } catch (error) {
-      const errorMessage = error?.data?.messages?.Error?.[0] || 
-                          error?.data?.messages?.[0] ||
-                          error?.data?.title ||
-                          "Failed to send withdrawal request";
-      
+      const errorMessage =
+        error?.data?.messages?.Error?.[0] ||
+        error?.data?.messages?.[0] ||
+        error?.data?.title ||
+        "Failed to send withdrawal request";
+
       toast({
         title: "Error",
         description: errorMessage,
         variant: "destructive",
-        duration: 5000
+        duration: 5000,
       });
     }
   };
 
   const formatDate = (dateString) => {
-    return format(new Date(dateString), 'MMM d, yyyy • HH:mm');
+    return format(new Date(dateString), "MMM d, yyyy • HH:mm");
   };
 
   const formatAmount = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
     }).format(amount);
   };
 
   // Calculate summary statistics
   // const calculateStats = () => {
   //   if (!transactions?.data?.items) return { deposits: 0, withdrawals: 0, pending: 0 };
-    
+
   //   return transactions.data.items.reduce((stats, transaction) => {
   //     if (transaction.type === 'Deposit' && transaction.status === 'Done') {
   //       stats.deposits += transaction.amount;
@@ -204,36 +210,91 @@ const Wallet = () => {
   // Get status badge styling
   const getStatusBadge = (status) => {
     switch (status) {
-      case 'Done':
+      case "Done":
         return (
-          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1">
+          <Badge
+            variant="outline"
+            className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1"
+          >
             <CheckCircle className="h-3 w-3" />
             <span>Completed</span>
           </Badge>
         );
-      case 'Pending':
+      case "Pending":
         return (
-          <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 flex items-center gap-1">
+          <Badge
+            variant="outline"
+            className="bg-yellow-50 text-yellow-700 border-yellow-200 flex items-center gap-1"
+          >
             <Clock className="h-3 w-3" />
             <span>Pending</span>
           </Badge>
         );
-      case 'Rejected':
+      case "Rejected":
         return (
-          <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 flex items-center gap-1">
+          <Badge
+            variant="outline"
+            className="bg-red-50 text-red-700 border-red-200 flex items-center gap-1"
+          >
             <XCircle className="h-3 w-3" />
             <span>Rejected</span>
           </Badge>
         );
       default:
         return (
-          <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">
+          <Badge
+            variant="outline"
+            className="bg-gray-50 text-gray-700 border-gray-200"
+          >
             {status}
           </Badge>
         );
     }
   };
+  const TransactionType = ({ type, amount  }) => {
+    const getColor = (type1) => {
+      if(!type1) return "text-green-600"
+      switch (type1) {
+        case "WalletPurchase":
+          return "text-red-600";
+        case "VNPayPurchase":
+          return "text-red-600";
+        case "Deposit":
+          return "text-green-600";
+        case "Withdraw":
+          return "text-red-600";
 
+        default:
+          return "text-green-600";
+      }
+    };
+    const getSym = (type1) => {
+      if(!type1) return ""
+      switch (type1) {
+        case "WalletPurchase":
+          return "-";
+        case "VNPayPurchase":
+          return "";
+        case "Deposit":
+          return "+";
+        case "Withdraw":
+          return "-";
+
+        default:
+          return "";
+      }
+    };
+    return (
+      <span
+        className={`font-semibold ${
+          getColor(type)
+        }`}
+      >
+        {getSym(type)}
+        {formatAmount(amount)}
+      </span>
+    );
+  };
   return (
     <div className="space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -241,7 +302,7 @@ const Wallet = () => {
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="transactions">Transactions</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="overview" className="space-y-6">
           {/* Balance Card */}
           <Card className="overflow-hidden">
@@ -250,7 +311,7 @@ const Wallet = () => {
                 <WalletIcon className="h-5 w-5" />
                 <h3 className="text-lg font-medium">Your Balance</h3>
               </div>
-              
+
               {isLoadingBalance ? (
                 <Skeleton className="h-10 w-40 bg-white/20" />
               ) : (
@@ -259,18 +320,18 @@ const Wallet = () => {
                 </div>
               )}
             </div>
-            
+
             <CardContent className="p-6">
               <div className="flex flex-wrap gap-4 justify-between">
-                <Button 
+                <Button
                   onClick={() => setIsDepositModalOpen(true)}
                   className="flex-1 min-w-[120px]"
                 >
                   <ArrowDownLeft className="mr-2 h-4 w-4" />
                   Deposit
                 </Button>
-                <Button 
-                  onClick={() => setIsWithdrawModalOpen(true)} 
+                <Button
+                  onClick={() => setIsWithdrawModalOpen(true)}
                   variant="outline"
                   className="flex-1 min-w-[120px]"
                 >
@@ -280,7 +341,7 @@ const Wallet = () => {
               </div>
             </CardContent>
           </Card>
-          
+
           {/* Stats Cards */}
           {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card>
@@ -325,22 +386,24 @@ const Wallet = () => {
               </CardContent>
             </Card>
           </div> */}
-          
+
           {/* Recent Transactions */}
           <Card>
             <CardHeader className="pb-2">
               <div className="flex justify-between items-center">
                 <CardTitle>Recent Transactions</CardTitle>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={() => setActiveTab("transactions")}
                   className="text-primary"
                 >
                   View All
                 </Button>
               </div>
-              <CardDescription>Your most recent financial activities</CardDescription>
+              <CardDescription>
+                Your most recent financial activities
+              </CardDescription>
             </CardHeader>
             <CardContent className="p-6">
               {isLoadingTransactions ? (
@@ -368,15 +431,26 @@ const Wallet = () => {
               ) : (
                 <div className="space-y-4">
                   {transactions?.data?.items.slice(0, 5).map((transaction) => (
-                    <div key={transaction.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                    <div
+                      key={transaction.id}
+                      className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors"
+                    >
                       <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-full ${
-                          transaction.type === 'Deposit' ? 'bg-blue-100' : 'bg-purple-100'
-                        }`}>
-                          {transaction.type === 'Deposit' ? (
-                            <ArrowDownLeft className={`h-5 w-5 text-blue-600`} />
+                        <div
+                          className={`p-2 rounded-full ${
+                            transaction.type === "Deposit"
+                              ? "bg-blue-100"
+                              : "bg-purple-100"
+                          }`}
+                        >
+                          {transaction.type === "Deposit" ? (
+                            <ArrowDownLeft
+                              className={`h-5 w-5 text-blue-600`}
+                            />
                           ) : (
-                            <ArrowUpRight className={`h-5 w-5 text-purple-600`} />
+                            <ArrowUpRight
+                              className={`h-5 w-5 text-purple-600`}
+                            />
                           )}
                         </div>
                         <div>
@@ -387,12 +461,7 @@ const Wallet = () => {
                         </div>
                       </div>
                       <div className="flex flex-col items-end">
-                        <span className={`font-semibold ${
-                          transaction.type === 'Withdraw' ? 'text-red-600' : 'text-green-600'
-                        }`}>
-                          {transaction.type === 'Withdraw' ? '- ' : '+ '}
-                          {formatAmount(transaction.amount)}
-                        </span>
+                        <TransactionType type={transaction.type} amount={transaction.amount}/>
                         <div className="mt-1">
                           {getStatusBadge(transaction.status)}
                         </div>
@@ -404,9 +473,12 @@ const Wallet = () => {
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="transactions">
-          <WalletTransactionHistory formatAmount={formatAmount} formatDate={formatDate} />
+          <WalletTransactionHistory
+            formatAmount={formatAmount}
+            formatDate={formatDate}
+          />
         </TabsContent>
       </Tabs>
 
@@ -444,32 +516,40 @@ const Wallet = () => {
                 {depositAmount && depositExchangeData?.data && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
                     <RefreshCw className="h-3 w-3" />
-                    <span>≈ {depositExchangeData.data.toLocaleString()} VND</span>
+                    <span>
+                      ≈ {depositExchangeData.data.toLocaleString()} VND
+                    </span>
                   </div>
                 )}
               </div>
-              
+
               <div className="bg-blue-50 p-3 rounded-md border border-blue-100 text-sm text-blue-700 mt-2">
                 <div className="flex items-start gap-2">
                   <AlertCircle className="h-4 w-4 mt-0.5" />
                   <div>
-                    You will be redirected to VNPay to complete your deposit. The funds will be available in your wallet immediately after successful payment.
+                    You will be redirected to VNPay to complete your deposit.
+                    The funds will be available in your wallet immediately after
+                    successful payment.
                   </div>
                 </div>
               </div>
             </div>
             <DialogFooter>
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => setIsDepositModalOpen(false)}
                 disabled={isDepositLoading}
               >
                 Cancel
               </Button>
-              <Button 
+              <Button
                 type="submit"
-                disabled={isDepositLoading || !depositAmount || Number(depositAmount) <= 0}
+                disabled={
+                  isDepositLoading ||
+                  !depositAmount ||
+                  Number(depositAmount) <= 0
+                }
               >
                 {isDepositLoading ? (
                   <span className="flex items-center gap-2">
@@ -501,9 +581,11 @@ const Wallet = () => {
             <div className="grid gap-4 py-4">
               <div className="bg-muted p-3 rounded-md flex items-center justify-between">
                 <span className="text-sm">Current Balance:</span>
-                <span className="font-semibold">{formatAmount(balanceData?.data || 0)}</span>
+                <span className="font-semibold">
+                  {formatAmount(balanceData?.data || 0)}
+                </span>
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Amount (USD)</Label>
                 <div className="relative">
@@ -524,11 +606,13 @@ const Wallet = () => {
                 {withdrawAmount && withdrawExchangeData?.data && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
                     <RefreshCw className="h-3 w-3" />
-                    <span>≈ {withdrawExchangeData.data.toLocaleString()} VND</span>
+                    <span>
+                      ≈ {withdrawExchangeData.data.toLocaleString()} VND
+                    </span>
                   </div>
                 )}
               </div>
-              
+
               {Number(withdrawAmount) > (balanceData?.data || 0) && (
                 <div className="bg-red-50 p-3 rounded-md border border-red-100 text-sm text-red-700">
                   <div className="flex items-start gap-2">
@@ -539,29 +623,31 @@ const Wallet = () => {
                   </div>
                 </div>
               )}
-              
+
               <div className="bg-amber-50 p-3 rounded-md border border-amber-100 text-sm text-amber-700">
                 <div className="flex items-start gap-2">
                   <Clock className="h-4 w-4 mt-0.5" />
                   <div>
-                    Withdrawal requests are typically processed within 1-3 business days. You will be notified once your request has been processed.
+                    Withdrawal requests are typically processed within 1-3
+                    business days. You will be notified once your request has
+                    been processed.
                   </div>
                 </div>
               </div>
             </div>
             <DialogFooter>
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => setIsWithdrawModalOpen(false)}
                 disabled={isWithdrawLoading}
               >
                 Cancel
               </Button>
-              <Button 
+              <Button
                 type="submit"
                 disabled={
-                  isWithdrawLoading || 
+                  isWithdrawLoading ||
                   Number(withdrawAmount) > (balanceData?.data || 0) ||
                   Number(withdrawAmount) <= 0
                 }
