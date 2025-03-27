@@ -69,9 +69,9 @@ export default function WithdrawRequestsPage() {
   };
 
   const formatAmount = (amount) => {
-    return new Intl.NumberFormat('vi-VN', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'VND'
+      currency: 'USD'
     }).format(amount);
   };
 
