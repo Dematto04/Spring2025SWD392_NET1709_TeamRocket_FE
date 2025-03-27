@@ -31,7 +31,7 @@ function ServiceDetailOverview({ overview, additionalServices }) {
                     <div className="h-full flex gap-4 flex-wrap md:flex-nowrap">
                       <div className="md:shrink-0">
                         <img
-                          src="/home-cleaning.webp"
+                          src={item?.url}
                           className="h-full object-contain rounded-lg"
                         />
                       </div>
