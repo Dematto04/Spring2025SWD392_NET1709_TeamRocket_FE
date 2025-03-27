@@ -36,7 +36,6 @@ import AddServiceAdditionalService from "@/components/Housekeeper/AddService/Add
 import { useNavigate } from "react-router-dom";
 import { formSchema } from "./formSchema";
 
-
 // thiếu field image
 function HousekeeperAddService() {
   const [dateOfWeek, setDateOfWeek] = useState(serviceTimeSlots);
@@ -46,7 +45,7 @@ function HousekeeperAddService() {
   const { data: categories, isLoading } = useGetHousekeeperSkillsQuery({
     refetchOnMountOrArgChange: true,
     refetchOnFocus: true,
-    refetchOnReconnect: true
+    refetchOnReconnect: true,
   });
   //api create service
 
@@ -61,20 +60,22 @@ function HousekeeperAddService() {
       description: "",
       duration: "",
       price: 0,
-      serviceSteps: [{ step_order: 1, step_description: "", step_duration: null }],
+      serviceSteps: [
+        { step_order: 1, step_description: "", step_duration: null },
+      ],
       additionalServices: [],
       // city: "",
       // province: "",
       // address_line: "",
       // place_id: "",
       // location: "",
-      serviceDistanceRule: [{
-        min_distance: "0",
-        max_distance: "0",
-        base_fee: "0"
-
-
-      }],
+      serviceDistanceRule: [
+        {
+          min_distance: "0",
+          max_distance: "0",
+          base_fee: "0",
+        },
+      ],
       serviceTimeSlots: [],
     },
   });
@@ -100,6 +101,14 @@ function HousekeeperAddService() {
     name: "serviceDistanceRule",
   });
   const handleSubmit = async (data) => {
+    if (data.serviceTimeSlots.every((slot) => slot.slots.length === 0)) {
+      toast({
+        title: "Please add time slot",
+        variant: "destructive",
+      });
+      return;
+    }
+
     let temp = [];
     const timeSlotField = form.watch("serviceTimeSlots");
     timeSlotField.forEach((field, index) => {
@@ -132,10 +141,9 @@ function HousekeeperAddService() {
       })),
       serviceTimeSlots: temp,
     };
-    console.log({body});
-    
+    console.log({ body });
 
-    if (data.serviceDistanceRule.length === 0) {
+    if (data.serviceDistanceRule.length === 0 || !data?.serviceDistanceRule) {
       toast({
         title: "Please add distance rule",
         variant: "destructive",
