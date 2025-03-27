@@ -16,7 +16,7 @@ const Transactions = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [transactionType, setTransactionType] = useState('BookingPurchase');
-
+  
 
   // API Hooks
   const { data: transactions, isLoading: isLoadingTransactions } = useGetWalletTransactionQuery({

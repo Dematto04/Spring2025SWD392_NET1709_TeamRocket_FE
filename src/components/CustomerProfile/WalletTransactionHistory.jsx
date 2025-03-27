@@ -16,6 +16,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   ArrowUpRight,
   ArrowDownLeft,
   Clock,
@@ -30,10 +37,19 @@ import {
   AlertCircle,
   CheckCircle,
   XCircle,
+  CalendarDays,
+  Loader2,
+  MapPin,
+  Mail,
+  PhoneIcon,
+  FileText,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
+import { useGetBookingDetailQuery } from "@/redux/api/bookingApi";
+import { Separator } from "../ui/separator";
+import { format, parseISO } from "date-fns";
 
 const TRANSACTION_TYPES = [
   {
@@ -97,6 +113,7 @@ const WalletTransactionHistory = ({ formatAmount, formatDate }) => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [transactionType, setTransactionType] = useState("ShowAllHistoryUser");
+  const [selectedBookingId, setSelectedBookingId] = useState(null);
 
   // API Hooks
   const { data: transactions, isLoading: isLoadingTransactions } =
@@ -105,11 +122,32 @@ const WalletTransactionHistory = ({ formatAmount, formatDate }) => {
       pageSize: pageSize,
       transactionType: transactionType,
     });
+  const { data: bookingDetailResponse, isLoading: isDetailLoading } =
+    useGetBookingDetailQuery(selectedBookingId, { skip: !selectedBookingId });
 
   const handleTransactionTypeChange = (value) => {
     setTransactionType(value);
     setPage(1);
   };
+  const bookingDetail = bookingDetailResponse?.data;
+  const formatDateTime = (dateString, timeString) => {
+    try {
+      const date = parseISO(dateString);
+      return `${format(date, "dd/MM/yyyy")} ${timeString || ""}`;
+    } catch (e) {
+      // Handle the case where date might not be a valid ISO string
+      return `${dateString?.split("T")[0] || "N/A"} ${timeString || ""}`;
+    }
+  };
+   const formatPaymentDate = (dateString) => {
+      if (!dateString) return "N/A";
+      try {
+        const date = parseISO(dateString);
+        return format(date, "dd/MM/yyyy HH:mm");
+      } catch (e) {
+        return dateString;
+      }
+    };
 
   // Get status badge styling
   const getStatusBadge = (status) => {
@@ -319,7 +357,12 @@ const WalletTransactionHistory = ({ formatAmount, formatDate }) => {
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.2, delay: index * 0.05 }}
                   >
-                    <Card className="overflow-hidden hover:shadow-md transition-shadow">
+                    <Card
+                      className="overflow-hidden hover:shadow-md transition-shadow"
+                      onClick={() =>
+                        setSelectedBookingId(transaction?.referenceId)
+                      }
+                    >
                       <CardContent className="p-0">
                         <div className="flex flex-col md:flex-row md:items-center justify-between p-4">
                           <div className="flex items-start md:items-center gap-3 mb-3 md:mb-0">
@@ -333,7 +376,8 @@ const WalletTransactionHistory = ({ formatAmount, formatDate }) => {
                                   ? "bg-red-100"
                                   : transaction.type === "VNPayPurchase"
                                   ? "bg-blue-100"
-                                  : transaction.type === "BookingCanceledPayback"
+                                  : transaction.type ===
+                                    "BookingCanceledPayback"
                                   ? "bg-green-100"
                                   : "bg-gray-100"
                               }`}
@@ -353,7 +397,9 @@ const WalletTransactionHistory = ({ formatAmount, formatDate }) => {
                               </div>
                               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                 <Calendar className="h-3 w-3" />
-                                <span>{formatDate(transaction.createdDate)}</span>
+                                <span>
+                                  {formatDate(transaction.createdDate)}
+                                </span>
                               </div>
                               {transaction.referenceId && (
                                 <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
@@ -367,11 +413,14 @@ const WalletTransactionHistory = ({ formatAmount, formatDate }) => {
                             <span className={`text-xl font-bold ${color}`}>
                               {prefix} {formatAmount(transaction.amount)}
                             </span>
-                            {(transaction.currentAmount !== undefined && transaction.afterAmount !== undefined) && (
-                              <span className="text-sm text-muted-foreground">
-                                Before: {formatAmount(transaction.currentAmount)} - After: {formatAmount(transaction.afterAmount)}
-                              </span>
-                            )}
+                            {transaction.currentAmount !== undefined &&
+                              transaction.afterAmount !== undefined && (
+                                <span className="text-sm text-muted-foreground">
+                                  Before:{" "}
+                                  {formatAmount(transaction.currentAmount)} -
+                                  After: {formatAmount(transaction.afterAmount)}
+                                </span>
+                              )}
                           </div>
                         </div>
                       </CardContent>
@@ -417,6 +466,208 @@ const WalletTransactionHistory = ({ formatAmount, formatDate }) => {
           </div>
         )}
       </CardContent>
+      <Dialog
+        open={selectedBookingId !== null}
+        onOpenChange={(open) => !open && setSelectedBookingId(null)}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Booking Details</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto pr-6 -mr-6">
+            {isDetailLoading ? (
+              <div className="flex justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin" />
+              </div>
+            ) : bookingDetail ? (
+              <div className="space-y-6">
+                {/* Service Info Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-medium text-lg">
+                      {bookingDetail?.serviceName}
+                    </h3>
+                    <Badge className="capitalize">
+                      {bookingDetail?.status === "OnGoing"
+                        ? "Ongoing"
+                        : bookingDetail?.status}
+                    </Badge>
+                  </div>
+
+                  <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+                    <div className="flex items-center gap-2">
+                      <CalendarDays className="h-4 w-4 text-gray-500" />
+                      <span className="text-sm font-medium">
+                        {formatDateTime(bookingDetail?.preferDateStart, "")}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-gray-500" />
+                      <span className="text-sm">
+                        {bookingDetail?.timeStart} - {bookingDetail?.timeEnd}(
+                        {bookingDetail?.cleaningServiceDuration}{" "}
+                        {bookingDetail?.cleaningServiceDuration > 1
+                          ? "hours"
+                          : "hour"}
+                        )
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-gray-500" />
+                      <span className="text-sm">{bookingDetail.location}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <h3 className="font-medium">Additional Services</h3>
+                  <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+                    {bookingDetail?.bookings &&
+                    bookingDetail?.bookings.length > 0 ? (
+                      bookingDetail?.bookings.map((additional, index) => (
+                        <div
+                          key={additional.additionalId}
+                          className={`flex items-center justify-between ${
+                            index !== bookingDetail?.bookings.length - 1
+                              ? "pb-3 border-b border-gray-200"
+                              : ""
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <div className="h-8 w-8 rounded overflow-hidden">
+                              <img
+                                src={additional?.url}
+                                alt={additional?.name}
+                                className="h-full w-full object-cover"
+                              />
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium">
+                                {additional?.name}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {additional?.duration} minutes
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-sm font-semibold">
+                            ${additional?.price.toFixed(2)}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-sm text-gray-500">
+                        No additional services booked
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Payment Info Section */}
+                <div className="space-y-3">
+                  <h3 className="font-medium">Payment Information</h3>
+                  <div className="grid grid-cols-2 gap-y-2">
+                    <div className="text-sm text-gray-500">Payment Method:</div>
+                    <div className="text-sm font-medium flex items-center gap-1">
+                      <CreditCard className="h-3.5 w-3.5" />
+                      {bookingDetail?.paymentMethod}
+                    </div>
+
+                    <div className="text-sm text-gray-500">Payment Status:</div>
+                    <Badge
+                      className="w-fit capitalize"
+                    >
+                      {bookingDetail?.paymentStatus}
+                    </Badge>
+
+                    <div className="text-sm text-gray-500">Payment Date:</div>
+                    <div className="text-sm">
+                      {formatPaymentDate(bookingDetail?.paymentDate)}
+                    </div>
+
+                    <div className="text-sm text-gray-500">Total Amount:</div>
+                    <div className="text-sm font-semibold">
+                      ${bookingDetail?.totalPrice}
+                    </div>
+                  </div>
+                </div>
+
+
+                <Separator />
+                <div className="space-y-3">
+                  <h3 className="font-medium">Proof</h3>
+                  <div className="grid grid-cols-2 gap-y-2">
+                    <div className="text-sm text-gray-500">Proof image:</div>
+                    {bookingDetail?.proof ? (
+                      <div className="text-sm font-medium flex items-center gap-1">
+                        <img src={bookingDetail?.proof} alt="" />
+                      </div>
+                    ) : (
+                      <div className="text-sm font-medium flex items-center gap-1">
+                        No proof uploaded!
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <Separator />
+                {/* housekeeper Info Section */}
+                <div className="space-y-3">
+                  <h3 className="font-medium">Housekeeper Information</h3>
+                  <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                    <div className="font-medium">
+                      {bookingDetail?.housekeeperName}
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Mail className="h-4 w-4 text-gray-500" />
+                      <span>{bookingDetail?.houseKeeperMail}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <PhoneIcon className="h-4 w-4 text-gray-500" />
+                      <span>{bookingDetail?.houseKeeperPhoneNumber}</span>
+                    </div>
+                  </div>
+                </div>
+                {/* Customer Info Section */}
+                <div className="space-y-3">
+                  <h3 className="font-medium">Customer Information</h3>
+                  <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                    <div className="font-medium">
+                      {bookingDetail.customerName}
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Mail className="h-4 w-4 text-gray-500" />
+                      <span>{bookingDetail.customerMail}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <PhoneIcon className="h-4 w-4 text-gray-500" />
+                      <span>{bookingDetail.customerPhoneNumber}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Notes Section - Only show if notes exist */}
+                {bookingDetail.note && (
+                  <>
+                    <Separator />
+                    <div className="space-y-3">
+                      <h3 className="font-medium">Notes</h3>
+                      <div className="flex gap-2 bg-yellow-50 p-3 rounded-md">
+                        <FileText className="h-5 w-5 text-yellow-500 flex-shrink-0 mt-0.5" />
+                        <p className="text-sm">{bookingDetail?.note}</p>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                Booking details not available
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
