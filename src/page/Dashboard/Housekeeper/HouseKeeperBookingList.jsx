@@ -1,15 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { 
-  useGetHousekeeperBookingsQuery, 
-  useGetBookingDetailQuery, 
-  useSubmitProofMutation 
-} from '@/redux/api/bookingApi';
+import React, { useState, useRef, useEffect } from "react";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  useGetHousekeeperBookingsQuery,
+  useGetBookingDetailQuery,
+  useSubmitProofMutation,
+} from "@/redux/api/bookingApi";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -32,18 +27,30 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import { format, parseISO } from 'date-fns';
-import { Loader2, ChevronLeft, ChevronRight, ImageIcon, AlertCircle, Clock, CalendarDays, CreditCard, MapPin, FileText, Info } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { format, parseISO } from "date-fns";
+import {
+  Loader2,
+  ChevronLeft,
+  ChevronRight,
+  ImageIcon,
+  AlertCircle,
+  Clock,
+  CalendarDays,
+  CreditCard,
+  MapPin,
+  FileText,
+  Info,
+} from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { PhoneIcon, Mail } from 'lucide-react';
+import { PhoneIcon, Mail } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from '@/hooks/use-toast';
-import { Separator } from '@/components/ui/separator';
+import { useToast } from "@/hooks/use-toast";
+import { Separator } from "@/components/ui/separator";
 
 const ITEMS_PER_PAGE = 12;
 const PLACEHOLDER_IMAGE = "/placeholder-service.jpg";
@@ -56,34 +63,30 @@ function HouseKeeperBookingList() {
 
   // State management
   const [pageIndex, setPageIndex] = useState(1);
-  const [statusFilter, setStatusFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedBookingId, setSelectedBookingId] = useState(null);
   const [finishDialogOpen, setFinishDialogOpen] = useState(false);
   const [selectedFinishBooking, setSelectedFinishBooking] = useState(null);
   const [proofImage, setProofImage] = useState(null);
-  const [proofTitle, setProofTitle] = useState('');
+  const [proofTitle, setProofTitle] = useState("");
 
   // API queries
-  const { 
-    data: bookingsResponse, 
+  const {
+    data: bookingsResponse,
     isLoading: isBookingsLoading,
-    isFetching: isBookingsFetching 
+    isFetching: isBookingsFetching,
   } = useGetHousekeeperBookingsQuery({
     page: pageIndex,
     pageSize: ITEMS_PER_PAGE,
-    status: statusFilter === "All" ? undefined : statusFilter
+    status: statusFilter === "All" ? undefined : statusFilter,
   });
 
-  const {
-    data: bookingDetailResponse,
-    isLoading: isDetailLoading
-  } = useGetBookingDetailQuery(
-    selectedBookingId, 
-    { skip: !selectedBookingId }
-  );
+  const { data: bookingDetailResponse, isLoading: isDetailLoading } =
+    useGetBookingDetailQuery(selectedBookingId, { skip: !selectedBookingId });
 
-  const [submitProof, { isLoading: isSubmittingProof }] = useSubmitProofMutation();
+  const [submitProof, { isLoading: isSubmittingProof }] =
+    useSubmitProofMutation();
 
   // Extract data from response
   const bookings = bookingsResponse?.data?.items || [];
@@ -138,7 +141,7 @@ function HouseKeeperBookingList() {
     e.stopPropagation(); // Prevent card click
     setSelectedFinishBooking(booking);
     setProofImage(null);
-    setProofTitle('');
+    setProofTitle("");
     setFinishDialogOpen(true);
   };
 
@@ -150,7 +153,7 @@ function HouseKeeperBookingList() {
     const preview = URL.createObjectURL(file);
     setProofImage({
       file,
-      preview
+      preview,
     });
   };
 
@@ -160,7 +163,7 @@ function HouseKeeperBookingList() {
         toast({
           title: "Error",
           description: "Please upload a proof image",
-          variant: "destructive"
+          variant: "destructive",
         });
         return;
       }
@@ -169,7 +172,7 @@ function HouseKeeperBookingList() {
         toast({
           title: "Error",
           description: "Please provide a title for your proof",
-          variant: "destructive"
+          variant: "destructive",
         });
         return;
       }
@@ -178,7 +181,7 @@ function HouseKeeperBookingList() {
       await submitProof({
         bookingId: selectedFinishBooking.id,
         title: proofTitle,
-        imgUrl: proofImage.preview // In a real app, this would be the URL from server upload
+        imgUrl: proofImage.preview, // In a real app, this would be the URL from server upload
       }).unwrap();
 
       toast({
@@ -190,15 +193,16 @@ function HouseKeeperBookingList() {
       setFinishDialogOpen(false);
       setSelectedFinishBooking(null);
       setProofImage(null);
-      setProofTitle('');
-      
+      setProofTitle("");
+
       // Refresh booking list happens automatically via invalidatesTags
     } catch (error) {
-      console.error('Error submitting completion proof:', error);
+      console.error("Error submitting completion proof:", error);
       toast({
         title: "Error",
-        description: error.data?.messages?.Booking?.[0] || "Failed to submit proof",
-        variant: "destructive"
+        description:
+          error.data?.messages?.Booking?.[0] || "Failed to submit proof",
+        variant: "destructive",
       });
     }
   };
@@ -215,10 +219,10 @@ function HouseKeeperBookingList() {
   const formatDateTime = (dateString, timeString) => {
     try {
       const date = parseISO(dateString);
-      return `${format(date, 'dd/MM/yyyy')} ${timeString || ''}`;
+      return `${format(date, "dd/MM/yyyy")} ${timeString || ""}`;
     } catch (e) {
       // Handle the case where date might not be a valid ISO string
-      return `${dateString?.split('T')[0] || 'N/A'} ${timeString || ''}`;
+      return `${dateString?.split("T")[0] || "N/A"} ${timeString || ""}`;
     }
   };
 
@@ -227,7 +231,7 @@ function HouseKeeperBookingList() {
     if (!dateString) return "N/A";
     try {
       const date = parseISO(dateString);
-      return format(date, 'dd/MM/yyyy HH:mm');
+      return format(date, "dd/MM/yyyy HH:mm");
     } catch (e) {
       return dateString;
     }
@@ -280,12 +284,14 @@ function HouseKeeperBookingList() {
             <div className="flex flex-col items-center justify-center min-h-[300px] text-center p-6 border-2 border-dashed rounded-lg">
               <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-medium">No bookings found</h3>
-              <p className="text-muted-foreground mt-2">Try changing your filters or check back later.</p>
+              <p className="text-muted-foreground mt-2">
+                Try changing your filters or check back later.
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {bookings.map((booking) => (
-                <Card 
+                <Card
                   key={booking.id}
                   className="cursor-pointer hover:shadow-lg transition-shadow overflow-hidden relative"
                   onClick={() => setSelectedBookingId(booking.id)}
@@ -310,33 +316,53 @@ function HouseKeeperBookingList() {
                     <div className="space-y-4">
                       {/* Title and Status */}
                       <div className="flex justify-between items-start gap-2">
-                        <h3 className="font-medium text-lg">{booking.serviceName}</h3>
-                        <Badge 
+                        <h3 className="font-medium text-lg">
+                          {booking.serviceName}
+                        </h3>
+                        <Badge
                           variant={getStatusVariant(booking.status)}
                           className="capitalize"
                         >
-                          {booking.status === "OnGoing" ? "Ongoing" : booking.status}
+                          {booking.status === "OnGoing"
+                            ? "Ongoing"
+                            : booking.status}
                         </Badge>
                       </div>
 
                       {/* Booking Details */}
                       <div className="space-y-2">
                         <div className="flex gap-2">
-                          <span className="text-gray-500 min-w-[120px]">Booking Date</span>
-                          <span className="text-gray-900">: {formatDateTime(booking.preferDateStart, booking.timeStart)}</span>
+                          <span className="text-gray-500 min-w-[120px]">
+                            Booking Date
+                          </span>
+                          <span className="text-gray-900">
+                            :{" "}
+                            {formatDateTime(
+                              booking.preferDateStart,
+                              booking.timeStart
+                            )}
+                          </span>
                         </div>
 
                         <div className="flex gap-2">
-                          <span className="text-gray-500 min-w-[120px]">Amount</span>
+                          <span className="text-gray-500 min-w-[120px]">
+                            Amount
+                          </span>
                           <div className="flex gap-2 items-center">
-                            <span className="text-gray-900">: ${booking.totalPrice}</span>
+                            <span className="text-gray-900">
+                              : ${booking.totalPrice}
+                            </span>
                           </div>
                         </div>
 
                         <div className="flex gap-2">
-                          <span className="text-gray-500 min-w-[120px]">Location</span>
+                          <span className="text-gray-500 min-w-[120px]">
+                            Location
+                          </span>
                           <div className="flex-1 overflow-hidden">
-                            <span className="text-gray-900 inline-block">: </span>
+                            <span className="text-gray-900 inline-block">
+                              :{" "}
+                            </span>
                             <div className="inline-block truncate max-w-[calc(100%-10px)]">
                               <span className="text-gray-900">
                                 {booking.addressLine1}
@@ -346,7 +372,9 @@ function HouseKeeperBookingList() {
                         </div>
 
                         <div className="flex gap-2">
-                          <span className="text-gray-500 min-w-[120px]">User</span>
+                          <span className="text-gray-500 min-w-[120px]">
+                            User
+                          </span>
                           <div className="flex flex-1 items-center gap-2">
                             <span>:</span>
                             <div className="flex items-center gap-2 min-w-0">
@@ -373,7 +401,7 @@ function HouseKeeperBookingList() {
                       {/* Add Finish Button for ongoing bookings that are finishable */}
                       {booking.status === "OnGoing" && booking.isFinishable && (
                         <div className="mt-4">
-                          <Button 
+                          <Button
                             className="w-full"
                             onClick={(e) => handleFinishClick(e, booking)}
                           >
@@ -389,7 +417,10 @@ function HouseKeeperBookingList() {
           )}
 
           {/* Updated Booking Detail Dialog */}
-          <Dialog open={selectedBookingId !== null} onOpenChange={(open) => !open && setSelectedBookingId(null)}>
+          <Dialog
+            open={selectedBookingId !== null}
+            onOpenChange={(open) => !open && setSelectedBookingId(null)}
+          >
             <DialogContent className="max-w-md">
               <DialogHeader>
                 <DialogTitle>Booking Details</DialogTitle>
@@ -404,35 +435,81 @@ function HouseKeeperBookingList() {
                     {/* Service Info Section */}
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <h3 className="font-medium text-lg">{bookingDetail.serviceName}</h3>
-                        <Badge 
+                        <h3 className="font-medium text-lg">
+                          {bookingDetail.serviceName}
+                        </h3>
+                        <Badge
                           variant={getStatusVariant(bookingDetail.status)}
                           className="capitalize"
                         >
-                          {bookingDetail.status === "OnGoing" ? "Ongoing" : bookingDetail.status}
+                          {bookingDetail.status === "OnGoing"
+                            ? "Ongoing"
+                            : bookingDetail.status}
                         </Badge>
                       </div>
-                      
+
                       <div className="bg-gray-50 p-4 rounded-lg space-y-3">
                         <div className="flex items-center gap-2">
                           <CalendarDays className="h-4 w-4 text-gray-500" />
                           <span className="text-sm font-medium">
-                            {formatDateTime(bookingDetail.preferDateStart, '')}
+                            {formatDateTime(bookingDetail.preferDateStart, "")}
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Clock className="h-4 w-4 text-gray-500" />
                           <span className="text-sm">
-                            {bookingDetail.timeStart} - {bookingDetail.timeEnd} 
-                            ({bookingDetail.cleaningServiceDuration} {bookingDetail.cleaningServiceDuration > 1 ? 'hours' : 'hour'})
+                            {bookingDetail.timeStart} - {bookingDetail.timeEnd}(
+                            {bookingDetail.cleaningServiceDuration}{" "}
+                            {bookingDetail.cleaningServiceDuration > 1
+                              ? "hours"
+                              : "hour"}
+                            )
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
                           <MapPin className="h-4 w-4 text-gray-500" />
-                          <span className="text-sm">{bookingDetail.location}</span>
+                          <span className="text-sm">
+                            {bookingDetail.location}
+                          </span>
                         </div>
                       </div>
                     </div>
+                    <div className="space-y-3">
+  <h3 className="font-medium">Additional Services</h3>
+  <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+    {bookingDetail.bookings && bookingDetail.bookings.length > 0 ? (
+      bookingDetail.bookings.map((additional, index) => (
+        <div 
+          key={additional.additionalId} 
+          className={`flex items-center justify-between ${
+            index !== bookingDetail.bookings.length - 1 ? 'pb-3 border-b border-gray-200' : ''
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded overflow-hidden">
+              <img 
+                src={additional.url} 
+                alt={additional.name} 
+                className="h-full w-full object-cover"
+              />
+            </div>
+            <div>
+              <p className="text-sm font-medium">{additional.name}</p>
+              <p className="text-xs text-gray-500">
+                {additional.duration} minutes
+              </p>
+            </div>
+          </div>
+          <div className="text-sm font-semibold">
+            ${additional.price.toFixed(2)}
+          </div>
+        </div>
+      ))
+    ) : (
+      <p className="text-sm text-gray-500">No additional services booked</p>
+    )}
+  </div>
+</div>
 
                     <Separator />
 
@@ -440,34 +517,63 @@ function HouseKeeperBookingList() {
                     <div className="space-y-3">
                       <h3 className="font-medium">Payment Information</h3>
                       <div className="grid grid-cols-2 gap-y-2">
-                        <div className="text-sm text-gray-500">Payment Method:</div>
+                        <div className="text-sm text-gray-500">
+                          Payment Method:
+                        </div>
                         <div className="text-sm font-medium flex items-center gap-1">
                           <CreditCard className="h-3.5 w-3.5" />
                           {bookingDetail.paymentMethod}
                         </div>
-                        
-                        <div className="text-sm text-gray-500">Payment Status:</div>
-                        <Badge variant={getPaymentStatusVariant(bookingDetail.paymentStatus)} className="w-fit capitalize">
+
+                        <div className="text-sm text-gray-500">
+                          Payment Status:
+                        </div>
+                        <Badge
+                          variant={getPaymentStatusVariant(
+                            bookingDetail.paymentStatus
+                          )}
+                          className="w-fit capitalize"
+                        >
                           {bookingDetail.paymentStatus}
                         </Badge>
-                        
-                        <div className="text-sm text-gray-500">Payment Date:</div>
+
+                        <div className="text-sm text-gray-500">
+                          Payment Date:
+                        </div>
                         <div className="text-sm">
                           {formatPaymentDate(bookingDetail.paymentDate)}
                         </div>
-                        
-                        <div className="text-sm text-gray-500">Total Amount:</div>
-                        <div className="text-sm font-semibold">${bookingDetail.totalPrice}</div>
+
+                        <div className="text-sm text-gray-500">
+                          Total Amount:
+                        </div>
+                        <div className="text-sm font-semibold">
+                          ${bookingDetail.totalPrice}
+                        </div>
                       </div>
                     </div>
 
                     <Separator />
-
+                    <div className="space-y-3">
+                      <h3 className="font-medium">Commission</h3>
+                      <div className="grid grid-cols-2 gap-y-2">
+                        <div className="text-sm text-gray-500">
+                          Commision Fee:
+                        </div>
+                        <div className="text-sm font-medium flex items-center gap-1">
+                          {/* <CreditCard className="h-3.5 w-3.5" /> */}
+                          ${bookingDetail?.fee}
+                        </div>
+                      </div>
+                    </div>
+                    <Separator />
                     {/* Customer Info Section */}
                     <div className="space-y-3">
                       <h3 className="font-medium">Customer Information</h3>
                       <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-                        <div className="font-medium">{bookingDetail.customerName}</div>
+                        <div className="font-medium">
+                          {bookingDetail.customerName}
+                        </div>
                         <div className="flex items-center gap-2 text-sm">
                           <Mail className="h-4 w-4 text-gray-500" />
                           <span>{bookingDetail.customerMail}</span>
@@ -503,12 +609,15 @@ function HouseKeeperBookingList() {
           </Dialog>
 
           {/* Modified Finish Booking Dialog */}
-          <Dialog open={finishDialogOpen} onOpenChange={(open) => !open && setFinishDialogOpen(false)}>
+          <Dialog
+            open={finishDialogOpen}
+            onOpenChange={(open) => !open && setFinishDialogOpen(false)}
+          >
             <DialogContent className="max-w-md">
               <DialogHeader>
                 <DialogTitle>Complete Booking</DialogTitle>
               </DialogHeader>
-              
+
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="proof-title">Proof Title</Label>
@@ -523,7 +632,7 @@ function HouseKeeperBookingList() {
 
                 <div className="space-y-2">
                   <Label>Proof Image</Label>
-                  
+
                   {proofImage ? (
                     <div className="relative border rounded-lg overflow-hidden">
                       <div className="aspect-video bg-gray-100">
@@ -543,7 +652,7 @@ function HouseKeeperBookingList() {
                       </Button>
                     </div>
                   ) : (
-                    <div 
+                    <div
                       className="aspect-video border-2 border-dashed rounded-lg flex flex-col items-center justify-center p-6 cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors"
                       onClick={() => fileInputRef.current?.click()}
                     >
@@ -563,9 +672,10 @@ function HouseKeeperBookingList() {
                       />
                     </div>
                   )}
-                  
+
                   <p className="text-sm text-gray-500 mt-2">
-                    The image will be reviewed to verify the completion of your work
+                    The image will be reviewed to verify the completion of your
+                    work
                   </p>
                 </div>
 
@@ -579,7 +689,9 @@ function HouseKeeperBookingList() {
                   </Button>
                   <Button
                     onClick={handleFinishSubmit}
-                    disabled={isSubmittingProof || !proofImage || !proofTitle.trim()}
+                    disabled={
+                      isSubmittingProof || !proofImage || !proofTitle.trim()
+                    }
                   >
                     {isSubmittingProof ? (
                       <>
@@ -587,7 +699,7 @@ function HouseKeeperBookingList() {
                         Submitting...
                       </>
                     ) : (
-                      'Submit Completion'
+                      "Submit Completion"
                     )}
                   </Button>
                 </div>
@@ -615,7 +727,9 @@ function HouseKeeperBookingList() {
                   variant="outline"
                   size="sm"
                   onClick={handleNextPage}
-                  disabled={!bookingsResponse?.data?.hasNext || isBookingsFetching}
+                  disabled={
+                    !bookingsResponse?.data?.hasNext || isBookingsFetching
+                  }
                 >
                   Next
                   <ChevronRight className="h-4 w-4 ml-1" />
